@@ -1,0 +1,124 @@
+/* Global Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    width: 90%;
+    margin: 0 auto;
+  }
+  
+  /* Header Styles */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ff6f61;
+    padding: 10px;
+  }
+  
+  .header .logo {
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .header .search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+  }
+  
+  .header .search-bar input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .header .user-options {
+    color: white;
+  }
+  
+  /* Restaurant Grid Styles */
+  .restaurant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+  }
+  
+  .restaurant-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .restaurant-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .restaurant-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .restaurant-card .restaurant-info {
+    padding: 15px;
+  }
+  
+  .restaurant-card .restaurant-info h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .restaurant-card .restaurant-info .rating {
+    color: #ff6f61;
+    margin-top: 5px;
+  }
+  
+  /* Footer Styles */
+  .footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .header .search-bar {
+      margin: 10px 0;
+    }
+  
+    .restaurant-card img {
+      height: 120px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .header .logo {
+      font-size: 20px;
+    }
+  
+    .restaurant-card img {
+      height: 100px;
+    }
+  
+    .restaurant-card .restaurant-info h3 {
+      font-size: 16px;
+    }
+  }
+  
