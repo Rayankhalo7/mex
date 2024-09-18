@@ -1,0 +1,89 @@
+{% extends "backend/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+
+
+
+
+
+
+<!-- Login 8 - Bootstrap Brain Component -->
+<section class="bg-light p-3 p-md-4 p-xl-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-xxl-11">
+          <div class="card border-light-subtle shadow-sm">
+            <div class="row g-0">
+              <div class="col-12 col-md-6">
+                <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src="https://images7.alphacoders.com/858/858236.jpg" alt="Welcome back you've been missed!">
+              </div>
+              <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <div class="col-12 col-lg-11 col-xl-10">
+                  <div class="card-body p-3 p-md-4 p-xl-5">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="mb-5">
+                          <div class="text-center mb-4">
+                            
+                              <p>Benutzer Login</p>
+                            
+                          </div>
+                          <h4 class="text-center">Willkommen zurück!</h4>
+                        </div>
+                      </div>
+                    </div>
+
+                    <form action="{{ url_for('user_bp.login') }}" method="POST">
+                      <div class="row gy-3 overflow-hidden">
+                        <div class="col-12">
+                          <div class="form-floating mb-3">
+                            
+                            <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                            <label for="email" class="form-label">Email</label>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <div class="form-floating mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" placeholder="Password" required>
+                          </div>
+                        </div>
+                        <div class="col-12">
+
+                        </div>
+                        <div class="col-12">
+                          <div class="d-grid">
+                            
+                            <button class="btn btn-dark btn-lg" type="submit">Login</button>
+
+                            {% if error %}
+                        <p style="color:red;">{{ error }}</p>
+                        {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center mt-5">
+                            <a href="{{ url_for('user_bp.register') }}" class="link-secondary text-decoration-none">Registrieren</a>
+                            <a href="{{ url_for('user_bp.password_reset_request') }}" class="link-secondary text-decoration-none">Passwort vergessen</a>
+                            
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
