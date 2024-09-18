@@ -10,16 +10,14 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
     
-    # Adresse in einzelne Felder unterteilt
-    street = db.Column(db.String(100), nullable=False)  # Straße
-    house_number = db.Column(db.String(10), nullable=False)  # Hausnummer
-    postal_code = db.Column(db.String(10), nullable=False)  # PLZ
-    city = db.Column(db.String(50), nullable=False)  # Ort
+    # Adresse als optionale Felder
+    street = db.Column(db.String(100), nullable=True)  # Straße optional
+    house_number = db.Column(db.String(10), nullable=True)  # Hausnummer optional
+    postal_code = db.Column(db.String(10), nullable=True)  # PLZ optional
+    city = db.Column(db.String(50), nullable=True)  # Ort optional
     
-    # Telefonnummer
-    phone_number = db.Column(db.String(20), nullable=True)  # Telefonnummer, optional
-    
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())  # Erstellungsdatum
+    phone_number = db.Column(db.String(20), nullable=True)  # Telefonnummer optional
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
