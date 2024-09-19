@@ -37,8 +37,12 @@ def create_app():
     # Einstellung URLSafeTimedSerializer für generieren von secure tokens
     app.serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
-    # Register blueprints
+    # Register blueprints für user 
     from app.routes.user_routes import user_bp
     app.register_blueprint(user_bp, url_prefix='/user')
+
+    # Register blueprints für Client
+    from app.routes.client_routes import client_bp
+    app.register_blueprint(client_bp, url_prefix='/client')
 
     return app

@@ -1,0 +1,18 @@
+{% extends "backend/base.html" %}
+
+{%block body%}
+
+<div class="container">
+    <h1>Willkommen {{clientname}}!</h1>
+    <p>Willkommen in Dashboard</p>
+
+    <a href="{{ url_for('client_bp.logout') }}" class="btn btn-logout">Logout</a>
+
+
+</div>
+
+
+
+{% endblock %}
+
+
