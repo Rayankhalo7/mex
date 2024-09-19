@@ -61,13 +61,13 @@
       integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <!-- Sweet Alert -->
-<link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='assets/css/sweetalert2.min.css') }}" rel="stylesheet">
 
 <!-- Notyf -->
-<link type="text/css" href="{{ config.ASSETS_ROOT }}/vendor/notyf/notyf.min.css" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='assets/css/notyf.min.css') }}" rel="stylesheet">
 
 <!-- Volt CSS -->
-<link type="text/css" href="{{ config.ASSETS_ROOT }}/css/volt.css" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='assets/css/volt.css') }}" rel="stylesheet">
 
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}
@@ -77,7 +77,8 @@
 
     {% block content %}{% endblock content %}
 
-    {% include 'includes/scripts.html' %}
+    {% include 'client_dashboard/includes/scripts.html' %}
+
 
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}{% endblock javascripts %}  
