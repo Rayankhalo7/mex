@@ -9,6 +9,16 @@ from werkzeug.utils import secure_filename
 # Definiere den Blueprint
 client_bp = Blueprint('client_bp', __name__, template_folder='../templates/backend/client_templates')
 
+# Upload-Ordner
+PROFILE_UPLOAD_FOLDER = 'static/uploads/client_bilder/client_profile'
+GALLERY_UPLOAD_FOLDER = 'static/uploads/client_bilder/client_galerie'
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Hilfsfunktion zur Dateiendungsüberprüfung
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 # Login Route für client
 @client_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -112,12 +122,16 @@ def password_reset_token(token):
 def dashboard():
     if "clientname" not in session:
         return redirect(url_for('client_bp.login'))
-    return render_template("client_dashboard.html", clientname=session['clientname'])
+    
+    # Lade das Client-Objekt
+    client = Client.query.filter_by(clientname=session['clientname']).first()
+    return render_template("client_dashboard.html", client=client, page_name="Dashboard")
+
 
 
 import os
 
-# Profil + Bild-Upload
+# Profil-Seite 
 @client_bp.route("/profile", methods=["GET", "POST"])
 def profile():
     if "client_id" not in session:
@@ -126,29 +140,12 @@ def profile():
     client = Client.query.get(session['client_id'])
 
     if request.method == "POST":
-        # Überprüfe, ob die POST-Anfrage eine Datei enthält
-        if 'photo' not in request.files:
-            flash('Keine Datei ausgewählt')
-            return redirect(request.url)
+        # Andere Logik, falls nötig (z.B. Profil-Daten aktualisieren)
+        flash('Profil aktualisiert!')
+        return redirect(url_for('client_bp.profile'))
 
-        file = request.files['photo']
+    return render_template("client_profile.html", client=client, page_name="Profil")
 
-        # Überprüfe, ob eine Datei hochgeladen wurde und ob sie die richtige Dateiendung hat
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            
-            # Speichere die Datei im festgelegten Upload-Ordner
-            file.save(filepath)
-
-            # Speichere den Pfad zur Datei in der Datenbank
-            client.photo = filepath
-            db.session.commit()
-
-            flash('Bild erfolgreich hochgeladen!')
-            return redirect(url_for('client_bp.profile'))
-
-    return render_template("client_profile.html", client=client)
 
 
 

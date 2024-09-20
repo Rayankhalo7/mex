@@ -61,8 +61,10 @@
 <link type="text/css" href="{{ url_for('static', filename='assets/css/notyf.min.css') }}" rel="stylesheet">
 <link type="text/css" href="{{ url_for('static', filename='assets/css/volt.css') }}" rel="stylesheet">
 
+
 <!-- Specific Page JS goes HERE  -->    
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+{% endblock stylesheets %}
 
 </head>
 <body>
@@ -70,10 +72,34 @@
     {% include 'client_dashboard/includes/sidebar.html' %}
     
     <main class="content">
-
+      
       {% include 'client_dashboard/includes/navigation.html' %}
 
-      {% block content %}{% endblock content %} 
+      <!-- base.html -->
+<div class="col-12 col-xl-12" style="padding-top: 20px;">
+  <!-- start page title -->
+  <div class="row">
+      <div class="col-12">
+          <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+              <h4 class="mb-sm-0 font-size-18">{{page_name}}</h4>
+
+              <div class="page-title-right">
+                  <ol class="breadcrumb m-0">
+                      <li class="breadcrumb-item"><a href="{{ url_for('client_bp.dashboard') }}">Dashboard</a></li>
+                      <li class="breadcrumb-item active">{{ page_name }}</li>
+                  </ol>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- end page title -->
+</div>
+<div class="py-4">  
+</div>
+
+      {% block content %}
+    
+      {% endblock content %} 
 
       {% include 'client_dashboard/includes/settings-box.html' %}
 
