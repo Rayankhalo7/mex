@@ -75,8 +75,12 @@ def password_reset_request():
 
             flash('Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.')
             return redirect(url_for('user_bp.password_reset_request'))
+        else:
+            # Wenn die E-Mail nicht gefunden wurde
+            flash('Diese E-Mail ist nicht registriert.')
+            return redirect(url_for('user_bp.password_reset_request'))
 
-    return render_template("password_reset_request.html")
+    return render_template("user_password_reset_request.html")
 
 # Passwort zurücksetzen
 @user_bp.route('/password_reset/<token>', methods=["GET", "POST"])

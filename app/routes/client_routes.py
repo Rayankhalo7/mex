@@ -18,7 +18,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
-        client = Client.query.filter_by(email=email).first()  # Hier Client statt client verwenden
+        client = Client.query.filter_by(email=email).first()  
         if client and client.check_password(password):
             session['clientname'] = client.clientname
             return redirect(url_for('client_bp.dashboard'))
@@ -39,12 +39,12 @@ def register():
         email = request.form['email']
         password = request.form['password']
         
-        client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()  # Hier Client statt client verwenden
+        client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()  
 
         if client:
             return render_template("client_register.html", error="Benutzername oder E-Mail bereits vergeben")
         else:
-            new_client = Client(clientname=clientname, email=email)  # Hier Client statt client verwenden
+            new_client = Client(clientname=clientname, email=email) 
             new_client.set_password(password)
             db.session.add(new_client)
             db.session.commit()
@@ -59,7 +59,7 @@ def register():
 def password_reset_request():
     if request.method == "POST":
         email = request.form['email']
-        client = Client.query.filter_by(email=email).first()  # Hier Client statt client verwenden
+        client = Client.query.filter_by(email=email).first() 
 
         if client:
             s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
@@ -74,8 +74,12 @@ def password_reset_request():
 
             flash('Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.')
             return redirect(url_for('client_bp.password_reset_request'))
+        else:
+            # Wenn die E-Mail nicht gefunden wurde
+            flash('Diese E-Mail ist nicht registriert.')
+            return redirect(url_for('client_bp.password_reset_request'))
 
-    return render_template("password_reset_request.html")
+    return render_template("client_password_reset_request.html")
 
 # Passwort zurücksetzen
 @client_bp.route('/password_reset/<token>', methods=["GET", "POST"])
