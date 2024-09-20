@@ -5,19 +5,28 @@ from app.models.client_model import Client
 from app import db, mail
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.utils import secure_filename
+import time
+import os
+
+
+
 
 # Definiere den Blueprint
 client_bp = Blueprint('client_bp', __name__, template_folder='../templates/backend/client_templates')
 
-# Upload-Ordner
-PROFILE_UPLOAD_FOLDER = 'static/uploads/client_bilder/client_profile'
-GALLERY_UPLOAD_FOLDER = 'static/uploads/client_bilder/client_galerie'
-
+# Definiere die erlaubten Dateitypen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# Hilfsfunktion zur Dateiendungsüberprüfung
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# Hilfsfunktion zum Löschen des alten Bildes
+def delete_old_image(old_photo_path):
+    full_path = os.path.join('static/uploads/client_bilder/client_trash', old_photo_path)
+    if os.path.exists(full_path):
+        os.remove(full_path)
+
 
 # Login Route für client
 @client_bp.route("/login", methods=["GET", "POST"])
@@ -129,22 +138,68 @@ def dashboard():
 
 
 
-import os
 
-# Profil-Seite 
-@client_bp.route("/profile", methods=["GET", "POST"])
+# Profil-Seite anzeigen
+@client_bp.route("/profile", methods=["GET"])
 def profile():
     if "client_id" not in session:
         return redirect(url_for('client_bp.login'))
     
     client = Client.query.get(session['client_id'])
-
-    if request.method == "POST":
-        # Andere Logik, falls nötig (z.B. Profil-Daten aktualisieren)
-        flash('Profil aktualisiert!')
-        return redirect(url_for('client_bp.profile'))
-
+    
     return render_template("client_profile.html", client=client, page_name="Profil")
+
+
+
+
+
+# Route zum Aktualisieren des Profils
+@client_bp.route("/profile_update", methods=["POST"])
+def profile_update():
+    if "client_id" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+
+    # Aktualisiere die Felder mit den Formulardaten
+    client.clientname = request.form.get('clientname')
+    client.email = request.form.get('email')
+    client.phone_number = request.form.get('phone_number')
+    client.street = request.form.get('street')
+    client.house_number = request.form.get('house_number')
+    client.postal_code = request.form.get('postal_code')
+    client.city = request.form.get('city')
+
+    # Überprüfe, ob ein neues Bild hochgeladen wurde
+    if 'photo' in request.files:
+        file = request.files['photo']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_ext = filename.rsplit('.', 1)[1].lower()
+            new_filename = f"{int(time.time())}.{file_ext}"  # Einzigartiger Dateiname basierend auf Zeitstempel
+            upload_folder = os.path.join('static', 'uploads', 'client_bilder', 'client_profile')
+
+            # Prüfe, ob das Verzeichnis existiert, wenn nicht, erstelle es
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+
+            # Speichere die Datei
+            file_path = os.path.join(upload_folder, new_filename)
+            file.save(file_path)
+
+            # Speichere den relativen Pfad in der Datenbank
+            client.photo = os.path.join('uploads', 'client_bilder', 'client_profile', new_filename).replace('\\', '/')
+
+            # Debug-Ausgabe
+            print(f"Datei gespeichert: {file_path}")
+
+    # Speichere die Änderungen in der Datenbank
+    db.session.commit()
+
+    flash('Profil erfolgreich aktualisiert!')
+    return redirect(url_for('client_bp.profile'))
+
+
 
 
 
