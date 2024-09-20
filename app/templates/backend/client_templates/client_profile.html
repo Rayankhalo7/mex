@@ -127,7 +127,7 @@
                             <div class="profile-cover rounded-top" data-background="{{ config.ASSETS_ROOT }}/img/profile-cover.jpg"></div>
                             <div class="card-body pb-5">
                                 <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}" 
-     class="avatar-xl rounded-circle mx-auto mt-n7 mb-4" 
+     class="avatar-xl rounded mx-auto mt-n7 mb-4" width="140"
      alt="Profilbild">
                                 <h4 class="h3">
                                     {{client.clientname}}

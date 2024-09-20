@@ -17,7 +17,7 @@
                             <div class="row align-items-center">
                                 <div class="col-auto">
                                   <!-- Avatar -->
-                                  <img alt="Image placeholder" src="{{ url_for('static', filename='assets/img/team/profile-picture-1.jpg') }}" class="avatar-md rounded">
+                                  
                                 </div>
                                 <div class="col ps-0 ms-2">
                                   <div class="d-flex justify-content-between align-items-center">
@@ -115,13 +115,15 @@
                         </div>
                       </div>
                     </li>
+                    <!-- Benutzer ganz links oben -->
                     <li class="nav-item dropdown ms-lg-3">
                       <a class="nav-link dropdown-toggle pt-1 px-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="media d-flex align-items-center">
-                          <img class="avatar rounded-circle" alt="Image placeholder" src="{{ url_for('static', filename='assets/img/team/profile-picture-3.jpg') }}">
+                          <img class="avatar rounded-circle" alt="Image placeholder" src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}">
+                          
                           <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
                             <span class="mb-0 font-small fw-bold text-gray-900">
-                              Current User: <strong>{{clientname}}</strong>
+                             <strong>{{client.clientname}}</strong>
                             </span>
                           </div>
                         </div>
@@ -131,9 +133,9 @@
                           <svg class="dropdown-icon text-gray-400 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path></svg>
                           Meine Profile
                         </a>
-                        <a class="dropdown-item d-flex align-items-center" href="/settings.html">
+                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('client_bp.change_password') }}">
                           <svg class="dropdown-icon text-gray-400 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-                          Settings
+                          Passwort ändern
                         </a>
                         <a class="dropdown-item d-flex align-items-center" href="#">
                           <svg class="dropdown-icon text-gray-400 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2l-1 2H8l-1-2H5V5z" clip-rule="evenodd"></path></svg>

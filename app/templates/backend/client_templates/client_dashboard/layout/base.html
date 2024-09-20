@@ -23,7 +23,7 @@
 <!-- Primary Meta Tags -->
 
 <title>
-    Flask Volt Dashboard - {% block title %}{% endblock %} | AppSeed
+    Restaurant Dashboard - {% block title %}{% endblock %} | AppSeed
 </title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -60,6 +60,15 @@
 
 <link type="text/css" href="{{ url_for('static', filename='assets/css/notyf.min.css') }}" rel="stylesheet">
 <link type="text/css" href="{{ url_for('static', filename='assets/css/volt.css') }}" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+
+<style>
+    .custom-toast {
+    top: 120px !important;  /* Bewegt die Benachrichtigung 250px von oben nach unten */
+}
+
+</style>
+
 
 
 <!-- Specific Page JS goes HERE  -->    
@@ -74,6 +83,8 @@
     <main class="content">
       
       {% include 'client_dashboard/includes/navigation.html' %}
+
+    
 
       <!-- base.html -->
 <div class="col-12 col-xl-12" style="padding-top: 20px;">
@@ -100,6 +111,7 @@
       {% block content %}
     
       {% endblock content %} 
+       
 
       {% include 'client_dashboard/includes/settings-box.html' %}
 
@@ -110,7 +122,48 @@
   {% include 'client_dashboard/includes/scripts.html' %}
     
   <!-- Specific Page JS goes HERE  -->
-  {% block javascripts %}{% endblock javascripts %}  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <script type="text/javascript">
+    // Toastr options configuration
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
+        "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
+        "extendedTimeOut": "1000"
+    }
+
+    // Überprüfe, ob es geflashte Nachrichten gibt
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    var type = "{{ category }}";  // Kategorie: success, info, warning, error
+    switch(type){
+        case 'info':
+            toastr.info("{{ message }}");
+            break;
+        case 'success':
+            toastr.success("{{ message }}");
+            break;
+        case 'warning':
+            toastr.warning("{{ message }}");
+            break;
+        case 'error':
+            toastr.error("{{ message }}");
+            break;
+    }
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</script>
+
+  
+
+
+{% block javascripts %} {% endblock javascripts %}  
       
 </body>
 </html>

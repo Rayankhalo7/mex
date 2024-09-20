@@ -37,19 +37,29 @@ def login():
     if "clientname" in session:
         return redirect(url_for('client_bp.dashboard'))
 
+    errors = {}
+
     if request.method == "POST":
         email = request.form['email']
         password = request.form['password']
         
-        client = Client.query.filter_by(email=email).first()  
-        if client and client.check_password(password):
+        client = Client.query.filter_by(email=email).first()
+
+        # Fehler bei der Email-Adresse
+        if not client:
+            errors['email'] = 'Ungültige E-Mail-Adresse.'
+
+        # Fehler beim Passwort
+        if client and not client.check_password(password):
+            errors['password'] = 'Ungültiges Passwort.'
+
+        # Wenn keine Fehler vorhanden sind, logge den Benutzer ein
+        if not errors:
             session['client_id'] = client.id
             session['clientname'] = client.clientname
             return redirect(url_for('client_bp.dashboard'))
-        else:
-            return render_template("client_login.html", error="Ungültige E-Mail oder Passwort")
 
-    return render_template("client_login.html")
+    return render_template("client_login.html", errors=errors)
 
 
 # Register Route für client
@@ -136,7 +146,7 @@ def dashboard():
         return redirect(url_for('client_bp.login'))
     
     # Lade das Client-Objekt
-    client = Client.query.filter_by(clientname=session['clientname']).first()
+    client = Client.query.get(session['client_id'])
     return render_template("client_dashboard.html", client=client, page_name="Dashboard")
 
 
@@ -204,10 +214,46 @@ def profile_update():
     # Speichere die Änderungen in der Datenbank
     db.session.commit()
 
-    flash('Profil erfolgreich aktualisiert!')
+    
+
+    flash('Profil erfolgreich aktualisiert!', 'success')
     return redirect(url_for('client_bp.profile'))
 
 
+
+
+# Client Password ändern im Profil
+@client_bp.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    if "client_id" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+    errors = {}
+
+    if request.method == 'POST':
+        # Hol die eingegebenen Werte aus dem Formular
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Überprüfung des aktuellen Passworts
+        if not client.check_password(current_password):
+            errors['current_password'] = 'Das aktuelle Passwort ist falsch.'
+
+        # Überprüfung, ob das neue Passwort mit der Bestätigung übereinstimmt
+        if new_password != confirm_password:
+            errors['confirm_password'] = 'Die neuen Passwörter stimmen nicht überein.'
+
+        # Wenn keine Fehler vorhanden sind, aktualisiere das Passwort
+        if not errors:
+            client.set_password(new_password)
+            db.session.commit()
+
+            flash('Passwort erfolgreich aktualisiert!', 'success')
+            return redirect(url_for('client_bp.change_password'))
+
+    return render_template('client_change_password.html', client=client, errors=errors, page_name="Passwort ändern")
 
 
 
