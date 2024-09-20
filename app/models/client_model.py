@@ -10,7 +10,8 @@ class Client(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
     
-    # Adresse als optionale Felder
+    # Felder in Datenbanken als optionale Felder
+    photo = db.Column(db.String(150), nullable=True)  # Bildpfad optional
     street = db.Column(db.String(100), nullable=True)  # Straße optional
     house_number = db.Column(db.String(10), nullable=True)  # Hausnummer optional
     postal_code = db.Column(db.String(10), nullable=True)  # PLZ optional

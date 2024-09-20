@@ -4,6 +4,7 @@ from flask_mail import Message
 from app.models.client_model import Client
 from app import db, mail
 from itsdangerous import URLSafeTimedSerializer
+from werkzeug.utils import secure_filename
 
 # Definiere den Blueprint
 client_bp = Blueprint('client_bp', __name__, template_folder='../templates/backend/client_templates')
@@ -20,6 +21,7 @@ def login():
         
         client = Client.query.filter_by(email=email).first()  
         if client and client.check_password(password):
+            session['client_id'] = client.id
             session['clientname'] = client.clientname
             return redirect(url_for('client_bp.dashboard'))
         else:
@@ -74,10 +76,6 @@ def password_reset_request():
 
             flash('Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.')
             return redirect(url_for('client_bp.password_reset_request'))
-        else:
-            # Wenn die E-Mail nicht gefunden wurde
-            flash('Diese E-Mail ist nicht registriert.')
-            return redirect(url_for('client_bp.password_reset_request'))
 
     return render_template("client_password_reset_request.html")
 
@@ -115,6 +113,47 @@ def dashboard():
     if "clientname" not in session:
         return redirect(url_for('client_bp.login'))
     return render_template("client_dashboard.html", clientname=session['clientname'])
+
+
+import os
+
+# Profil + Bild-Upload
+@client_bp.route("/profile", methods=["GET", "POST"])
+def profile():
+    if "client_id" not in session:
+        return redirect(url_for('client_bp.login'))
+    
+    client = Client.query.get(session['client_id'])
+
+    if request.method == "POST":
+        # Überprüfe, ob die POST-Anfrage eine Datei enthält
+        if 'photo' not in request.files:
+            flash('Keine Datei ausgewählt')
+            return redirect(request.url)
+
+        file = request.files['photo']
+
+        # Überprüfe, ob eine Datei hochgeladen wurde und ob sie die richtige Dateiendung hat
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            
+            # Speichere die Datei im festgelegten Upload-Ordner
+            file.save(filepath)
+
+            # Speichere den Pfad zur Datei in der Datenbank
+            client.photo = filepath
+            db.session.commit()
+
+            flash('Bild erfolgreich hochgeladen!')
+            return redirect(url_for('client_bp.profile'))
+
+    return render_template("client_profile.html", client=client)
+
+
+
+
+
 
 
 # Logout Route für client
