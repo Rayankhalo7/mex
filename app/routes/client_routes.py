@@ -23,9 +23,12 @@ def allowed_file(filename):
 
 # Hilfsfunktion zum Löschen des alten Bildes
 def delete_old_image(old_photo_path):
-    full_path = os.path.join('static/uploads/client_bilder/client_trash', old_photo_path)
+    full_path = os.path.join(current_app.root_path, 'static', 'upload', 'client_bilder', 'client_profile', old_photo_path)
     if os.path.exists(full_path):
         os.remove(full_path)
+        print(f"Altes Bild gelöscht: {full_path}")  # Debugging-Information
+    else:
+        print(f"Bild nicht gefunden: {full_path}")  # Debugging-Information
 
 
 # Login Route für client
@@ -140,7 +143,7 @@ def dashboard():
 
 
 # Profil-Seite anzeigen
-@client_bp.route("/profile", methods=["GET"])
+@client_bp.route("/profile", methods=["GET", "POST"])
 def profile():
     if "client_id" not in session:
         return redirect(url_for('client_bp.login'))
@@ -153,7 +156,6 @@ def profile():
 
 
 
-# Route zum Aktualisieren des Profils
 @client_bp.route("/profile_update", methods=["POST"])
 def profile_update():
     if "client_id" not in session:
@@ -173,31 +175,39 @@ def profile_update():
     # Überprüfe, ob ein neues Bild hochgeladen wurde
     if 'photo' in request.files:
         file = request.files['photo']
-        if file and allowed_file(file.filename):
+        if file and file.filename != '' and allowed_file(file.filename):
+            print(f"Dateiname: {file.filename}")  # Debugging-Information
             filename = secure_filename(file.filename)
             file_ext = filename.rsplit('.', 1)[1].lower()
             new_filename = f"{int(time.time())}.{file_ext}"  # Einzigartiger Dateiname basierend auf Zeitstempel
-            upload_folder = os.path.join('static', 'uploads', 'client_bilder', 'client_profile')
+
+            # Verwende den richtigen Pfad relativ zum app-Ordner
+            upload_folder = os.path.join(current_app.root_path, 'static', 'upload', 'client_bilder', 'client_profile')
 
             # Prüfe, ob das Verzeichnis existiert, wenn nicht, erstelle es
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
+            os.makedirs(upload_folder, exist_ok=True)
 
             # Speichere die Datei
             file_path = os.path.join(upload_folder, new_filename)
+            print(f"Speicherpfad: {file_path}")  # Debugging-Information
             file.save(file_path)
 
             # Speichere den relativen Pfad in der Datenbank
-            client.photo = os.path.join('uploads', 'client_bilder', 'client_profile', new_filename).replace('\\', '/')
+            client.photo = os.path.join('upload', 'client_bilder', 'client_profile', new_filename).replace('\\', '/')
+            print(f"Relativer Pfad in der DB: {client.photo}")  # Debugging-Information
 
             # Debug-Ausgabe
             print(f"Datei gespeichert: {file_path}")
+        else:
+            print("Keine gültige Datei hochgeladen oder Dateityp nicht erlaubt")  # Debugging-Information
 
     # Speichere die Änderungen in der Datenbank
     db.session.commit()
 
     flash('Profil erfolgreich aktualisiert!')
     return redirect(url_for('client_bp.profile'))
+
+
 
 
 
