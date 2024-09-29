@@ -32,27 +32,40 @@ def login():
 # Register Route für User
 @user_bp.route('/register', methods=["GET", "POST"])
 def register():
+    # Wenn der Benutzer bereits angemeldet ist, zur Dashboard-Seite weiterleiten
     if "username" in session:
         return redirect(url_for('user_bp.dashboard'))
 
+    # Wird nur ausgeführt, wenn der Benutzer nicht angemeldet ist
     if request.method == "POST":
+        # Felder aus dem Formular abfragen
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        
+
+        # Überprüfen, ob der Benutzername oder die E-Mail bereits existieren
         user = User.query.filter((User.username == username) | (User.email == email)).first()
 
         if user:
+            # Fehlermeldung anzeigen, wenn der Benutzername oder die E-Mail bereits vorhanden sind
             return render_template("user_register.html", error="Benutzername oder E-Mail bereits vergeben")
         else:
+            # Neuen Benutzer erstellen und in der Datenbank speichern
             new_user = User(username=username, email=email)
-            new_user.set_password(password)
+            new_user.set_password(password)  # Verschlüsseltes Passwort setzen
             db.session.add(new_user)
             db.session.commit()
+
+            # Benutzerinformationen in der Sitzung speichern
             session['username'] = username
+            session['user_id'] = new_user.id  # Korrigiere die Sitzungsschlüssel auf 'user_id'
+            
+            # Weiterleitung zur Dashboard-Seite des Benutzers
             return redirect(url_for('user_bp.dashboard'))
 
+    # Bei GET-Anfragen wird das Registrierungsformular angezeigt
     return render_template("user_register.html")
+
 
 
 # Passwort zurücksetzen Anfrage
@@ -122,4 +135,5 @@ def dashboard():
 @user_bp.route("/logout")
 def logout():
     session.pop('username', None)
+    session.pop('user_id', None)
     return redirect(url_for('user_bp.login'))

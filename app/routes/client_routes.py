@@ -67,25 +67,27 @@ def login():
 def register():
     if "clientname" in session:
         return redirect(url_for('client_bp.dashboard'))
-
-    if request.method == "POST":
-        clientname = request.form['clientname']
-        email = request.form['email']
-        password = request.form['password']
+    else:
+        if request.method == "POST":
+            clientname = request.form['clientname']
+            email = request.form['email']
+            password = request.form['password']
         
-        client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()  
+            client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()
 
-        if client:
-            return render_template("client_register.html", error="Benutzername oder E-Mail bereits vergeben")
-        else:
-            new_client = Client(clientname=clientname, email=email) 
-            new_client.set_password(password)
-            db.session.add(new_client)
-            db.session.commit()
-            session['clientname'] = clientname
-            return redirect(url_for('client_bp.dashboard'))
+            if client:
+                return render_template("client_register.html", error="Benutzername oder E-Mail bereits vergeben")
+            else:
+                new_client = Client(clientname=clientname, email=email)
+                new_client.set_password(password)
+                db.session.add(new_client)
+                db.session.commit()
+                session['clientname'] = clientname
+                session['client_id'] = new_client.id  # Hier sollte 'new_client.id' verwendet werden, um die ID des neuen Clients zu erhalten
+                return redirect(url_for('client_bp.dashboard'))
 
     return render_template("client_register.html")
+
 
 
 # Passwort zurücksetzen Anfrage
@@ -264,8 +266,10 @@ def change_password():
 
 
 
-# Logout Route für client
 @client_bp.route("/logout")
 def logout():
     session.pop('clientname', None)
+    session.pop('client_id', None)
+    
     return redirect(url_for('client_bp.login'))
+

@@ -2,16 +2,23 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
+from flask_caching import Cache
 import os
 from itsdangerous import URLSafeTimedSerializer
 
-# Initializierung von Extentions
+# Initialisierung von Extensions
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
+cache = Cache()  # Cache-Objekt definieren
 
 def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
+
+    # Cache-Konfiguration hinzufügen
+    app.config['CACHE_TYPE'] = 'simple'  # Mögliche Typen: 'redis', 'filesystem', 'memcached', etc.
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Optional: Timeout für Cache in Sekunden festlegen
+    cache.init_app(app)
 
     # Konfiguration Secret Key
     app.config["SECRET_KEY"] = os.urandom(24)
@@ -25,7 +32,7 @@ def create_app():
     app.config["MAIL_PORT"] = 587
     app.config["MAIL_USE_TLS"] = True
     app.config["MAIL_USERNAME"] = 'expressmahlzeit@gmail.com'
-    app.config["MAIL_PASSWORD"] = 'albl ddwj xvdn junn'
+    app.config["MAIL_PASSWORD"] = 'albl ddwj xvdn junn'  # Besser: Verwendung von Umgebungsvariablen statt Klartext-Passwörtern
 
     # Konfiguration für Datei-Upload
     app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'client_bilder', 'client_profile')
