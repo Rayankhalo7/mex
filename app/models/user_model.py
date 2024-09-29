@@ -1,4 +1,5 @@
 # app/models/user_model.py
+import hashlib
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db  # Importiere die 'db' Instanz aus der App
@@ -20,8 +21,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        # Verwende hashlib, um den md5-Hash zu generieren
+        md5_hash = hashlib.md5(password.encode()).hexdigest()
+        self.password_hash = f'md5${md5_hash}'  # Speichere den Hash mit einem Präfix, um ihn zu identifizieren
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        # Extrahiere den gespeicherten md5-Hash und vergleiche
+        stored_md5_hash = self.password_hash.split('$')[1]
+        return stored_md5_hash == hashlib.md5(password.encode()).hexdigest()
 

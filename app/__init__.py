@@ -6,6 +6,8 @@ from flask_caching import Cache
 import os
 from itsdangerous import URLSafeTimedSerializer
 
+from dotenv import load_dotenv
+
 # Initialisierung von Extensions
 db = SQLAlchemy()
 migrate = Migrate()
@@ -24,7 +26,7 @@ def create_app():
     app.config["SECRET_KEY"] = os.urandom(24)
 
     # Konfiguration Datenbank
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mahlzeit.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:@localhost/mahlzeit_db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # Konfiguration Flask-E-Mail
