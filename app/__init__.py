@@ -40,8 +40,10 @@ def create_app():
     app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 
+
     # Konfiguration für Datei-Upload
-    app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'client_bilder', 'client_profile')
+    app.config['CLIENT_UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'client_bilder', 'client_profile')
+    app.config['ADMIN_UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'admin_bilder', 'admin_profile')
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB maximale Dateigröße
 
     # Initialisierung von Extensions
@@ -59,5 +61,9 @@ def create_app():
     # Register blueprints für Client
     from app.routes.client_routes import client_bp
     app.register_blueprint(client_bp, url_prefix='/client')
+
+    # Register blueprints für Admin
+    from app.routes.admin_routes import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     return app
