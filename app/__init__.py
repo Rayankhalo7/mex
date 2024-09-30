@@ -1,3 +1,5 @@
+# app/__init__.py
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -5,8 +7,10 @@ from flask_mail import Mail
 from flask_caching import Cache
 import os
 from itsdangerous import URLSafeTimedSerializer
-
 from dotenv import load_dotenv
+
+# Lade die Umgebungsvariablen aus der .env-Datei
+load_dotenv()
 
 # Initialisierung von Extensions
 db = SQLAlchemy()
@@ -18,23 +22,23 @@ def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
 
     # Cache-Konfiguration hinzufügen
-    app.config['CACHE_TYPE'] = 'simple'  # Mögliche Typen: 'redis', 'filesystem', 'memcached', etc.
-    app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Optional: Timeout für Cache in Sekunden festlegen
+    app.config['CACHE_TYPE'] = os.getenv('CACHE_TYPE', 'simple')  # Mögliche Typen: 'redis', 'filesystem', 'memcached', etc.
+    app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.getenv('CACHE_DEFAULT_TIMEOUT', 300))  # Optional: Timeout für Cache in Sekunden festlegen
     cache.init_app(app)
 
-    # Konfiguration Secret Key
-    app.config["SECRET_KEY"] = os.urandom(24)
+    # Konfiguration Secret Key (aus .env laden oder generieren)
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", os.urandom(24).hex())
 
-    # Konfiguration Datenbank
-    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:@localhost/mahlzeit_db"
+    # Konfiguration Datenbank (aus .env laden)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "mysql://root:@localhost/mahlzeit_db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    # Konfiguration Flask-E-Mail
-    app.config["MAIL_SERVER"] = "smtp.gmail.com"
-    app.config["MAIL_PORT"] = 587
-    app.config["MAIL_USE_TLS"] = True
-    app.config["MAIL_USERNAME"] = 'expressmahlzeit@gmail.com'
-    app.config["MAIL_PASSWORD"] = 'albl ddwj xvdn junn'  # Besser: Verwendung von Umgebungsvariablen statt Klartext-Passwörtern
+    # Konfiguration Flask-E-Mail (aus .env laden)
+    app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
+    app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
+    app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
+    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 
     # Konfiguration für Datei-Upload
     app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'client_bilder', 'client_profile')
