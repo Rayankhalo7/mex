@@ -1,0 +1,150 @@
+{% include 'backend/user_templates/dashboard/header.html' %}
+<section class="section pt-4 pb-4 osahan-account-page">
+    <div class="container">
+       <div class="row">
+         {% include 'backend/user_templates/dashboard/sidebar.html' %}
+
+
+          <div class="col-md-9">
+             <div class="osahan-account-page-right rounded shadow-sm bg-white p-4 h-100">
+                <div class="tab-content" id="myTabContent">
+                   <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                      <h4 class="font-weight-bold mt-0 mb-4">Passwort ändern</h4>
+
+                      <div class="bg-white card mb-4 order-list shadow-sm">
+                         <div class="gold-members p-4">
+                            
+
+                            <form action="{{ url_for('user_bp.passwort_aendern') }}" method="POST">
+                                <!-- Altes Passwort -->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="current_password" class="form-label">Aktuelles Passwort</label>
+                                            <input class="form-control" name="current_password" type="password" id="current_password" required>
+                                            {% if 'current_password' in errors %}
+                                                <span class="text-danger">{{ errors['current_password'] }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Neues Passwort -->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="new_password" class="form-label">Neues Passwort</label>
+                                            <input class="form-control" name="new_password" type="password" id="new_password" required>
+                                            {% if 'new_password' in errors %}
+                                                <span class="text-danger">{{ errors['new_password'] }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Passwort bestätigen -->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label for="confirm_password" class="form-label">Neues Passwort bestätigen</label>
+                                            <input class="form-control" name="confirm_password" type="password" id="confirm_password" required>
+                                            {% if 'confirm_password' in errors %}
+                                                <span class="text-danger">{{ errors['confirm_password'] }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Hinweis für Passwortanforderungen (optional) -->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <p class="text-muted">Das Passwort muss mindestens 6 Zeichen lang sein.</p>
+                                    </div>
+                                </div>
+                            
+                                <!-- Button zum Speichern -->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <button class="btn btn-lg btn-outline-primary btn-block text-uppercase font-weight-bold mb-2" type="submit">Passwort ändern</button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            
+                            
+                            
+                           
+                           
+
+
+                         </div>
+                      </div>
+
+
+                   </div>
+
+
+
+                </div>
+             </div>
+          </div>
+
+
+
+
+
+       </div>
+    </div>
+ </section>
+ {% include 'backend/user_templates/dashboard/footer.html' %}
+
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+ <!-- JavaScript zur Bildvorschau -->
+ <script type="text/javascript">
+   $(document).ready(function(){
+       $('#image').change(function(e){
+           var reader = new FileReader();
+           reader.onload = function(e){
+               $('#showImage').attr('src', e.target.result);
+           }
+           reader.readAsDataURL(e.target.files[0]);
+       });
+   });
+</script>
+
+<script type="text/javascript">
+   // Toastr options configuration
+   toastr.options = {
+       "closeButton": true,
+       "progressBar": true,
+       "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
+       "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
+       "extendedTimeOut": "1000"
+   }
+
+   // Überprüfe, ob es geflashte Nachrichten gibt
+   {% with messages = get_flashed_messages(with_categories=True) %}
+   {% if messages %}
+   {% for category, message in messages %}
+   var type = "{{ category }}";  // Kategorie: success, info, warning, error
+   switch(type){
+       case 'info':
+           toastr.info("{{ message }}");
+           break;
+       case 'success':
+           toastr.success("{{ message }}");
+           break;
+       case 'warning':
+           toastr.warning("{{ message }}");
+           break;
+       case 'error':
+           toastr.error("{{ message }}");
+           break;
+   }
+   {% endfor %}
+   {% endif %}
+   {% endwith %}
+</script>

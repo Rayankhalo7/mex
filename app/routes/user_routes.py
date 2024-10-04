@@ -8,6 +8,7 @@ import time
 import os
 from app.models.user_model import User
 from app import db, mail
+from flask import request
 
 # Definiere die erlaubten Dateiendungen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -18,6 +19,18 @@ def allowed_file(filename):
 
 # Definiere den Blueprint
 user_bp = Blueprint('user_bp', __name__, template_folder='../templates/backend/user_templates')
+
+
+
+@user_bp.context_processor
+def inject_current_path():
+    return {
+        'current_path': request.path,  # Der aktuelle Pfad, z.B. /user/dashboard
+        'current_rule': str(request.url_rule),  # Die URL-Regel, z.B. /dashboard
+        'current_blueprint': request.blueprint  # Der aktuelle Blueprint, z.B. user_bp
+    }
+
+
 
 # Login Route für User
 @user_bp.route("/login", methods=["GET", "POST"])
@@ -177,6 +190,61 @@ def profile_edit():
         flash('Profil erfolgreich aktualisiert!', 'success')
 
     return render_template("backend/user_templates/dashboard/dashboard.html", user=current_user)
+
+
+
+@user_bp.route("/passwort_aendern", methods=["GET", "POST"])
+@login_required
+def passwort_aendern():
+    user = current_user  # Verwende den aktuell eingeloggenen Benutzer
+    errors = {}  # Fehlerdictionary zum Speichern von Fehlern während der Überprüfung
+
+    if request.method == 'POST':
+        # Hole die eingegebenen Werte aus dem Formular
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Debugging: Geben Sie die eingegebenen Werte aus, um zu sehen, ob das Formular korrekt übermittelt wird
+        print(f"Aktuelles Passwort: {current_password}")
+        print(f"Neues Passwort: {new_password}")
+        print(f"Passwortbestätigung: {confirm_password}")
+
+        # Überprüfung des aktuellen Passworts
+        if not user.check_password(current_password):
+            errors['current_password'] = 'Das aktuelle Passwort ist falsch.'
+            flash('Das aktuelle Passwort ist falsch.', 'danger')
+            print("Fehler: Das aktuelle Passwort ist falsch")
+
+        # Überprüfung, ob das neue Passwort mit der Bestätigung übereinstimmt
+        if new_password != confirm_password:
+            errors['confirm_password'] = 'Die neuen Passwörter stimmen nicht überein.'
+            flash('Die neuen Passwörter stimmen nicht überein.', 'danger')
+            print("Fehler: Die neuen Passwörter stimmen nicht überein")
+
+        # Überprüfen, ob das neue Passwort bestimmten Kriterien entspricht (optional)
+        if len(new_password) < 6:
+            errors['new_password'] = 'Das neue Passwort muss mindestens 6 Zeichen lang sein.'
+            flash('Das neue Passwort muss mindestens 6 Zeichen lang sein.', 'danger')
+            print("Fehler: Das neue Passwort ist zu kurz")
+
+        # Wenn keine Fehler vorhanden sind, aktualisiere das Passwort
+        if not errors:
+            try:
+                user.set_password(new_password)  # Neues verschlüsseltes Passwort setzen (MD5)
+                db.session.commit()  # Speichern in der Datenbank
+                flash('Passwort erfolgreich aktualisiert!', 'success')
+                print("Passwort erfolgreich aktualisiert und gespeichert")
+                return redirect(url_for('user_bp.passwort_aendern'))
+            except Exception as e:
+                # Fange alle möglichen Fehler beim Speichern ab
+                print(f"Fehler beim Speichern des neuen Passworts: {e}")
+                flash('Fehler beim Speichern des neuen Passworts. Bitte versuche es erneut.', 'danger')
+
+    # Rendere die Seite mit eventuellen Fehlern, falls das Formular nicht korrekt ausgefüllt wurde
+    return render_template('backend/user_templates/dashboard/passwort_aendern.html', user=user, errors=errors, page_name="Passwort ändern")
+
+
 
 
 # Logout Route für User

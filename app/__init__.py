@@ -8,6 +8,7 @@ import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 
+
 # Lade die Umgebungsvariablen aus der .env-Datei
 load_dotenv()
 
@@ -82,5 +83,8 @@ def create_app():
     # Register blueprints für Admin
     from app.routes.admin_routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
+
+  
+    
 
     return app
