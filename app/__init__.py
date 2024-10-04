@@ -1,10 +1,9 @@
-# app/__init__.py
-
-from flask import Flask
+from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_caching import Cache
+from flask_login import LoginManager, current_user
 import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
@@ -16,7 +15,9 @@ load_dotenv()
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
-cache = Cache()  # Cache-Objekt definieren
+cache = Cache()
+login_manager = LoginManager()
+login_manager.login_view = "user_bp.login"  # Definiere die Login-Route
 
 def create_app():
     app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -39,13 +40,6 @@ def create_app():
     app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True") == "True"
     app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD") 
-    # Überprüfe die SMTP-Konfiguration direkt nach dem Laden der Konfigurationswerte
-    print(f"MAIL_SERVER: {app.config['MAIL_SERVER']}")
-    print(f"MAIL_PORT: {app.config['MAIL_PORT']}")
-    print(f"MAIL_USE_TLS: {app.config['MAIL_USE_TLS']}")
-    print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
-    print(f"MAIL_PASSWORD: {'*' * len(app.config['MAIL_PASSWORD'])}")  # Zeigt die Länge des Passworts, aber nicht den Inhalt
-
 
     # Konfiguration für Datei-Upload
     app.config['CLIENT_UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'upload', 'client_bilder', 'client_profile')
@@ -56,9 +50,26 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+    login_manager.init_app(app)  # Initialisierung von Flask-Login
 
     # Einstellung URLSafeTimedSerializer für das Generieren von sicheren Tokens
     app.serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+    # Flask-Login Konfiguration
+    login_manager.login_view = "user_bp.login"  # Login-Seite für nicht authentifizierte Benutzer
+    login_manager.login_message_category = "info"  # Kategorie für Login-Meldungen
+
+    # Callback-Funktion für Flask-Login: Laden des Benutzers anhand der ID
+    from app.models.user_model import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    # before_request-Hook, um aktuellen Benutzer global in `g` zu setzen
+    @app.before_request
+    def before_request():
+        g.user = current_user
 
     # Register blueprints für user
     from app.routes.user_routes import user_bp
@@ -73,5 +84,3 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
     return app
-
-

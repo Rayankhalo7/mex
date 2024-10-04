@@ -1,20 +1,3 @@
-<!--
-
-=========================================================
-* Volt Free - Bootstrap 5 Dashboard
-=========================================================
-
-* Product Page: https://themesberg.com/product/admin-dashboard/volt-premium-bootstrap-5-dashboard
-* Copyright 2020 Themesberg (https://www.themesberg.com)
-* License (https://themesberg.com/licensing)
-
-* Designed and coded by https://themesberg.com
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal.
-
--->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,7 +6,7 @@
 <!-- Primary Meta Tags -->
 
 <title>
-    Flask Volt Dashboard - {% block title %}{% endblock %} | AppSeed
+    Restaurant Dashboard - {% block title %}{% endblock %}
 </title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -61,13 +44,13 @@
       integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <!-- Sweet Alert -->
-<link type="text/css" href="{{ url_for('static', filename='assets/css/sweetalert2.min.css') }}" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='backend/assets/css/sweetalert2.min.css') }}" rel="stylesheet">
 
 <!-- Notyf -->
-<link type="text/css" href="{{ url_for('static', filename='assets/css/notyf.min.css') }}" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='backend/assets/css/notyf.min.css') }}" rel="stylesheet">
 
 <!-- Volt CSS -->
-<link type="text/css" href="{{ url_for('static', filename='assets/css/volt.css') }}" rel="stylesheet">
+<link type="text/css" href="{{ url_for('static', filename='backend/assets/css/volt.css') }}" rel="stylesheet">
 
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}

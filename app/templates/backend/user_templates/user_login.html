@@ -1,89 +1,73 @@
 {% extends "backend/base.html" %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Benutzer Login{% endblock %}
 
 {% block body %}
 
+      <div class="container-fluid">
+         <div class="row no-gutter">
+            <div class="d-none d-md-flex col-md-4 col-lg-6 bg-image"></div>
+            <div class="col-md-8 col-lg-6">
+               <div class="login d-flex align-items-center py-5">
+                  <div class="container">
+                     <div class="row">
+                        <div class="col-md-9 col-lg-8 mx-auto pl-5 pr-5">
+                           <h3 class="login-heading mb-4">Welcome back!</h3>
 
+                           <!-- Flash Messages Block -->
+                     {% with messages = get_flashed_messages(with_categories=true) %}
+                     {% if messages %}
+                       <div class="alert alert-danger" role="alert">
+                         {% for category, message in messages %}
+                           {{ message }}
+                         {% endfor %}
+                       </div>
+                     {% endif %}
+                   {% endwith %}
+                   <!-- End Flash Messages Block -->
+                           
+                          <form action="{{ url_for('user_bp.login') }}" method="POST">
+                            <div class="form-label-group">
+                              <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                                  <label for="email" class="form-label">Email</label>
+                               
+                            </div>
+                            <div class="form-label-group">
+                              <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                              <label for="password" class="form-label">Password</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                               <input type="checkbox" class="custom-control-input" id="customCheck1">
+                               <label class="custom-control-label" for="customCheck1">Remember password</label>
+                            </div>
+                            <button class="btn btn-lg btn-outline-primary btn-block btn-login text-uppercase font-weight-bold mb-2" type="submit">Login</button>
+                            <div class="text-center pt-3">
+                              Ich habe mein <a class="font-weight-bold" href="{{ url_for('user_bp.password_reset_request') }}">Passwort vergessen?</a>
 
-
-
-
-<!-- Login 8 - Bootstrap Brain Component -->
-<section class="bg-light p-3 p-md-4 p-xl-5">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-12 col-xxl-11">
-          <div class="card border-light-subtle shadow-sm">
-            <div class="row g-0">
-              <div class="col-12 col-md-6">
-                <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src="https://images7.alphacoders.com/858/858236.jpg" alt="Welcome back you've been missed!">
-              </div>
-              <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
-                <div class="col-12 col-lg-11 col-xl-10">
-                  <div class="card-body p-3 p-md-4 p-xl-5">
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="mb-5">
-                          <div class="text-center mb-4">
-                            
-                              <p>Benutzer Login</p>
-                            
-                          </div>
-                          <h4 class="text-center">Willkommen zurück!</h4>
+                           </div>
+                           <div class="text-center pt-3">
+                            Noch kein Konto? <a class="font-weight-bold" href="{{ url_for('user_bp.register') }}">Registrieren</a>
+                         </div>
+                         </form>
+                           <hr class="my-4">
+                           <p class="text-center">LOGIN WITH</p>
+                           <div class="row">
+                              <div class="col pr-2">
+                                 <button class="btn pl-1 pr-1 btn-lg btn-google font-weight-normal text-white btn-block text-uppercase" type="submit"><i class="fab fa-google mr-2"></i> Google</button>
+                              </div>
+                              <div class="col pl-2">
+                                 <button class="btn pl-1 pr-1 btn-lg btn-facebook font-weight-normal text-white btn-block text-uppercase" type="submit"><i class="fab fa-facebook-f mr-2"></i> Facebook</button>
+                              </div>
+                           </div>
                         </div>
-                      </div>
-                    </div>
-
-                    <form action="{{ url_for('user_bp.login') }}" method="POST">
-                      <div class="row gy-3 overflow-hidden">
-                        <div class="col-12">
-                          <div class="form-floating mb-3">
-                            
-                            <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
-                            <label for="email" class="form-label">Email</label>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <div class="form-floating mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" placeholder="Password" required>
-                          </div>
-                        </div>
-                        <div class="col-12">
-
-                        </div>
-                        <div class="col-12">
-                          <div class="d-grid">
-                            
-                            <button class="btn btn-dark btn-lg" type="submit">Login</button>
-
-                            {% if error %}
-                        <p style="color:red;">{{ error }}</p>
-                        {% endif %}
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-
-                    <div class="row">
-                      <div class="col-12">
-                        <div class="d-flex gap-2 gap-md-4 flex-column flex-md-row justify-content-md-center mt-5">
-                            <a href="{{ url_for('user_bp.register') }}" class="link-secondary text-decoration-none">Registrieren</a>
-                            <a href="{{ url_for('user_bp.password_reset_request') }}" class="link-secondary text-decoration-none">Passwort vergessen</a>
-                            
-                          
-                        </div>
-                      </div>
-                    </div>
+                     </div>
                   </div>
-                </div>
-              </div>
+               </div>
             </div>
-          </div>
-        </div>
+         </div>
       </div>
-    </div>
-  </section>
+
+
+
 
 {% endblock %}

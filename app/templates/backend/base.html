@@ -1,44 +1,26 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Meine Website{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-
-    <style>html, body {
-        height: 100%;
-        margin: 0;
-    }
-    
-    body {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    main {
-        flex: 1; /* Hauptinhalt dehnt sich aus */
-    }
-    
-    footer {
-        background-color: #f8f9fa; /* Farbe des Footers */
-        text-align: center;
-        padding: 10px;
-        position: relative; /* Footer bleibt am unteren Rand, wenn nicht genug Inhalt vorhanden ist */
-        bottom: 0;
-        width: 100%;
-        border-top: 1px solid #ddd;
-    }
-    
-    p {
-        margin: 0;
-    }
-    </style>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="Askbootstrap">
+      <meta name="author" content="Askbootstrap">
+      <title>Mahlzeit Express</title>
+      <!-- Favicon Icon -->
+      <link rel="icon" type="image/png" href="img/favicon.png">
+      <!-- Bootstrap core CSS-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+      <!-- Font Awesome-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/fontawesome/css/all.min.css')}}" rel="stylesheet">
+      <!-- Font Awesome-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/icofont/icofont.min.css')}}" rel="stylesheet">
+      <!-- Select2 CSS-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/select2/css/select2.min.css')}}" rel="stylesheet">
+      <!-- Custom styles for this template-->
+      <link href="{{ url_for('static', filename='frontend/themes/css/osahan.css')}}" rel="stylesheet">
+   </head>
+   <body class="bg-white">
     <!--<header>
         <nav>
             <a href="{{ url_for('user_bp.login') }}">Login</a>
@@ -53,8 +35,14 @@
         {% endblock %}
     </main>
 
-    <footer>
-        <p>Team 2 &copy; 2024 Mahlzeit Express</p>
-    </footer>
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='frontend/themes/vendor/jquery/jquery-3.3.1.slim.min.js')}}"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <!-- Select2 JavaScript-->
+    <script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
 </body>
 </html>

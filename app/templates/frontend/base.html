@@ -1,35 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="Askbootstrap">
+      <meta name="author" content="Askbootstrap">
+      <title>Mahlzeit Express</title>
+      <!-- Favicon Icon -->
+      <link rel="icon" type="image/png" href="img/favicon.png">
+      <!-- Bootstrap core CSS-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+      <!-- Font Awesome-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/fontawesome/css/all.min.css')}}" rel="stylesheet">
+      <!-- Font Awesome-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/icofont/icofont.min.css')}}" rel="stylesheet">
+      <!-- Select2 CSS-->
+      <link href="{{ url_for('static', filename='frontend/themes/vendor/select2/css/select2.min.css')}}" rel="stylesheet">
+      <!-- Custom styles for this template-->
+      <link href="{{ url_for('static', filename='frontend/themes/css/osahan.css')}}" rel="stylesheet">
+      <!-- Owl Carousel -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.css')}}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.theme.css')}}">
+   </head>
+   <body>
+      <div class="homepage-header">
+      <div class="overlay"></div>
+      {% include 'frontend/layout/header.html' %}
+
+      {% include 'frontend/layout/banner.html' %}
+
+      </div>
+
+      {% include 'frontend/layout/ads.html' %}
+
+      {% block content %}
 
 
-    <title>Flask Auth</title>
-</head>
-<body>
-
-    <header> Flask Auth</header>
-
-    {% block body %}
-    <div class="homepage-header">
-        <div class="overlay"></div>
-  
-        @include('frontend.layouts.header')
-  
-        @include('frontend.layouts.banner')
-  
-    </div>
-
-
-
-
-
-
+      
     
-    {% endblock %}
+            
 
-</body>
+      {% endblock content %}
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+      {% include 'frontend/layout/member.html' %}
+
+
+      {% include 'frontend/layout/footer.html' %}
+
+
+
+      <!-- jQuery -->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/jquery/jquery-3.3.1.slim.min.js')}}"></script>
+      <!-- Bootstrap core JavaScript-->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+      <!-- Select2 JavaScript-->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
+      <!-- Owl Carousel -->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.js')}}"></script>
+      <!-- Custom scripts for all pages-->
+      <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
+   </body>
 </html>

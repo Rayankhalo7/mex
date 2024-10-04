@@ -1,305 +1,238 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Essen Online Bestellen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+{% extends "frontend/base.html" %}
+
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<!--Inclouden von banner-->
 
 
 
-    <style>
-        * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-}
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
 
-header {
-    background-color: #ffffff;
-    padding: 20px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 100;
-}
+<section class="section pt-5 pb-5 products-section">
+    <div class="container">
+       <div class="section-header text-center">
+          <h2>Lieblings Restaurants</h2>
+          <p>Top restaurants, cafes, pubs, and bars in Ludhiana, based on trends</p>
+          <span class="line"></span>
+       </div>
+       <div class="row">
 
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+          <div class="col-md-3">
+             
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #ff6347;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-nav ul li a:hover {
-    color: #ff6347;
-}
-
-nav ul li a.button {
-    background-color: #ff6347;
-    color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-}
-
-#home {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f7f7f7;
-    padding-top: 100px;
-}
-
-.hero-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.hero-content {
-    max-width: 600px;
-}
-
-.hero-content h1 {
-    font-size: 3rem;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-}
-
-#search-form {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#search-input {
-    width: 300px;
-    padding: 15px;
-    border: 2px solid #ff6347;
-    border-radius: 50px;
-    outline: none;
-}
-
-#search-form button {
-    padding: 15px 30px;
-    background-color: #ff6347;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-}
-
-.hero-image img {
-    width: 100%;
-    max-width: 400px;
-}
-
-#restaurants {
-    padding: 50px 0;
-    background-color: #ffffff;
-    text-align: center;
-}
-
-.section-title {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
-    color: #333;
-}
-
-.restaurant-cards {
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.restaurant-card {
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    max-width: 300px;
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.restaurant-card:hover {
-    transform: scale(1.05);
-}
-
-.restaurant-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.restaurant-info {
-    padding: 20px;
-}
-
-.restaurant-info h3 {
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.restaurant-info p {
-    margin-bottom: 20px;
-    color: #777;
-}
-
-.btn-primary, .btn-secondary {
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background-color: #ff6347;
-    color: white;
-    border: none;
-}
-
-.btn-secondary {
-    background-color: #333;
-    color: white;
-    border: none;
-}
-
-footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
-
-@media (max-width: 768px) {
-    .hero-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .hero-image img {
-        margin-top: 20px;
-    }
-
-    .restaurant-cards {
-        flex-direction: column;
-    }
-}
-
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="container header-container">
-            <div class="logo">EssenBestellen</div>
-            <nav>
-                <ul>
-                    <li><a href="#home">Startseite</a></li>
-                    <li><a href="#restaurants">Restaurants</a></li>
-                    <li><a href="#about">Über uns</a></li>
-                    <li><a href="#contact">Kontakt</a></li>
-                    <li><a href="{{ url_for('user_bp.login') }}" class="button">Anmelden</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <section id="home">
-        <div class="container hero-container">
-            <div class="hero-content">
-                <h1>Bestelle dein Lieblingsessen</h1>
-                <p>Leckere Gerichte in deiner Nähe, geliefert in wenigen Minuten.</p>
-                <form id="search-form">
-                    <input type="text" placeholder="Suche nach Restaurants oder Gerichten..." id="search-input">
-                    <button type="submit" class="btn-primary">Suchen</button>
-                </form>
-            </div>
-            <div class="hero-image">
-                <img src="delivery.svg" alt="Lieferung">
-            </div>
-        </div>
-    </section>
-
-    <section id="restaurants">
-        <div class="container">
-            <h2 class="section-title">Beliebte Restaurants</h2>
-            <div class="restaurant-cards">
-                <div class="restaurant-card">
-                    <img src="restaurant1.jpg" alt="Restaurant 1">
-                    <div class="restaurant-info">
-                        <h3>Pizza Palace</h3>
-                        <p>Pizza, Italienisch</p>
-                        <button class="btn-secondary">Bestellen</button>
-                    </div>
+                <div class="item pb-3">
+                   <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                      <div class="list-card-image">
+                         <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+                         <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+                         <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+                         <a href="detail.html">
+                         <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+                         </a>
+                      </div>
+                      <div class="p-3 position-relative">
+                         <div class="list-card-body">
+                            <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                            <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                            <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+                         </div>
+                         <div class="list-card-badge">
+                            <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+                         </div>
+                      </div>
+                   </div>
                 </div>
-                <div class="restaurant-card">
-                    <img src="restaurant2.jpg" alt="Restaurant 2">
-                    <div class="restaurant-info">
-                        <h3>Sushi Place</h3>
-                        <p>Japanisch, Sushi</p>
-                        <button class="btn-secondary">Bestellen</button>
-                    </div>
-                </div>
-                <div class="restaurant-card">
-                    <img src="restaurant3.jpg" alt="Restaurant 3">
-                    <div class="restaurant-info">
-                        <h3>Curry House</h3>
-                        <p>Indisch, Vegetarisch</p>
-                        <button class="btn-secondary">Bestellen</button>
-                    </div>
-                </div>
+                
+
+
+             
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+          <div class="col-md-3">
+             
+
+            <div class="item pb-3">
+               <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+                  <div class="list-card-image">
+                     <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+                     <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+                     <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+                     <a href="detail.html">
+                     <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+                     </a>
+                  </div>
+                  <div class="p-3 position-relative">
+                     <div class="list-card-body">
+                        <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                        <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                        <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+                     </div>
+                     <div class="list-card-badge">
+                        <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+                     </div>
+                  </div>
+               </div>
             </div>
-        </div>
-    </section>
+            
 
-    <footer>
-        <div class="container">
-            <p>© 2024 EssenBestellen. Alle Rechte vorbehalten.</p>
-        </div>
-    </footer>
 
-    <script src="script.js"></script>
-</body>
-</html>
+         
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+
+          <div class="col-md-3">
+             
+
+        <div class="item pb-3">
+           <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+              <div class="list-card-image">
+                 <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+                 <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+                 <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+                 <a href="detail.html">
+                 <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+                 </a>
+              </div>
+              <div class="p-3 position-relative">
+                 <div class="list-card-body">
+                    <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                    <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                    <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+                 </div>
+                 <div class="list-card-badge">
+                    <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+                 </div>
+              </div>
+           </div>
+        </div>
+        
+
+
+     
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+          <div class="col-md-3">
+             
+
+    <div class="item pb-3">
+       <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+          <div class="list-card-image">
+             <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+             <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+             <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+             <a href="detail.html">
+             <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+             </a>
+          </div>
+          <div class="p-3 position-relative">
+             <div class="list-card-body">
+                <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+             </div>
+             <div class="list-card-badge">
+                <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+             </div>
+          </div>
+       </div>
+    </div>
+    
+
+
+ 
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+          <div class="col-md-3">
+             
+
+    <div class="item pb-3">
+       <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+          <div class="list-card-image">
+             <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+             <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+             <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+             <a href="detail.html">
+             <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+             </a>
+          </div>
+          <div class="p-3 position-relative">
+             <div class="list-card-body">
+                <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+             </div>
+             <div class="list-card-badge">
+                <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+             </div>
+          </div>
+       </div>
+    </div>
+    
+
+
+ 
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+          <div class="col-md-3">
+             
+
+    <div class="item pb-3">
+       <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
+          <div class="list-card-image">
+             <div class="star position-absolute"><span class="badge badge-success"><i class="icofont-star"></i> 3.1 (300+)</span></div>
+             <div class="favourite-heart text-danger position-absolute"><a href="detail.html"><i class="icofont-heart"></i></a></div>
+             <div class="member-plan position-absolute"><span class="badge badge-dark">Promoted</span></div>
+             <a href="detail.html">
+             <img src="{{ url_for('static', filename='frontend/themes/img/list/1.png')}}" class="img-fluid item-img">
+             </a>
+          </div>
+          <div class="p-3 position-relative">
+             <div class="list-card-body">
+                <h6 class="mb-1"><a href="detail.html" class="text-black">World Famous</a></h6>
+                <p class="text-gray mb-3">North Indian • American • Pure veg</p>
+                <p class="text-gray mb-3 time"><span class="bg-light text-dark rounded-sm pl-2 pb-1 pt-1 pr-2"><i class="icofont-wall-clock"></i> 20–25 min</span> <span class="float-right text-black-50"> $250 FOR TWO</span></p>
+             </div>
+             <div class="list-card-badge">
+                <span class="badge badge-success">OFFER</span> <small>65% off | Use Coupon OSAHAN50</small>
+             </div>
+          </div>
+       </div>
+    </div>
+    
+
+
+ 
+          </div>
+          <!-- Ende von coloumn md-3-->
+
+
+       </div>
+    </div>
+ </section>
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
