@@ -1,0 +1,21 @@
+# Flask settings
+SECRET_KEY=zufällige key
+
+# SQLAlchemy settings
+DEV_DATABASE_URI=sqlite:///dev.db
+SQLALCHEMY_DATABASE_URI=mysql://root:passwort@localhost/dbname
+
+# Mail settings
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=mail@gmail.com
+MAIL_PASSWORD=passwort
+
+# Cache settings
+CACHE_TYPE=simple
+CACHE_DEFAULT_TIMEOUT=300
+
+# Upload settings
+UPLOAD_FOLDER=static/upload/client_bilder/client_profile
+UPLOAD_FOLDER=static/upload/user_bilder/user_profile
