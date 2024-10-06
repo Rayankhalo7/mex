@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db  # Importiere die 'db' Instanz aus der App
 from hashlib import md5
+from app.models.opening_hours import OpeningHours
 
 # Datenbanken Models - Nur für client
 class Client(db.Model):
@@ -24,6 +25,11 @@ class Client(db.Model):
 
     # Status der Clients
     status = db.Column(db.Integer, default=1)  # 1 = aktiv, 0 = inaktiv
+
+
+    categories = db.relationship('Category', backref='client', lazy=True)
+    products = db.relationship('Product', backref='client', lazy=True)
+    opening_hours = db.relationship('OpeningHours', backref='client', lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, password):
         # Verwende hashlib, um den md5-Hash zu generieren

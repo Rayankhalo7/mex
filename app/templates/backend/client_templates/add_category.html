@@ -1,0 +1,13 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block content %}
+<h1>Neue Kategorie hinzufügen</h1>
+<form action="{{ url_for('client_category_bp.add_category') }}" method="POST">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name der Kategorie</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <button type="submit" class="btn btn-success">Speichern</button>
+    <a href="{{ url_for('client_category_bp.view_categories') }}" class="btn btn-secondary">Abbrechen</a>
+</form>
+{% endblock %}

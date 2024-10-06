@@ -79,6 +79,8 @@ def create_app():
         g.user = current_user
 
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+
+    
     
     # Register blueprints für user
     from app.routes.user_routes import user_bp
@@ -91,6 +93,19 @@ def create_app():
     # Register blueprints für Admin
     from app.routes.admin_routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
+
+
+
+
+
+    # Registriere Blueprints für Kategorien und Produkte
+    from app.routes.category import client_category_bp
+    from app.routes.product import client_product_bp
+    from app.routes.opening_hours import client_opening_hours_bp  # Importiere das Blueprint für Öffnungszeiten
+
+    app.register_blueprint(client_category_bp, url_prefix='/client')
+    app.register_blueprint(client_product_bp, url_prefix='/client')
+    app.register_blueprint(client_opening_hours_bp, url_prefix='/client')  # Registriere das Blueprint für Öffnungszeiten
 
   
     

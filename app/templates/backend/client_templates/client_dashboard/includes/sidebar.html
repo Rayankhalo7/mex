@@ -108,76 +108,80 @@
                   role="list" id="submenu-app" aria-expanded="false">
                   <ul class="flex-column nav">
                     <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
-                      <a class="nav-link" href="/tables-bootstrap-tables.html">
+                      <a class="nav-link" href="{{ url_for('client_opening_hours_bp.view_opening_hours') }}">
                         <span class="sidebar-text">Öffnungszeiten</span>
-                      </a>
+                    </a>
                     </li>
                   </ul>
                 </div>
 
               </li>
-              <li class="nav-item {% if 'page-' in segment %} active {% endif %}">
-                <span
-                  class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                  data-bs-toggle="collapse" data-bs-target="#submenu-pages">
-                  <span>
-                    <span class="sidebar-icon">
-                      <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"></path><path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"></path></svg>
-                    </span> 
-                    <span class="sidebar-text">Kategorien</span>
-                  </span>
-                  <span class="link-arrow">
-                    <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                  </span>
+              <li class="nav-item {% if 'categories' in request.path %} active {% endif %}">
+                <span class="nav-link collapsed d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#submenu-categories">
+                    <span>
+                        <span class="sidebar-icon">
+                            <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"></path>
+                                <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"></path>
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Kategorien</span>
+                    </span>
+                    <span class="link-arrow">
+                        <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </span>
                 </span>
-                <div class="multi-level collapse {% if 'page-' in segment %} show {% endif %} " role="list"
-                  id="submenu-pages" aria-expanded="false">
-                  <ul class="flex-column nav">
-                    <li class="nav-item">
-                      <a class="nav-link" href="/page-sign-in.html">
-                        <span class="sidebar-text">Alle Kategorien</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/page-sign-up.html">
-                        <span class="sidebar-text">Kategorie hinzufügen</span>
-                      </a>
-                    </li>
-                    
-                  </ul>
+                <div class="multi-level collapse {% if 'categories' in request.path %} show {% endif %}" role="list" id="submenu-categories" aria-expanded="false">
+                    <ul class="flex-column nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('client_category_bp.view_categories') }}">
+                                <span class="sidebar-text">Alle Kategorien</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('client_category_bp.add_category') }}">
+                                <span class="sidebar-text">Kategorie hinzufügen</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-              </li>
-              <li class="nav-item {% if 'components-' in segment %} active {% endif %}">
-                <span
-                  class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                  data-bs-toggle="collapse" data-bs-target="#submenu-components">
-                  <span>
-                    <span class="sidebar-icon">
-                      <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                    </span> 
-                    <span class="sidebar-text">Menü</span>
-                  </span>
-                  <span class="link-arrow">
-                    <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                  </span>
+            </li>
+            
+            <li class="nav-item {% if 'products' in request.path %} active {% endif %}">
+                <span class="nav-link collapsed d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#submenu-products">
+                    <span>
+                        <span class="sidebar-icon">
+                            <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path>
+                                <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                        <span class="sidebar-text">Produkte</span>
+                    </span>
+                    <span class="link-arrow">
+                        <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </span>
                 </span>
-                <div class="multi-level collapse {% if 'components-' in segment %} show {% endif %}" role="list"
-                  id="submenu-components" aria-expanded="false">
-                  <ul class="flex-column nav">
-                    <li class="nav-item {% if 'components-buttons' in segment %} active {% endif %}">
-                      <a class="nav-link" href="/components-buttons.html">
-                        <span class="sidebar-text">Menü übersicht</span>
-                      </a>
-                    </li>
-                    <li class="nav-item {% if 'components-notifications' in segment %} active {% endif %}">
-                      <a class="nav-link" href="/components-notifications.html">
-                        <span class="sidebar-text">Speise hinzufügen</span>
-                      </a>
-                    </li>
-                    
-                  </ul>
+                <div class="multi-level collapse {% if 'products' in request.path %} show {% endif %}" role="list" id="submenu-products" aria-expanded="false">
+                    <ul class="flex-column nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('client_product_bp.view_products') }}">
+                                <span class="sidebar-text">Alle Produkte</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('client_product_bp.add_product') }}">
+                                <span class="sidebar-text">Produkt hinzufügen</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-              </li>
+            </li>
+            
 
               <li class="nav-item {% if 'settings' in segment %} active {% endif %}">
                 <a href="/settings.html" class="nav-link">
