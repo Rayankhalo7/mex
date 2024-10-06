@@ -51,6 +51,7 @@
 
 <!-- Volt CSS -->
 <link type="text/css" href="{{ url_for('static', filename='backend/assets/css/volt.css') }}" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}
@@ -62,7 +63,7 @@
 
     {% include 'client_dashboard/includes/scripts.html' %}
 
-
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}{% endblock javascripts %}  
   

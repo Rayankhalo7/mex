@@ -7,6 +7,9 @@ from itsdangerous import URLSafeTimedSerializer
 from werkzeug.utils import secure_filename
 import time
 import os
+from app import serializer
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from flask import flash
 
 
 
@@ -62,30 +65,41 @@ def login():
     return render_template("client_login.html", errors=errors)
 
 
-# Register Route für client
+# Register Route für Clients
 @client_bp.route('/register', methods=["GET", "POST"])
 def register():
+    # Überprüfe, ob der Client bereits eingeloggt ist
     if "clientname" in session:
         return redirect(url_for('client_bp.dashboard'))
-    else:
-        if request.method == "POST":
-            clientname = request.form['clientname']
-            email = request.form['email']
-            password = request.form['password']
+    
+    if request.method == "POST":
+        # Erhalte die Formulardaten
+        clientname = request.form['clientname']
+        email = request.form['email']
+        password = request.form['password']
+    
+        # Überprüfe, ob der Benutzername oder die E-Mail bereits existieren
+        client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()
         
-            client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()
+        if client:
+            # Benutzername oder E-Mail bereits vorhanden
+            flash("Benutzername oder E-Mail bereits vergeben", "danger")  # Fehler-Meldung mit Kategorie "danger"
+            return redirect(url_for('client_bp.register'))
+        else:
+            # Neuen Client erstellen
+            new_client = Client(clientname=clientname, email=email)
+            new_client.set_password(password)  # Passwort-Hash generieren und speichern
+            db.session.add(new_client)
+            db.session.commit()
+            
+            # Setze die Session-Variablen
+            session['clientname'] = clientname
+            session['client_id'] = new_client.id
+            
+            flash("Registrierung erfolgreich! Sie wurden eingeloggt.", "success")  # Erfolgreiche Registrierung
+            return redirect(url_for('client_bp.dashboard'))
 
-            if client:
-                return render_template("client_register.html", error="Benutzername oder E-Mail bereits vergeben")
-            else:
-                new_client = Client(clientname=clientname, email=email)
-                new_client.set_password(password)
-                db.session.add(new_client)
-                db.session.commit()
-                session['clientname'] = clientname
-                session['client_id'] = new_client.id  # Hier sollte 'new_client.id' verwendet werden, um die ID des neuen Clients zu erhalten
-                return redirect(url_for('client_bp.dashboard'))
-
+    # Renders the registration template
     return render_template("client_register.html")
 
 
@@ -138,6 +152,53 @@ def password_reset_token(token):
             return redirect(url_for('client_bp.password_reset_request'))
 
     return render_template('backend/client_templates/client_password_reset_form.html', token=token)
+
+@client_bp.route('/password_set_admin/<token>', methods=['GET', 'POST'])
+def client_password_set_admin(token):
+    """Verarbeitet das Setzen des Passworts durch den Admin-Link."""
+    try:
+        # Überprüfe den Token und hole die Client-ID heraus
+        client_id = serializer.loads(token, salt='password-set', max_age=3600)  # 1 Stunde gültig
+    except SignatureExpired:
+        flash('Der Link ist abgelaufen. Bitte fordere eine neue E-Mail an.', 'danger')
+        return redirect(url_for('client_bp.login'))
+    except BadSignature:
+        flash('Ungültiger Link. Bitte fordere eine neue E-Mail an.', 'danger')
+        return redirect(url_for('client_bp.login'))
+
+    # Suche den Client anhand der ID in der Datenbank
+    client = Client.query.get(client_id)
+    if not client:
+        flash('Ungültiger Client.', 'danger')
+        return redirect(url_for('client_bp.login'))
+
+    if request.method == 'POST':
+        # Lese die E-Mail und das Passwort aus dem Formular
+        entered_email = request.form['email']
+        password = request.form['password']
+
+        # Überprüfe, ob die eingegebene E-Mail-Adresse mit der vom Admin festgelegten E-Mail übereinstimmt
+        if entered_email != client.email:
+            flash('Die eingegebene E-Mail-Adresse stimmt nicht mit der vom Admin festgelegten E-Mail überein.', 'danger')
+            return render_template('client_password_set_admin.html', client=client, token=token)
+
+        # Überprüfe, ob die E-Mail in der Datenbank existiert
+        email_exists = Client.query.filter_by(email=entered_email).first()
+        if not email_exists:
+            flash('Die eingegebene E-Mail-Adresse existiert nicht in der Datenbank. Bitte überprüfen Sie die E-Mail-Adresse.', 'danger')
+            return render_template('client_password_set_admin.html', client=client, token=token)
+
+        # Setze das neue Passwort
+        client.set_password(password)
+
+        # Speichere das neue Passwort in der Datenbank
+        db.session.commit()
+        flash('Passwort erfolgreich gesetzt. Sie können sich jetzt einloggen.', 'success')
+        return redirect(url_for('client_bp.login'))
+
+    return render_template('client_password_set_admin.html', client=client, token=token)
+
+
 
 
 

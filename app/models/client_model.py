@@ -3,6 +3,7 @@ import hashlib
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db  # Importiere die 'db' Instanz aus der App
+from hashlib import md5
 
 # Datenbanken Models - Nur für client
 class Client(db.Model):
@@ -20,6 +21,9 @@ class Client(db.Model):
     
     phone_number = db.Column(db.String(20), nullable=True)  # Telefonnummer optional
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Status der Clients
+    status = db.Column(db.Integer, default=1)  # 1 = aktiv, 0 = inaktiv
 
     def set_password(self, password):
         # Verwende hashlib, um den md5-Hash zu generieren

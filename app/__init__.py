@@ -9,6 +9,10 @@ from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 
 
+# Initialisiere den Serializer als globale Variable
+serializer = None
+
+
 # Lade die Umgebungsvariablen aus der .env-Datei
 load_dotenv()
 
@@ -21,6 +25,8 @@ login_manager = LoginManager()
 login_manager.login_view = "user_bp.login"  # Definiere die Login-Route
 
 def create_app():
+    global serializer
+    
     app = Flask(__name__, template_folder='templates', static_folder='static')
 
     # Cache-Konfiguration hinzufügen
@@ -72,6 +78,8 @@ def create_app():
     def before_request():
         g.user = current_user
 
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    
     # Register blueprints für user
     from app.routes.user_routes import user_bp
     app.register_blueprint(user_bp, url_prefix='/user')
