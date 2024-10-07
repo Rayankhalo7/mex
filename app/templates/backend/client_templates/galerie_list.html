@@ -1,0 +1,39 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Galerie Verwaltung {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Galerie Verwaltung</h2>
+
+            <!-- Button zum Hinzufügen eines neuen Bildes -->
+            <a href="{{ url_for('client_galerie_bp.add_galerie_image') }}" class="btn btn-primary mb-3">Neues Bild hinzufügen</a>
+
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Iteriere durch alle Galerie-Bilder -->
+                        {% for image in galerie %}
+                        <div class="col-md-3">
+                            <div class="card mb-3">
+                                <!-- Ersetze Backslashes durch normale Slashes im Bildpfad -->
+                                {% set image_path = image.image.replace('\\', '/') %}
+                                <img src="{{ url_for('static', filename=image_path) }}" class="card-img-top img-thumbnail" alt="Galerie Bild">
+                                <div class="card-body text-center">
+                                    <!-- Button zum Löschen des Bildes -->
+                                    <form action="{{ url_for('client_galerie_bp.delete_galerie_image', id=image.id) }}" method="POST" style="display:inline-block;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,63 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %}Neue Galerie hinzufügen{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Neue Galerie hinzufügen</h2>
+            <form action="{{ url_for('client_galerie_bp.add_galerie_image') }}" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Eingabefeld für Bild -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Bild auswählen</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                        </div>
+
+                        <!-- Bildvorschau -->
+                        <div class="mb-3">
+                            <img id="showImage" src="" alt="Bildvorschau" style="max-width: 300px; max-height: 200px; display: none;" class="img-thumbnail"/>
+                        </div>
+                    </div>
+
+                    <!-- Eingabefeld für Titel der Galerie -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Titel der Galerie</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Titel der Galerie eingeben" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Textbereich für die Beschreibung der Galerie -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Beschreibung</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Geben Sie eine Beschreibung der Galerie ein"></textarea>
+                </div>
+
+                <!-- Schaltflächen zum Speichern oder Abbrechen -->
+                <button type="submit" class="btn btn-primary">Galerie hinzufügen</button>
+                <a href="{{ url_for('client_galerie_bp.view_galerie') }}" class="btn btn-secondary">Zurück</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- JavaScript zur Bildvorschau -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#image').change(function(e){
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $('#showImage').attr('src', e.target.result).show();
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    });
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,44 @@
+<section class="restaurant-detailed-banner">
+   
+  <div class="text-center" style="height: 400px; overflow: hidden;">
+   {% if banner and banner.image %}
+          {% set image_path = banner.image.replace('\\', '/') %}
+   <img class="img-fluid" src="{{ url_for('static', filename=image_path) }}" alt="Banner"
+        style="width: 100%; height: 100%; object-fit: cover;">
+        {% endif %}
+</div>
+ 
+
+  
+    <div class="restaurant-detailed-header">
+       <div class="container">
+          <div class="row d-flex align-items-end">
+             <div class="col-md-8">
+                <div class="restaurant-detailed-header-left">
+                   <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid mb-4" alt="{{ client.clientname }}">
+                   <h2 class="text-white">{{ client.clientname }}</h2>
+                   <p class="text-white mb-1"><i class="icofont-location-pin"></i> {{ client.street }} {{ client.house_number }}, {{ client.city }} - {{ client.postal_code }} <span class="badge badge-success">OPEN</span>
+                   </p>
+                   <p class="text-white mb-0"><i class="icofont-food-cart"></i>
+                     {% if categories %}
+                         {% for category in categories %}
+                         {{ category.name }}{% if not loop.last %}, {% endif %}
+                         {% endfor %}
+                     {% else %}
+                         Keine Kategorien verfügbar
+                     {% endif %}
+                 </p>
+                </div>
+             </div>
+             <div class="col-md-4">
+                <div class="restaurant-detailed-header-right text-right">
+                   <button class="btn btn-success" type="button"><i class="icofont-clock-time"></i> 25–35 min
+                   </button>
+                   <h6 class="text-white mb-0 restaurant-detailed-ratings"><span class="generator-bg rounded text-white"><i class="icofont-star"></i> 3.1</span> 23 Ratings  <i class="ml-3 icofont-speech-comments"></i> 91 reviews</h6>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+    </div> 
+ </section>

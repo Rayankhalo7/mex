@@ -1,0 +1,33 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %}Bewertungen für {{ client.clientname }}{% endblock %}
+
+{% block content %}
+<h1>Bewertungen für {{ client.clientname }}</h1>
+<div class="card border-0 shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-centered table-nowrap mb-0 rounded">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="border-0">Bewertung</th>
+                        <th class="border-0">Kommentar</th>
+                        <th class="border-0">Benutzer</th>
+                        <th class="border-0">Erstellungsdatum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rating in ratings %}
+                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td class="border-0">{{ rating.rating }} Sterne</td>
+                        <td class="border-0">{{ rating.comment }}</td>
+                        <td class="border-0">{{ rating.user.username }}</td>
+                        <td class="border-0">{{ rating.created_at.strftime('%d.%m.%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

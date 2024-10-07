@@ -1,3 +1,5 @@
+# app/__init__.py
+
 from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -8,10 +10,8 @@ import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 
-
 # Initialisiere den Serializer als globale Variable
 serializer = None
-
 
 # Lade die Umgebungsvariablen aus der .env-Datei
 load_dotenv()
@@ -80,34 +80,37 @@ def create_app():
 
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
-    
-    
-    # Register blueprints für user
-    from app.routes.user_routes import user_bp
-    app.register_blueprint(user_bp, url_prefix='/user')
+    # Blueprint-Registrierungen innerhalb von `app.app_context()` vornehmen, um Zirkularimporte zu vermeiden
+    with app.app_context():
+        # Register blueprints für user
+        from app.routes.user_routes import user_bp
+        app.register_blueprint(user_bp, url_prefix='/user')
 
-    # Register blueprints für Client
-    from app.routes.client_routes import client_bp
-    app.register_blueprint(client_bp, url_prefix='/client')
+        # Register blueprints für Client
+        from app.routes.client_routes import client_bp
+        app.register_blueprint(client_bp, url_prefix='/client')
 
-    # Register blueprints für Admin
-    from app.routes.admin_routes import admin_bp
-    app.register_blueprint(admin_bp, url_prefix='/admin')
+        # Register blueprints für Admin
+        from app.routes.admin_routes import admin_bp
+        app.register_blueprint(admin_bp, url_prefix='/admin')
 
+        # Blueprint für das Frontend (importiere hier, um den Kreislauf zu brechen)
+        from app.routes.frontend import frontend_bp
+        app.register_blueprint(frontend_bp, url_prefix='/')
 
+        # Registriere Blueprints für Kategorien, Produkte und weitere Module
+        from app.routes.category import client_category_bp
+        from app.routes.product import client_product_bp
+        from app.routes.opening_hours import client_opening_hours_bp  # Importiere das Blueprint für Öffnungszeiten
+        from app.routes.rating import rating_bp
+        from app.routes.banner import client_banner_bp
+        from app.routes.client_galerie import client_galerie_bp
 
-
-
-    # Registriere Blueprints für Kategorien und Produkte
-    from app.routes.category import client_category_bp
-    from app.routes.product import client_product_bp
-    from app.routes.opening_hours import client_opening_hours_bp  # Importiere das Blueprint für Öffnungszeiten
-
-    app.register_blueprint(client_category_bp, url_prefix='/client')
-    app.register_blueprint(client_product_bp, url_prefix='/client')
-    app.register_blueprint(client_opening_hours_bp, url_prefix='/client')  # Registriere das Blueprint für Öffnungszeiten
-
-  
-    
+        app.register_blueprint(client_category_bp, url_prefix='/client')
+        app.register_blueprint(client_product_bp, url_prefix='/client')
+        app.register_blueprint(client_opening_hours_bp, url_prefix='/client')  # Registriere das Blueprint für Öffnungszeiten
+        app.register_blueprint(rating_bp, url_prefix='/client')
+        app.register_blueprint(client_banner_bp, url_prefix='/client')
+        app.register_blueprint(client_galerie_bp, url_prefix='/client')
 
     return app

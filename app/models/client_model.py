@@ -27,9 +27,13 @@ class Client(db.Model):
     status = db.Column(db.Integer, default=1)  # 1 = aktiv, 0 = inaktiv
 
 
+    # Beziehungen zu anderen Modellen
     categories = db.relationship('Category', backref='client', lazy=True)
     products = db.relationship('Product', backref='client', lazy=True)
     opening_hours = db.relationship('OpeningHours', backref='client', lazy=True, cascade="all, delete-orphan")
+    ratings = db.relationship('Rating', backref='client_rating', lazy=True)  # Geänderter `backref`-Name
+    banners = db.relationship('Banner', backref='banner_client', lazy=True, cascade="all, delete-orphan")
+    galerie_images = db.relationship('Galerie', backref='client_galerie', lazy=True, cascade="all, delete-orphan")  # Galerie-Beziehung hinzufügen
 
     def set_password(self, password):
         # Verwende hashlib, um den md5-Hash zu generieren

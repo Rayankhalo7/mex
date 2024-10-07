@@ -1,6 +1,6 @@
 {% extends "client_dashboard/layout/base.html" %}
 
-{% block title %} Produkte Verwaltung {% endblock %}
+{% block title %} Banner Verwaltung {% endblock %}
 
 <!-- Specific Page CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -9,10 +9,10 @@
 <div class="row">
     <div class="col-12 col-xl-12">
         <div class="card card-body border-0 shadow mb-4">
-            <h2 class="h5 mb-4">Alle Produkte</h2>
+            <h2 class="h5 mb-4">Alle Banner</h2>
 
-            <!-- Button zum Hinzufügen eines neuen Produkts -->
-            <a href="{{ url_for('client_product_bp.add_product') }}" class="btn btn-primary mb-3">Neues Produkt hinzufügen</a>
+            <!-- Button zum Hinzufügen eines neuen Banners -->
+            <a href="{{ url_for('client_banner_bp.add_banner') }}" class="btn btn-primary mb-3">Neues Banner hinzufügen</a>
 
             <div class="card border-0 shadow">
                 <div class="card-body">
@@ -21,30 +21,33 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th class="border-0 rounded-start">ID</th>
-                                    <th class="border-0">Produktname</th>
-                                    <th class="border-0">Preis</th>
-                                    <th class="border-0">Kategorie</th>
+                                    <th class="border-0">Bild</th>
+                                    <th class="border-0">URL</th>
                                     <th class="border-0">Aktionen</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Iteriere durch alle Produkte -->
-                                {% for product in products %}
+                                <!-- Iteriere durch alle Banner -->
+                                {% for banner in banners %}
                                 <tr style="border-bottom: 1px solid #e0e0e0;">
-                                    <td class="border-0">{{ product.id }}</td>
-                                    <td class="border-0">{{ product.name }}</td>
-                                    <td class="border-0">{{ product.price }}0 €</td>
-                                    <td class="border-0">{{ product.category.name }}</td> <!-- Zeigt den Namen der Kategorie an -->
+                                    <td class="border-0">{{ banner.id }}</td>
+                                    <td class="border-0">
+                                        <!-- Bildpfad wird korrigiert -->
+                                        {% set image_path = banner.image.replace('\\', '/') %}
+                                        <img src="{{ url_for('static', filename=image_path) }}" class="img-thumbnail" alt="Banner Bild" style="max-width: 150px;">
+                                    </td>
+                                    <td class="border-0">{{ banner.url }}</td>
                                     <td class="border-0">
                                         <!-- Buttons zum Bearbeiten und Löschen -->
-                                        <a href="{{ url_for('client_product_bp.edit_product', id=product.id) }}" class="btn btn-warning">Bearbeiten</a>
-                                        <form action="{{ url_for('client_product_bp.delete_product', id=product.id) }}" method="POST" style="display:inline-block;">
-                                            <button type="submit" class="btn btn-danger">Löschen</button>
+                                        <a href="{{ url_for('client_banner_bp.edit_banner', id=banner.id) }}" class="btn btn-warning btn-sm">Bearbeiten</a>
+                                        <form action="{{ url_for('client_banner_bp.delete_banner', id=banner.id) }}" method="POST" style="display:inline-block;">
+                                            <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
                                         </form>
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
+                            
                         </table>
                     </div>
                 </div>
@@ -62,7 +65,7 @@
         $('#image').change(function(e){
             var reader = new FileReader();
             reader.onload = function(e){
-                $('#showImage').attr('src', e.target.result);
+                $('#showImage').attr('src', e.target.result).show();
             }
             reader.readAsDataURL(e.target.files[0]);
         });
