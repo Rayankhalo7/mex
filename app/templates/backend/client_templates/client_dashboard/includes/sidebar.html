@@ -119,6 +119,17 @@
                   role="list" id="submenu-app" aria-expanded="false">
                   <ul class="flex-column nav">
                     <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
+                      <a class="nav-link" href="{{ url_for('client_lieferzeiten_bp.view_lieferzeiten') }}">
+                        <span class="sidebar-text">Lieferzeiten</span>
+                    </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="multi-level collapse {% if 'tables-bootstrap-' in segment %} show {% endif %}"
+                  role="list" id="submenu-app" aria-expanded="false">
+                  <ul class="flex-column nav">
+                    <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
                       <a class="nav-link" href="{{ url_for('rating_bp.client_dashboard_ratings') }}">
                         <span class="sidebar-text">Bewertungen</span>
                     </a>

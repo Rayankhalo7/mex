@@ -1,0 +1,47 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Öffnungszeiten Verwaltung {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Alle Lieferzeiten</h2>
+
+            <!-- Button zum Hinzufügen neuer Öffnungszeiten -->
+            <a href="{{ url_for('client_lieferzeiten_bp.add_lieferzeiten') }}" class="btn btn-primary mb-3">Neue Öffnungszeiten hinzufügen</a>
+
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0 rounded">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="border-0">Liefer von</th>
+                                    <th class="border-0">bis</th>
+                                    <th class="border-0">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hours in lieferzeiten %}
+                                <tr style="border-bottom: 1px solid #e0e0e0;">
+                                    <td class="border-0">{{ hours.zeit_von }}</td>
+                                    <td class="border-0">{{ hours.zeit_bis }}</td>
+                                    <td class="border-0">
+                                        <!-- Buttons zum Bearbeiten und Löschen -->
+                                        <a href="{{ url_for('client_lieferzeiten_bp.edit_lieferzeiten', id=hours.id) }}" class="btn btn-warning">Bearbeiten</a>
+                                        <form action="{{ url_for('client_lieferzeiten_bp.delete_lieferzeiten', id=hours.id) }}" method="POST" style="display:inline-block;">
+                                            <button type="submit" class="btn btn-danger">Löschen</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

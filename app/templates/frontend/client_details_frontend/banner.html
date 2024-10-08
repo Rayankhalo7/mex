@@ -66,8 +66,17 @@
              </div>
              <div class="col-md-4">
                 <div class="restaurant-detailed-header-right text-right">
-                   <button class="btn btn-success" type="button"><i class="icofont-clock-time"></i> 25–35 min
-                   </button>
+                  {% if lieferzeiten %}
+    {% for lieferzeit in lieferzeiten %}
+        <button class="btn btn-success" type="button">
+            <i class="icofont-clock-time"></i> {{ lieferzeit.zeit_von.strftime('%M') }} – {{ lieferzeit.zeit_bis.strftime('%M') }} min
+        </button>
+    {% endfor %}
+{% else %}
+    <p>Es wurden noch keine Lieferzeiten festgelegt.</p>
+{% endif %}
+
+
                    <h6 class="text-white mb-0 restaurant-detailed-ratings">
                      <!-- Durchschnittliche Bewertung anzeigen -->
                      <span class="generator-bg rounded text-white">

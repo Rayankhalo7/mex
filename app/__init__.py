@@ -105,6 +105,7 @@ def create_app():
         from app.routes.rating import rating_bp
         from app.routes.banner import client_banner_bp
         from app.routes.client_galerie import client_galerie_bp
+        from app.routes.lieferzeiten import client_lieferzeiten_bp
 
         app.register_blueprint(client_category_bp, url_prefix='/client')
         app.register_blueprint(client_product_bp, url_prefix='/client')
@@ -112,5 +113,6 @@ def create_app():
         app.register_blueprint(rating_bp, url_prefix='/client')
         app.register_blueprint(client_banner_bp, url_prefix='/client')
         app.register_blueprint(client_galerie_bp, url_prefix='/client')
+        app.register_blueprint(client_lieferzeiten_bp, url_prefix='/client')
 
     return app

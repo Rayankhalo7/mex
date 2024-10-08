@@ -1,6 +1,9 @@
 {% extends "client_dashboard/layout/base.html" %}
 
 {% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
 <h1>Neue Kategorie hinzufügen</h1>
 <form action="{{ url_for('client_category_bp.add_category') }}" method="POST">
     <div class="mb-3">
@@ -10,4 +13,8 @@
     <button type="submit" class="btn btn-success">Speichern</button>
     <a href="{{ url_for('client_category_bp.view_categories') }}" class="btn btn-secondary">Abbrechen</a>
 </form>
+
+        </div>
+    </div> 
+</div>
 {% endblock %}

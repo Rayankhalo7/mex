@@ -1,0 +1,27 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Lieferzeiten Bearbeiten {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Lieferzeiten bearbeiten</h2>
+            <form method="POST" action="{{ url_for('client_lieferzeiten_bp.edit_lieferzeiten', id=lieferzeiten.id) }}">
+                <div class="mb-3">
+                    <label for="zeit_von" class="form-label">Lieferzeit von</label>
+                    <input type="time" id="zeit_von" name="zeit_von" class="form-control" value="{{ lieferzeiten.zeit_von }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="zeit_bis" class="form-label">Lieferzeit bis</label>
+                    <input type="time" id="zeit_bis" name="zeit_bis" class="form-control" value="{{ lieferzeiten.zeit_bis }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Speichern</button>
+                <a href="{{ url_for('client_lieferzeiten_bp.view_lieferzeiten') }}" class="btn btn-secondary">Abbrechen</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

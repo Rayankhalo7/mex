@@ -1,0 +1,29 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Öffnungszeiten hinzufügen {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Öffnungszeiten hinzufügen</h2>
+
+            <form method="POST" action="{{ url_for('client_lieferzeiten_bp.add_lieferzeiten') }}">
+                
+
+                <div class="mb-3">
+                    <label for="zeit_von" class="form-label">Lieferzeit von</label>
+                    <input type="time" id="zeit_von" name="zeit_von" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="zeit_bis" class="form-label">Lieferzeit bis</label>
+                    <input type="time" id="zeit_bis" name="zeit_bis" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-success">Lieferzeiten hinzufügen</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

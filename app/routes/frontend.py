@@ -7,7 +7,9 @@ from app import db
 from flask_login import current_user
 from app.models.banner import Banner
 from app.models.rating import Rating
+from app.models.lieferzeiten import Lieferzeiten
 from datetime import datetime
+from app.models.product import Product
 
 # Blueprint für das Frontend erstellen
 frontend_bp = Blueprint('frontend_bp', __name__, template_folder='templates/frontend')
@@ -24,6 +26,7 @@ def home():
     return render_template('frontend/home.html', clients=clients)
 
 # Route für die Client-Detailseite
+# Route für die Client-Detailseite
 @frontend_bp.route('/client/<int:client_id>')
 def client_detail(client_id):
     # Spezifischen Client anhand der ID abrufen
@@ -39,16 +42,30 @@ def client_detail(client_id):
     # Überprüfen, ob Öffnungszeiten vorhanden sind, um Fehler in der Vorlage zu vermeiden
     opening_hours = client.opening_hours if hasattr(client, 'opening_hours') else []
 
+    # Lieferzeiten abrufen
+    lieferzeiten = client.lieferzeiten if hasattr(client, 'lieferzeiten') else []
+
+    # Kategorien abrufen
     categories = client.categories if hasattr(client, 'categories') else []
 
+    # Authentifizierter Benutzer
     user = current_user if current_user.is_authenticated else None
 
+    # Banner abrufen
     banner = Banner.query.filter_by(client_id=client.id).first()
     
     # Berechne die Anzahl der Kommentare
     total_reviews = sum(1 for rating in ratings if rating.comment)
 
+    # Aktuelle Uhrzeit
     current_time = datetime.now()
+
+    # Filtere die "Most Popular"-Produkte des Clients
+    most_popular_products = Product.query.filter_by(client_id=client.id, is_must_popular=True).all()
+
+    # Filtere die "Bestseller"-Produkte des Clients
+    bestseller_products = Product.query.filter_by(client_id=client.id, is_bestseller=True).all()
+
 
     return render_template(
         'frontend/client_detail.html',
@@ -61,6 +78,9 @@ def client_detail(client_id):
         current_time=current_time,
         total_ratings=total_ratings,  # Hinzufügen von total_ratings
         average_rating=average_rating,  # Hinzufügen von average_rating
-        total_reviews=total_reviews  # Hinzufügen von total_reviews
+        total_reviews=total_reviews,  # Hinzufügen von total_reviews
+        lieferzeiten=lieferzeiten,
+        most_popular_products=most_popular_products, 
+        bestseller_products=bestseller_products
     )
 

@@ -631,7 +631,7 @@ span.count-number.float-right {
 background: #ff6347; /* Old browsers */
 background: -moz-linear-gradient(-45deg, #ff6347 1%, #fe792b 100%); /* FF3.6-15 */
 background: -webkit-linear-gradient(-45deg, #ff6347 1%,#fe792b 100%); /* Chrome10-25,Safari5.1-6 */
-background: linear-gradient(135deg, #ff6347 1%,#fe792b 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+background: linear-gradient(135deg, #ff6347 1%,#ff8000 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff6347', endColorstr='#fe792b',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 .restaurant-detailed-banner {

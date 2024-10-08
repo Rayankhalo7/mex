@@ -1,8 +1,14 @@
 {% extends "client_dashboard/layout/base.html" %}
 
+{% block title %} Produkt bearbeiten {% endblock %}
+
 {% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
 <h1>Produkt bearbeiten</h1>
-<form action="{{ url_for('client_product_bp.edit_product', id=product.id) }}" method="POST">
+<form action="{{ url_for('client_product_bp.edit_product', id=product.id) }}" method="POST" enctype="multipart/form-data">
+    <!-- Produktinformationen -->
     <div class="mb-3">
         <label for="name" class="form-label">Name des Produkts</label>
         <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
@@ -23,7 +29,67 @@
             {% endfor %}
         </select>
     </div>
+
+    <!-- Checkboxen für Gruppenzugehörigkeit -->
+    <div class="mb-3">
+        <label class="form-label">Gruppen:</label><br>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="is_must_popular" name="is_must_popular" {% if product.is_must_popular %} checked {% endif %}>
+            <label class="form-check-label" for="is_must_popular">
+                Must Popular
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="is_bestseller" name="is_bestseller" {% if product.is_bestseller %} checked {% endif %}>
+            <label class="form-check-label" for="is_bestseller">
+                Bestseller
+            </label>
+        </div>
+    </div>
+
+    <!-- Bild-Upload -->
+    <div class="mb-3">
+        <label for="image" class="form-label">Neues Produktbild</label>
+        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+    </div>
+    
+    <!-- Vorschau des aktuellen Bildes anzeigen -->
+    <div class="mb-3">
+        {% if product.image %}
+            <label for="current_image" class="form-label">Aktuelles Bild</label><br>
+            <img id="current_image" src="{{ url_for('static', filename='upload/client_produktbilder/' ~ client.id ~ '/' ~ product.image) }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 200px; height: 200px; border: 1px solid #ddd;">
+        {% else %}
+            <p>Kein Bild vorhanden</p>
+        {% endif %}
+    </div>
+
+    <!-- Bildvorschau für das neue Bild anzeigen -->
+    <div class="mb-3">
+        <img id="showImage" src="#" alt="Bildvorschau" style="display: none; width: 200px; height: 200px; border: 1px solid #ddd; margin-top: 10px;">
+    </div>
+
+    <!-- Buttons -->
     <button type="submit" class="btn btn-success">Änderungen speichern</button>
     <a href="{{ url_for('client_product_bp.view_products') }}" class="btn btn-secondary">Abbrechen</a>
 </form>
+
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        // Vorschau des neuen ausgewählten Bildes anzeigen
+        $('#image').change(function(e){
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $('#showImage').attr('src', e.target.result).show();
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    });
+</script>
+{% endblock javascripts %}

@@ -2,9 +2,6 @@
 
 {% block title %} Produkte Verwaltung {% endblock %}
 
-<!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
-
 {% block content %}
 <div class="row">
     <div class="col-12 col-xl-12">
@@ -21,9 +18,11 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th class="border-0 rounded-start">ID</th>
+                                    <th class="border-0">Produktbild</th> <!-- Neue Spalte für das Bild -->
                                     <th class="border-0">Produktname</th>
                                     <th class="border-0">Preis</th>
                                     <th class="border-0">Kategorie</th>
+                                    <th class="border-0">Gruppen</th> <!-- Neue Spalte für die Gruppenzugehörigkeit -->
                                     <th class="border-0">Aktionen</th>
                                 </tr>
                             </thead>
@@ -32,9 +31,29 @@
                                 {% for product in products %}
                                 <tr style="border-bottom: 1px solid #e0e0e0;">
                                     <td class="border-0">{{ product.id }}</td>
+                                    <td class="border-0">
+                                        <!-- Überprüfe, ob ein Bild vorhanden ist -->
+                                        {% if product.image %}
+                                            <img src="{{ url_for('static', filename='upload/client_produktbilder/' ~ client.id ~ '/' ~ product.image) }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 100px; height: 100px;">
+                                        {% else %}
+                                            <span>Kein Bild vorhanden</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="border-0">{{ product.name }}</td>
-                                    <td class="border-0">{{ product.price }}0 €</td>
+                                    <td class="border-0">{{ product.price }} €</td>
                                     <td class="border-0">{{ product.category.name }}</td> <!-- Zeigt den Namen der Kategorie an -->
+                                    <td class="border-0">
+                                        <!-- Gruppenzugehörigkeit anzeigen -->
+                                        {% if product.is_must_popular and product.is_bestseller %}
+                                            <span class="badge bg-primary">Must Popular & Bestseller</span>
+                                        {% elif product.is_must_popular %}
+                                            <span class="badge bg-success">Must Popular</span>
+                                        {% elif product.is_bestseller %}
+                                            <span class="badge bg-warning">Bestseller</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Keine Gruppe</span>
+                                        {% endif %}
+                                    </td>
                                     <td class="border-0">
                                         <!-- Buttons zum Bearbeiten und Löschen -->
                                         <a href="{{ url_for('client_product_bp.edit_product', id=product.id) }}" class="btn btn-warning">Bearbeiten</a>

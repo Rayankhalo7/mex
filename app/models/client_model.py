@@ -34,6 +34,7 @@ class Client(db.Model):
     ratings = db.relationship('Rating', backref='client_rating', lazy=True) 
     banners = db.relationship('Banner', backref='banner_client', lazy=True, cascade="all, delete-orphan")
     galerie_images = db.relationship('Galerie', backref='client_galerie', lazy=True, cascade="all, delete-orphan") 
+    lieferzeiten = db.relationship('Lieferzeiten', backref='client_lieferzeiten', lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, password):
         # Verwende hashlib, um den md5-Hash zu generieren
