@@ -14,7 +14,7 @@ class Rating(db.Model):
 
     # Beziehung zu anderen Modellen
     client = db.relationship('Client', backref='client_reviews')  # Geänderter `backref`-Name
-    user = db.relationship('User', backref='user_reviews')
+    user = db.relationship('User', backref=db.backref('user_ratings', lazy=True))
 
     def __repr__(self):
         return f"<Rating {self.rating} for Client {self.client_id}>"

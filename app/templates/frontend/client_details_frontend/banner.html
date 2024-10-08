@@ -17,8 +17,42 @@
                 <div class="restaurant-detailed-header-left">
                    <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid mb-4" alt="{{ client.clientname }}">
                    <h2 class="text-white">{{ client.clientname }}</h2>
-                   <p class="text-white mb-1"><i class="icofont-location-pin"></i> {{ client.street }} {{ client.house_number }}, {{ client.city }} - {{ client.postal_code }} <span class="badge badge-success">OPEN</span>
-                   </p>
+                   <p class="text-white mb-1">
+                     <i class="icofont-location-pin"></i> 
+                     {{ client.street }} {{ client.house_number }}, {{ client.postal_code }}, {{ client.city }} -
+                     
+                     
+
+                        {% set weekday_map = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+                           {% set current_day = weekday_map[current_time.strftime('%A')] %}
+
+                              {% if client.opening_hours|length > 0 %}
+                                    <!-- Finde die Öffnungszeiten für den heutigen Tag -->
+                                    {% set today_opening_hours = client.opening_hours|selectattr('day_of_week', 'equalto', current_day)|first %}
+
+                                    {% if today_opening_hours %}
+                                    <!-- Anzeige des Wochentags und der Öffnungszeiten -->
+                                    <i class="icofont-clock-time"></i>
+                                    <strong>{{ today_opening_hours.day_of_week }}:</strong> 
+                                    {{ today_opening_hours.open_time.strftime('%H:%M') }} - {{ today_opening_hours.close_time.strftime('%H:%M') }}
+
+                                    <!-- Überprüfe, ob der Client geöffnet ist -->
+                                    {% set now_time = current_time.time() %}
+                                    {% if today_opening_hours.open_time <= now_time <= today_opening_hours.close_time %}
+                                    <span class="badge badge-success"> geöffnet</span>
+                                    {% else %}
+                                    <span class="badge badge-danger"> geschlossen </span>
+                                    {% endif %}
+                                    {% else %}
+                                    <i class="icofont-clock-time text-primary mr-2"></i> <strong> Öffnungszeiten:</strong> Heute geschlossen
+                                    {% endif %}
+                                    {% else %}
+                                    <i class="icofont-clock-time"></i><strong> Öffnungszeiten:</strong> Keine Angaben
+                                    {% endif %}
+
+                       </p>
+
+
                    <p class="text-white mb-0"><i class="icofont-food-cart"></i>
                      {% if categories %}
                          {% for category in categories %}
@@ -34,7 +68,17 @@
                 <div class="restaurant-detailed-header-right text-right">
                    <button class="btn btn-success" type="button"><i class="icofont-clock-time"></i> 25–35 min
                    </button>
-                   <h6 class="text-white mb-0 restaurant-detailed-ratings"><span class="generator-bg rounded text-white"><i class="icofont-star"></i> 3.1</span> 23 Ratings  <i class="ml-3 icofont-speech-comments"></i> 91 reviews</h6>
+                   <h6 class="text-white mb-0 restaurant-detailed-ratings">
+                     <!-- Durchschnittliche Bewertung anzeigen -->
+                     <span class="generator-bg rounded text-white">
+                         <i class="icofont-star"></i> {{ average_rating }}
+                     </span> 
+                     <!-- Anzahl der Bewertungen anzeigen -->
+                     {{ total_ratings }} Bewertungen  
+                     <i class="ml-3 icofont-speech-comments"></i> 
+                     <!-- Anzahl der Kommentare anzeigen -->
+                     {{ total_reviews }} Kommentare
+                 </h6>
                 </div>
              </div>
           </div>

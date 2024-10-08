@@ -27,7 +27,7 @@ class Admin(db.Model):
         self.password_hash = f'md5${md5_hash}'  # Speichere den Hash mit einem Präfix, um ihn zu identifizieren
 
     def check_password(self, password):
-        # Extrahiere den gespeicherten md5-Hash und vergleiche
+        # Extrahiere den gespeicherten md5-Hash und vergleichen
         stored_md5_hash = self.password_hash.split('$')[1]
         return stored_md5_hash == hashlib.md5(password.encode()).hexdigest()
 

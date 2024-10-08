@@ -17,6 +17,7 @@
                <div class="col-md-8">
                   <div class="offer-dedicated-body-left">
                      <div class="tab-content" id="pills-tabContent">
+
                         <div class="tab-pane fade show active" id="pills-order-online" role="tabpanel" aria-labelledby="pills-order-online-tab">
                            <div id="#menu" class="bg-white rounded shadow-sm p-4 mb-4 explore-outlets">
                               
@@ -107,6 +108,7 @@
 
                            
                         </div>
+
                         <div class="tab-pane fade" id="pills-gallery" role="tabpanel" aria-labelledby="pills-gallery-tab">
                             <div id="gallery" class="bg-white rounded shadow-sm p-4 mb-4">
                                 <div class="restaurant-slider-main position-relative homepage-great-deals-carousel">
@@ -147,25 +149,52 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h5 class="mb-4">Restaurant Info</h5>
+                                <h5 class="mb-4">Restaurant Infos</h5>
                                 <p class="mb-3">
-                                    {{ client.address }}<br>
-                                    {{ client.city }}, {{ client.state }} - {{ client.postal_code }}
+                                    {{ client.street }} {{ client.house_number}}<br>
+                                    {{ client.postal_code }}, {{ client.city }}
                                 </p>
                                 <p class="mb-2 text-black">
-                                    <i class="icofont-phone-circle text-primary mr-2"></i> {{ client.phone_1 }}, {{ client.phone_2 }}
+                                    <i class="icofont-phone-circle text-primary mr-2"></i> {{ client.phone_number }}
                                 </p>
                                 <p class="mb-2 text-black">
-                                    <i class="icofont-email text-primary mr-2"></i> {{ client.email_1 }}, {{ client.email_2 }}
+                                    <i class="icofont-email text-primary mr-2"></i> {{ client.email }}
                                 </p>
+                                
                                 <p class="mb-2 text-black">
-                                    <i class="icofont-clock-time text-primary mr-2"></i> Heute: {{ client.opening_hours }}
-                                    {% if client.is_open %}
-                                        <span class="badge badge-success"> OPEN NOW </span>
-                                    {% else %}
-                                        <span class="badge badge-danger"> CLOSED </span>
-                                    {% endif %}
+
+                                 {% set weekday_map = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+{% set current_day = weekday_map[current_time.strftime('%A')] %}
+
+{% if client.opening_hours|length > 0 %}
+    <!-- Finde die Öffnungszeiten für den heutigen Tag -->
+    {% set today_opening_hours = client.opening_hours|selectattr('day_of_week', 'equalto', current_day)|first %}
+
+    {% if today_opening_hours %}
+        <!-- Anzeige des Wochentags und der Öffnungszeiten -->
+        <i class="icofont-clock-time text-primary mr-2"></i>
+        <strong>{{ today_opening_hours.day_of_week }}:</strong> 
+        {{ today_opening_hours.open_time.strftime('%H:%M') }} - {{ today_opening_hours.close_time.strftime('%H:%M') }}
+
+        <!-- Überprüfe, ob der Client geöffnet ist -->
+        {% set now_time = current_time.time() %}
+        {% if today_opening_hours.open_time <= now_time <= today_opening_hours.close_time %}
+            <span class="badge badge-success"> geöffnet</span>
+        {% else %}
+            <span class="badge badge-danger"> geschlossen </span>
+        {% endif %}
+    {% else %}
+        <i class="icofont-clock-time text-primary mr-2"></i><strong>Öffnungszeiten:</strong> Heute geschlossen
+    {% endif %}
+{% else %}
+    <i class="icofont-clock-time text-primary mr-2"></i><strong>Öffnungszeiten:</strong> Keine Angaben
+{% endif %}
+
                                 </p>
+
+
+
+                                
                                 <hr class="clearfix">
                                 <p class="text-black mb-0">
                                     Sie können auch die 3D-Ansicht durch unsere Menükarte sehen, indem Sie hier klicken &nbsp;&nbsp;&nbsp; 
@@ -226,157 +255,108 @@
                               </form>
                            </div>
                         </div>
+
                         <div class="tab-pane fade" id="pills-reviews" role="tabpanel" aria-labelledby="pills-reviews-tab">
-                           <div id="ratings-and-reviews" class="bg-white rounded shadow-sm p-4 mb-4 clearfix restaurant-detailed-star-rating">
-                              <span class="star-rating float-right">
-                              <a href="#"><i class="icofont-ui-rating icofont-2x active"></i></a>
-                              <a href="#"><i class="icofont-ui-rating icofont-2x active"></i></a>
-                              <a href="#"><i class="icofont-ui-rating icofont-2x active"></i></a>
-                              <a href="#"><i class="icofont-ui-rating icofont-2x active"></i></a>
-                              <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                              </span>
-                              <h5 class="mb-0 pt-1">Rate this Place</h5>
+                           <!-- Bewertungsübersicht und Möglichkeit zur Abgabe einer Bewertung -->
+                           <div class="bg-white rounded shadow-sm p-4 mb-4 clearfix restaurant-detailed-star-rating">
+                               <h5 class="mb-0 pt-1">Bewertungen und Rezensionen</h5>
+                       
+                               <!-- Bewertungsübersicht -->
+                               {% if ratings|length > 0 %}
+                                   <div class="reviews-members pt-4 pb-4">
+                                       {% for rating in ratings %}
+                                           <div class="media mb-2">
+                                               <!-- Benutzerbild anzeigen -->
+                                               <img alt="Benutzerbild" src="{% if rating.user.photo %}{{ url_for('static', filename=rating.user.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}" class="mr-3 rounded-pill" style="max-height: 60px;">
+                                               
+                                               <div class="media-body">
+                                                   <div class="reviews-members-header">
+                                                       <!-- Sternebewertung anzeigen -->
+                                                       <span class="star-rating float-right">
+                                                           {% for i in range(1, 6) %}
+                                                               <a href="#" title="{{ i }} von 5 Sternen"><i class="icofont-ui-rating {% if i <= rating.rating %}active{% endif %}"></i></a>
+                                                           {% endfor %}
+                                                       </span>
+                                                       <h6 class="mb-1"><a class="text-black" href="#">{{ rating.user.username }}</a></h6>
+                                                       <p class="text-gray">{{ rating.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                                                   </div>
+                                                   <div class="reviews-members-body">
+                                                       <p>{{ rating.comment }}</p>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <hr>
+                                       {% endfor %}
+                                   </div>
+                                   <a class="text-center w-100 d-block mt-4 font-weight-bold" href="#">Alle Bewertungen anzeigen</a>
+                               {% else %}
+                                   <p>Keine Bewertungen verfügbar.</p>
+                               {% endif %}
                            </div>
-                           <div class="bg-white rounded shadow-sm p-4 mb-4 clearfix graph-star-rating">
-                              <h5 class="mb-0 mb-4">Ratings and Reviews</h5>
-                              <div class="graph-star-rating-header">
-                                 <div class="star-rating">
-                                    <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                    <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                    <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                    <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                    <a href="#"><i class="icofont-ui-rating"></i></a>  <b class="text-black ml-2">334</b>
-                                 </div>
-                                 <p class="text-black mb-4 mt-2">Rated 3.5 out of 5</p>
-                              </div>
-                              <div class="graph-star-rating-body">
-                                 <div class="rating-list">
-                                    <div class="rating-list-left text-black">
-                                       5 Star
-                                    </div>
-                                    <div class="rating-list-center">
-                                       <div class="progress">
-                                          <div style="width: 56%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5" role="progressbar" class="progress-bar bg-primary">
-                                             <span class="sr-only">80% Complete (danger)</span>
-                                          </div>
-                                       </div>
-                                    </div>
-                                    <div class="rating-list-right text-black">56%</div>
-                                 </div>
-                                 <div class="rating-list">
-                                    <div class="rating-list-left text-black">
-                                       4 Star
-                                    </div>
-                                    <div class="rating-list-center">
-                                       <div class="progress">
-                                          <div style="width: 23%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5" role="progressbar" class="progress-bar bg-primary">
-                                             <span class="sr-only">80% Complete (danger)</span>
-                                          </div>
-                                       </div>
-                                    </div>
-                                    <div class="rating-list-right text-black">23%</div>
-                                 </div>
-                                 <div class="rating-list">
-                                    <div class="rating-list-left text-black">
-                                       3 Star
-                                    </div>
-                                    <div class="rating-list-center">
-                                       <div class="progress">
-                                          <div style="width: 11%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5" role="progressbar" class="progress-bar bg-primary">
-                                             <span class="sr-only">80% Complete (danger)</span>
-                                          </div>
-                                       </div>
-                                    </div>
-                                    <div class="rating-list-right text-black">11%</div>
-                                 </div>
-                                 <div class="rating-list">
-                                    <div class="rating-list-left text-black">
-                                       2 Star
-                                    </div>
-                                    <div class="rating-list-center">
-                                       <div class="progress">
-                                          <div style="width: 2%" aria-valuemax="5" aria-valuemin="0" aria-valuenow="5" role="progressbar" class="progress-bar bg-primary">
-                                             <span class="sr-only">80% Complete (danger)</span>
-                                          </div>
-                                       </div>
-                                    </div>
-                                    <div class="rating-list-right text-black">02%</div>
-                                 </div>
-                              </div>
-                              <div class="graph-star-rating-footer text-center mt-3 mb-3">
-                                 <button type="button" class="btn btn-outline-primary btn-sm">Rate and Review</button>
-                              </div>
-                           </div>
-                           <div class="bg-white rounded shadow-sm p-4 mb-4 restaurant-detailed-ratings-and-reviews">
-                              <a href="#" class="btn btn-outline-primary btn-sm float-right">Top Rated</a>
-                              <h5 class="mb-1">All Ratings and Reviews</h5>
-                              
-                              <hr>
-                              <div class="reviews-members pt-4 pb-4">
-                                 <div class="media">
-                                    <a href="#"><img alt="Generic placeholder image" src="img/user/6.png" class="mr-3 rounded-pill"></a>
-                                    <div class="media-body">
-                                       <div class="reviews-members-header">
-                                          <span class="star-rating float-right">
-                                          <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                          <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                          <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                          <a href="#"><i class="icofont-ui-rating active"></i></a>
-                                          <a href="#"><i class="icofont-ui-rating"></i></a>
-                                          </span>
-                                          <h6 class="mb-1"><a class="text-black" href="#">Gurdeep Singh</a></h6>
-                                          <p class="text-gray">Tue, 20 Mar 2020</p>
-                                       </div>
-                                       <div class="reviews-members-body">
-                                          <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
-                                       </div>
-                                       <div class="reviews-members-footer">
-                                          <a class="total-like" href="#"><i class="icofont-thumbs-up"></i> 88K</a> <a class="total-like" href="#"><i class="icofont-thumbs-down"></i> 1K</a> 
-                                         
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                              <hr>
-                              <a class="text-center w-100 d-block mt-4 font-weight-bold" href="#">See All Reviews</a>
-                           </div>
+                           
+                           <!-- Bewertungen abgeben -->
+                           {% if current_user.is_authenticated %}
                            <div class="bg-white rounded shadow-sm p-4 mb-5 rating-review-select-page">
-                              <h5 class="mb-4">Leave Comment</h5>
-                              <p class="mb-2">Rate the Place</p>
-                              <div class="mb-4">
-                                 <span class="star-rating">
-                                 <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                                 <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                                 <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                                 <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                                 <a href="#"><i class="icofont-ui-rating icofont-2x"></i></a>
-                                 </span>
-                              </div>
-                              <form>
-                                 <div class="form-group">
-                                    <label>Your Comment</label>
-                                    <textarea class="form-control"></textarea>
-                                 </div>
-                                 <div class="form-group">
-                                    <button class="btn btn-primary btn-sm" type="button"> Submit Comment </button>
-                                 </div>
-                              </form>
+                               <h5 class="mb-4">Kommentar hinterlassen</h5>
+                               <p class="mb-2">Bewerten Sie den Ort</p>
+                               <div class="mb-4">
+                                   <form method="POST" action="{{ url_for('rating_bp.rate_client', client_id=client.id) }}">
+                                       <span class="star-rating">
+                                           <!-- Sterne für die Bewertung -->
+                                           {% for i in range(1, 6) %}
+                                               <label>
+                                                   <input type="radio" name="rating" value="{{ i }}" title="{{ i }} von 5 Sternen"> 
+                                                   <i class="icofont-ui-rating icofont-2x" title="{{ i }} von 5 Sternen"></i> {{ i }} 
+                                               </label>
+                                           {% endfor %}
+                                       </span>
+                                       <div class="form-group mt-3">
+                                           <label>Ihr Kommentar</label>
+                                           <textarea class="form-control" name="comment" placeholder="Ihr Kommentar"></textarea>
+                                       </div>
+                                       <div class="form-group">
+                                           <button class="btn btn-primary btn-sm" type="submit">Kommentar absenden</button>
+                                       </div>
+                                   </form>
+                               </div>
                            </div>
-                        </div>
+                           {% else %}
+                               <p>Bitte <a href="{{ url_for('user_bp.login') }}">loggen Sie sich ein</a>, um eine Bewertung abzugeben.</p>
+                           {% endif %}
+                       </div>
+                       
+
+
+                       
+
+
+
+
+
                      </div>
+
                   </div>
+
+
+
+               
+
+
+
                </div>
+
+
                <div class="col-md-4">
                   <div class="pb-2">
-				  <div class="bg-white rounded shadow-sm text-white mb-4 p-4 clearfix restaurant-detailed-earn-pts card-icon-overlap">
+              <div class="bg-white rounded shadow-sm text-white mb-4 p-4 clearfix restaurant-detailed-earn-pts card-icon-overlap">
                      <img class="img-fluid float-left mr-3" src="img/earn-score-icon.png">
                      <h6 class="pt-0 text-primary mb-1 font-weight-bold">OFFER</h6>
-                     <p class="mb-0">60% off on orders above $99 | Use coupon <span class="text-danger font-weight-bold">OSAHAN50</span></p>
+                     <p class="mb-0">60% off on orders above $99 | Use coupon <span class="text-danger font-weight-bold">Rayan50</span></p>
                      <div class="icon-overlap">
                         <i class="icofont-sale-discount"></i>
                      </div>
                   </div>
-				  </div>
+              </div>
                   <div class="generator-bg rounded shadow-sm mb-4 p-4 osahan-cart-item">
                      <h5 class="mb-1 text-white">Your Order</h5>
                      <p class="mb-4 text-white">6 ITEMS</p>
@@ -405,62 +385,20 @@
                      </div>
                      <a href="checkout.html" class="btn btn-success btn-block btn-lg">Checkout <i class="icofont-long-arrow-right"></i></a>
                   </div>
-				  
-				  <div class="text-center pt-2 mb-4">
-				  
-				  </div>
-				  <div class="text-center pt-2">
-				  
-				  </div>
-               </div>
+              
+              <div class="text-center pt-2 mb-4">
+              
+              </div>
+              <div class="text-center pt-2">
+              
+              </div>
+                 </div>
+
             </div>
          </div>
       </section>
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>{{ client.clientname }}</h2>
-            <!-- Client-Logo/Foto -->
-            <img src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid mb-4" alt="{{ client.clientname }}">
 
-            <p class="mt-3"><strong>Adresse:</strong> {{ client.street }} {{ client.house_number }}, {{ client.city }} - {{ client.postal_code }}</p>
-            <p><strong>Telefonnummer:</strong> {{ client.phone_number }}</p>
-            
-            <!-- Öffnungszeiten anzeigen, falls vorhanden -->
-            {% if client.opening_hours|length > 0 %}
-                <h4>Öffnungszeiten</h4>
-                <ul>
-                    {% for opening_hour in client.opening_hours %}
-                        <li>{{ opening_hour.day_of_week }}: {{ opening_hour.open_time.strftime('%H:%M') }} - {{ opening_hour.close_time.strftime('%H:%M') }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p><strong>Öffnungszeiten:</strong> Keine Angaben</p>
-            {% endif %}
-            
-            <!-- Galerie-Bilder anzeigen -->
-            
-            
-            <!-- Bewertungen anzeigen, falls vorhanden -->
-            <h4>Bewertungen</h4>
-            {% if ratings|length > 0 %}
-                <ul class="list-unstyled">
-                    {% for rating in ratings %}
-                        <li class="mb-3">
-                            <strong>{{ rating.user.username }}</strong> 
-                            <span class="badge badge-info">{{ rating.rating }} Sterne</span>
-                            <p>{{ rating.comment }}</p>
-                            <small class="text-muted">{{ rating.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Keine Bewertungen verfügbar.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
 {% endblock content %}
 
 {% include 'frontend/client_details_frontend/footer.html' %}

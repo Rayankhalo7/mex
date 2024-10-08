@@ -1,0 +1,42 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Öffnungszeiten bearbeiten {% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Öffnungszeiten bearbeiten</h2>
+
+            <!-- Bearbeitungsformular für die Öffnungszeiten -->
+            <form method="POST" action="{{ url_for('client_opening_hours_bp.edit_opening_hours', id=opening_hours.id) }}">
+                <div class="mb-3">
+                    <label for="day_of_week" class="form-label">Wochentag</label>
+                    <select id="day_of_week" name="day_of_week" class="form-control" required>
+                        <option value="Montag" {% if opening_hours.day_of_week == 'Montag' %}selected{% endif %}>Montag</option>
+                        <option value="Dienstag" {% if opening_hours.day_of_week == 'Dienstag' %}selected{% endif %}>Dienstag</option>
+                        <option value="Mittwoch" {% if opening_hours.day_of_week == 'Mittwoch' %}selected{% endif %}>Mittwoch</option>
+                        <option value="Donnerstag" {% if opening_hours.day_of_week == 'Donnerstag' %}selected{% endif %}>Donnerstag</option>
+                        <option value="Freitag" {% if opening_hours.day_of_week == 'Freitag' %}selected{% endif %}>Freitag</option>
+                        <option value="Samstag" {% if opening_hours.day_of_week == 'Samstag' %}selected{% endif %}>Samstag</option>
+                        <option value="Sonntag" {% if opening_hours.day_of_week == 'Sonntag' %}selected{% endif %}>Sonntag</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="open_time" class="form-label">Öffnungszeit</label>
+                    <input type="time" id="open_time" name="open_time" class="form-control" value="{{ opening_hours.open_time }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="close_time" class="form-label">Schließzeit</label>
+                    <input type="time" id="close_time" name="close_time" class="form-control" value="{{ opening_hours.close_time }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-success">Änderungen speichern</button>
+                <a href="{{ url_for('client_opening_hours_bp.view_opening_hours') }}" class="btn btn-secondary">Zurück</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
