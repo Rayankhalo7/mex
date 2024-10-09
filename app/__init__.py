@@ -115,4 +115,13 @@ def create_app():
         app.register_blueprint(client_galerie_bp, url_prefix='/client')
         app.register_blueprint(client_lieferzeiten_bp, url_prefix='/client')
 
+
+
+        # Registriere Blueprint für Warenkorb-Funktionalität
+        from app.routes.add_to_cart import cart_bp  # Importiere den neuen Warenkorb-Blueprint
+        app.register_blueprint(cart_bp, url_prefix='/cart')
+
+        from app.routes.checkout import checkout_bp
+        app.register_blueprint(checkout_bp, url_prefix='/')
+
     return app

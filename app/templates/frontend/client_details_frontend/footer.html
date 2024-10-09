@@ -90,5 +90,106 @@
 
 <!-- Custom scripts for all pages-->
 <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script type="text/javascript">
+  // Toastr options configuration
+  toastr.options = {
+      "closeButton": true,
+      "progressBar": true,
+      "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
+      "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
+      "extendedTimeOut": "1000"
+  }
+
+  // Überprüfe, ob es geflashte Nachrichten gibt
+  {% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  var type = "{{ category }}";  // Kategorie: success, info, warning, error
+  switch(type){
+      case 'info':
+          toastr.info("{{ message }}");
+          break;
+      case 'success':
+          toastr.success("{{ message }}");
+          break;
+      case 'warning':
+          toastr.warning("{{ message }}");
+          break;
+      case 'error':
+          toastr.error("{{ message }}");
+          break;
+  }
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+</script>
+
+
+<!-- JavaScript für das dynamische Hinzufügen und Entfernen von Produkten -->
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+       // Event-Listener für die Erhöhen-Buttons
+       document.querySelectorAll('.inc').forEach(button => {
+           button.addEventListener('click', function(event) {
+               const productId = this.closest('.gold-members').getAttribute('data-product-id');
+               fetch(`/increase_quantity/${productId}`, { method: 'POST' })
+                   .then(response => response.json())
+                   .then(data => {
+                       if (data.status === 'success') {
+                           // Aktualisiere die Menge im Warenkorb
+                           this.previousElementSibling.value = data.quantity;
+                           updateTotalCost();
+                       } else {
+                           alert(data.message);
+                       }
+                   });
+           });
+       });
+
+       // Event-Listener für die Verringern-Buttons
+       document.querySelectorAll('.dec').forEach(button => {
+           button.addEventListener('click', function(event) {
+               const productId = this.closest('.gold-members').getAttribute('data-product-id');
+               fetch(`/decrease_quantity/${productId}`, { method: 'POST' })
+                   .then(response => response.json())
+                   .then(data => {
+                       if (data.status === 'success') {
+                           // Aktualisiere die Menge im Warenkorb oder entferne das Produkt
+                           if (data.message === 'Produkt entfernt') {
+                               this.closest('.gold-members').remove();
+                           } else {
+                               this.nextElementSibling.value = data.quantity;
+                           }
+                           updateTotalCost();
+                       } else {
+                           alert(data.message);
+                       }
+                   });
+           });
+       });
+   });
+
+   // Funktion zum Aktualisieren der Gesamtkosten
+   function updateTotalCost() {
+       fetch('/cart', { method: 'GET' })
+           .then(response => response.text())
+           .then(html => {
+               // Finde das Subtotal im HTML und aktualisiere es
+               const tempDiv = document.createElement('div');
+               tempDiv.innerHTML = html;
+               const subtotal = tempDiv.querySelector('.text-danger').innerText;
+               document.querySelector('.text-danger').innerText = subtotal;
+           });
+   }
+</script>
+
+
+
 </body>
 </html>

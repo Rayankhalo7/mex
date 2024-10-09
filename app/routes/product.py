@@ -48,6 +48,7 @@ def add_product():
         image_file = request.files['image']
         is_must_popular = 'is_must_popular' in request.form  # Checkbox für "Must Popular"
         is_bestseller = 'is_bestseller' in request.form      # Checkbox für "Bestseller"
+        tax_rate = request.form.get('tax_rate', 0.0)
 
         # Ordner für Client erstellen, falls nicht vorhanden
         client_folder = os.path.join(UPLOAD_FOLDER_BASE, str(client.id))
@@ -70,7 +71,8 @@ def add_product():
             category_id=category_id,
             client_id=client.id,
             is_must_popular=is_must_popular,
-            is_bestseller=is_bestseller
+            is_bestseller=is_bestseller,
+            tax_rate=tax_rate
         )
         db.session.add(new_product)
         db.session.commit()
@@ -102,6 +104,7 @@ def edit_product(id):
         product.category_id = request.form.get('category_id')
         product.is_must_popular = 'is_must_popular' in request.form
         product.is_bestseller = 'is_bestseller' in request.form
+        product.tax_rate = float(request.form.get('tax_rate', 0.0))
 
         image_file = request.files['image']
         if image_file and image_file.filename != '':

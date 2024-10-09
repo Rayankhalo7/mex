@@ -9,6 +9,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     image = db.Column(db.String(255), nullable=True)  # Speichert den Dateinamen des Produktbildes
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    tax_rate = db.Column(db.Float, default=0.0)
 
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
 
