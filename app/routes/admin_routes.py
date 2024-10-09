@@ -15,17 +15,17 @@ from flask import flash
 
 
 
-# Definiere den Blueprint
+# Definieren von Blueprint
 admin_bp = Blueprint('admin_bp', __name__, template_folder='../templates/backend/admin_templates')
 
-# Definiere die erlaubten Dateitypen
+# Definiere die erlaubten Dateitypen für hochladen von DAteien beispiel ProfilBilder
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# Hilfsfunktion zum Löschen des alten Bildes
+# funktion zum Löschen des alten Bildes
 def delete_old_image(old_photo_path):
     full_path = os.path.join(current_app.root_path, 'static', 'upload', 'admin_bilder', 'admin_profile', old_photo_path)
     if os.path.exists(full_path):
@@ -49,7 +49,7 @@ def login():
         
         admin = Admin.query.filter_by(email=email).first()
 
-        # Fehler bei der Email-Adresse
+        # Fehler bei Emailadresse 
         if not admin:
             errors['email'] = 'Ungültige E-Mail-Adresse.'
 
@@ -57,7 +57,7 @@ def login():
         if admin and not admin.check_password(password):
             errors['password'] = 'Ungültiges Passwort.'
 
-        # Wenn keine Fehler vorhanden sind, logge den Benutzer ein
+        # Wenn keine Fehler vorhanden sind, logge den Admin ein
         if not errors:
             session['admin_id'] = admin.id
             session['adminname'] = admin.adminname
@@ -66,7 +66,7 @@ def login():
     return render_template("admin_login.html", errors=errors)
 
 
-# Register Route für admin
+# Register Route für admin # Das muss später Weg
 @admin_bp.route('/register', methods=["GET", "POST"])
 def register():
     if "adminname" in session:
@@ -87,14 +87,14 @@ def register():
                 db.session.add(new_admin)
                 db.session.commit()
                 session['adminname'] = adminname
-                session['admin_id'] = new_admin.id  # Hier sollte 'new_admin.id' verwendet werden, um die ID des neuen Admins zu erhalten
+                session['admin_id'] = new_admin.id  # Hier bekommt Admin einID
                 return redirect(url_for('admin_bp.dashboard'))
 
     return render_template("admin_register.html")
 
 
 
-# Passwort zurücksetzen Anfrage
+# Passwort zurücksetzen Anfrage 
 @admin_bp.route('/password_reset_request', methods=["GET", "POST"])
 def password_reset_request():
     if request.method == "POST":
@@ -130,7 +130,7 @@ def password_reset_token(token):
 
     if request.method == "POST":
         password = request.form['password']
-        admin = Admin.query.filter_by(email=email).first()  # Hier Admin statt admin verwenden
+        admin = Admin.query.filter_by(email=email).first() 
 
         if admin:
             admin.set_password(password)
@@ -151,7 +151,7 @@ def dashboard():
     if "adminname" not in session:
         return redirect(url_for('admin_bp.login'))
     
-    # Lade das Admin-Objekt
+    
     admin = Admin.query.get(session['admin_id'])
     return render_template("admin_dashboard.html", admin=admin, page_name="Dashboard")
 
@@ -171,7 +171,7 @@ def profile():
 
 
 
-
+# Profil daten bon Admin Bearbeiten
 @admin_bp.route("/profile_update", methods=["POST"])
 def profile_update():
     if "admin_id" not in session:
