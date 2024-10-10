@@ -452,13 +452,13 @@
         </p>
         {% endfor %}
         
-        <!-- Gesamtsteueranzeige -->
+        
         <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
             <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  <!-- Steuer Element mit zwei Dezimalstellen -->
         </h6>
 
-         <!--Anzeige des Prozentsatzes der Steuer an der Gesamtsumme -->
-        {% set tax_percentage = (total_tax / (total_cost + total_tax)) * 100 if total_cost + total_tax > 0 else 0 %}
+         
+         {% set tax_percentage = (total_tax / total_cost) * 100 if total_cost > 0 else 0 %}
         <p class="text-muted mb-1 d-flex justify-content-between">
             <span>MwSt./USt.-Anteil:</span> <span class="text">{{ '{:.2f}'.format(tax_percentage) }} %</span>   <!--Steuer Prozentsatz an der Gesamtsumme -->
         </p>

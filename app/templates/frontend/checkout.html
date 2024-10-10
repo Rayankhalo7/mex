@@ -60,7 +60,7 @@
                     <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  <!-- Steuer Element mit zwei Dezimalstellen -->
                 </h6>
         
-                 Anzeige des Prozentsatzes der Steuer an der Gesamtsumme 
+                 <!--Anzeige des Prozentsatzes der Steuer an der Gesamtsumme -->
                  {% set tax_percentage = (total_tax / total_cost) * 100 if total_cost > 0 else 0 %}
 
                 <p class="text-muted mb-1 d-flex justify-content-between">
