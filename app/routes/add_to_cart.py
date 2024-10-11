@@ -18,18 +18,18 @@ def add_to_cart(product_id):
     # Setze den `tax_rate` für das Produkt
     tax_rate = product.tax_rate if product.tax_rate else 0.0
 
-    # Überprüfe, ob der aktuelle Client gleich dem Client im Warenkorb ist
+    
     if 'cart_client_id' in session and session['cart_client_id'] != product.client_id:
         # Leere den Warenkorb und setze den Client ID neu
         session['cart'] = {}
         session['cart_client_id'] = product.client_id
         flash('Der Warenkorb wurde geleert, da Sie zu einem anderen Client gewechselt haben.', 'info')
 
-    # Setze die cart_client_id falls noch nicht vorhanden
+    
     if 'cart_client_id' not in session:
         session['cart_client_id'] = product.client_id
 
-    # Füge das Produkt zum Warenkorb hinzu oder aktualisiere die Menge
+    
     if str(product_id) in cart:
         cart[str(product_id)]['quantity'] += 1
     else:
@@ -39,7 +39,7 @@ def add_to_cart(product_id):
             'price': product.price,
             'image': product.image,
             'client_id': product.client_id,
-            'tax_rate': tax_rate,  # Hier wird der `tax_rate` hinzugefügt
+            'tax_rate': tax_rate,  
             'is_must_popular': product.is_must_popular,
             'is_bestseller': product.is_bestseller
         }

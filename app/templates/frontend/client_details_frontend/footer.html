@@ -1,195 +1,74 @@
-
 <section class="footer pt-5 pb-5">
-   <div class="container">
-      <div class="row">
-         <div class="col-md-4 col-12 col-sm-12">
-            <h6 class="mb-3">Abonnieren unsere Newsletter</h6>
-            <form class="newsletter-form mb-1">
-               <div class="input-group">
-                  <input type="text" placeholder="Geben Sie Ihre E-Mail ein" class="form-control">
-                  <div class="input-group-append">
-                     <button type="button" class="btn btn-primary">
-                     abonnieren
-                     </button>
-                  </div>
-               </div>
-            </form>
-            <p>Sie bekommen unsere aktuellsten Angebote</p>
-            <div class="app">
-               <p class="mb-2">Laden Sie unsere APP herunter</p>
-               <a href="#">
-               <img class="img-fluid" src="{{ url_for('static', filename='frontend/themes/img/google.png')}}">
-               
-               </a>
-               <a href="#">
-               <img class="img-fluid" src="{{ url_for('static', filename='frontend/themes/img/apple.png')}} ">
-               </a>
-            </div>
-         </div>
-         <div class="col-md-1 col-sm-6 mobile-none">
-         </div>
-         <div class="col-md-2 col-6 col-sm-4">
-            <h6 class="mb-3">ÜBER UNS</h6>
-            <ul>
-               <li><a href="#">Mehr über uns</a></li>
-               <li><a href="#">Wie funktioniert das</a></li>
-               <li><a href="#">Neuigkeiten</a></li>
-               <li><a href="#">Karriere</a></li>
-               <li><a href="#">Kontakt</a></li>
-            </ul>
-         </div>
-         <div class="col-md-2 col-6 col-sm-4">
-            <h6 class="mb-3">Für Benutzer</h6>
-            <ul>
-               <li><a href="#">AGBs</a></li>
-               <li><a href="#">Impressum</a></li>
-               <li><a href="#">Datenschutz</a></li>
-               <li><a href="#">Login</a></li>
-               <li><a href="#">Regesterieren</a></li>
-            </ul>
-         </div>
-         <div class="col-md-2 m-none col-4 col-sm-4">
-            <h6 class="mb-3">Für Restaurants</h6>
-            <ul>
-               <li><a href="#">Partner werden</a></li>
-               <li><a href="#">Restaurant hinzufügen</a></li>
-               <li><a href="#">Restaurant werben</a></li>
-               <li><a href="#">Hilfe</a></li>
-               <li><a href="#">Affiliatte</a></li>
-            </ul>
-         </div>
-      </div>
-   </div>
-</section>
-
-
-
-
-<footer class="pt-4 pb-4 text-center">
-   <div class="container">
-      <p class="mt-0 mb-0">© Alle Rechte vorbehalten 2024 Mahlzeit Express</p>
-      <small class="mt-0 mb-0"> Made with <i class="fas fa-heart heart-icon text-danger"></i> by
-      <a class="text-danger" target="_blank" href="#">Team 3</a>
-      </small>
-   </div>
-</footer>
-
-
-
-
-
-<!-- jQuery -->
-<script src="{{ url_for('static', filename='frontend/themes/vendor/jquery/jquery-3.3.1.slim.min.js')}}"></script>
-<!-- Bootstrap core JavaScript-->
-<script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-<!-- Select2 JavaScript-->
-<script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
-
-<!-- Owl Carousel -->
-<script src="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.js')}}"></script>
-
-<!-- Custom scripts for all pages-->
-<script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-<script type="text/javascript">
-  // Toastr options configuration
-  toastr.options = {
-      "closeButton": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
-      "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
-      "extendedTimeOut": "1000"
-  }
-
-  // Überprüfe, ob es geflashte Nachrichten gibt
-  {% with messages = get_flashed_messages(with_categories=True) %}
-  {% if messages %}
-  {% for category, message in messages %}
-  var type = "{{ category }}";  // Kategorie: success, info, warning, error
-  switch(type){
-      case 'info':
-          toastr.info("{{ message }}");
-          break;
-      case 'success':
-          toastr.success("{{ message }}");
-          break;
-      case 'warning':
-          toastr.warning("{{ message }}");
-          break;
-      case 'error':
-          toastr.error("{{ message }}");
-          break;
-  }
-  {% endfor %}
-  {% endif %}
-  {% endwith %}
-</script>
-
-
-<!-- JavaScript für das dynamische Hinzufügen und Entfernen von Produkten -->
-<script>
-   document.addEventListener('DOMContentLoaded', () => {
-       // Event-Listener für die Erhöhen-Buttons
-       document.querySelectorAll('.inc').forEach(button => {
-           button.addEventListener('click', function(event) {
-               const productId = this.closest('.gold-members').getAttribute('data-product-id');
-               fetch(`/increase_quantity/${productId}`, { method: 'POST' })
-                   .then(response => response.json())
-                   .then(data => {
-                       if (data.status === 'success') {
-                           // Aktualisiere die Menge im Warenkorb
-                           this.previousElementSibling.value = data.quantity;
-                           updateTotalCost();
-                       } else {
-                           alert(data.message);
-                       }
-                   });
-           });
-       });
-
-       // Event-Listener für die Verringern-Buttons
-       document.querySelectorAll('.dec').forEach(button => {
-           button.addEventListener('click', function(event) {
-               const productId = this.closest('.gold-members').getAttribute('data-product-id');
-               fetch(`/decrease_quantity/${productId}`, { method: 'POST' })
-                   .then(response => response.json())
-                   .then(data => {
-                       if (data.status === 'success') {
-                           // Aktualisiere die Menge im Warenkorb oder entferne das Produkt
-                           if (data.message === 'Produkt entfernt') {
-                               this.closest('.gold-members').remove();
-                           } else {
-                               this.nextElementSibling.value = data.quantity;
-                           }
-                           updateTotalCost();
-                       } else {
-                           alert(data.message);
-                       }
-                   });
-           });
-       });
-   });
-
-   // Funktion zum Aktualisieren der Gesamtkosten
-   function updateTotalCost() {
-       fetch('/cart', { method: 'GET' })
-           .then(response => response.text())
-           .then(html => {
-               // Finde das Subtotal im HTML und aktualisiere es
-               const tempDiv = document.createElement('div');
-               tempDiv.innerHTML = html;
-               const subtotal = tempDiv.querySelector('.text-danger').innerText;
-               document.querySelector('.text-danger').innerText = subtotal;
-           });
-   }
-</script>
-
-
-
-</body>
-</html>
+    <div class="container">
+       <div class="row">
+          <div class="col-md-4 col-12 col-sm-12">
+             <h6 class="mb-3">Abonnieren unsere Newsletter</h6>
+             <form class="newsletter-form mb-1">
+                <div class="input-group">
+                   <input type="text" placeholder="Geben Sie Ihre E-Mail ein" class="form-control">
+                   <div class="input-group-append">
+                      <button type="button" class="btn btn-primary">
+                      abonnieren
+                      </button>
+                   </div>
+                </div>
+             </form>
+             <p>Sie bekommen unsere aktuellsten Angebote</p>
+             <div class="app">
+                <p class="mb-2">Laden Sie unsere APP herunter</p>
+                <a href="#">
+                <img class="img-fluid" src="{{ url_for('static', filename='frontend/themes/img/google.png')}}">
+                
+                </a>
+                <a href="#">
+                <img class="img-fluid" src="{{ url_for('static', filename='frontend/themes/img/apple.png')}} ">
+                </a>
+             </div>
+          </div>
+          <div class="col-md-1 col-sm-6 mobile-none">
+          </div>
+          <div class="col-md-2 col-6 col-sm-4">
+             <h6 class="mb-3">ÜBER UNS</h6>
+             <ul>
+                <li><a href="#">Mehr über uns</a></li>
+                <li><a href="#">Wie funktioniert das</a></li>
+                <li><a href="#">Neuigkeiten</a></li>
+                <li><a href="#">Karriere</a></li>
+                <li><a href="#">Kontakt</a></li>
+             </ul>
+          </div>
+          <div class="col-md-2 col-6 col-sm-4">
+             <h6 class="mb-3">Für Benutzer</h6>
+             <ul>
+                <li><a href="#">AGBs</a></li>
+                <li><a href="#">Impressum</a></li>
+                <li><a href="#">Datenschutz</a></li>
+                <li><a href="#">Login</a></li>
+                <li><a href="#">Regesterieren</a></li>
+             </ul>
+          </div>
+          <div class="col-md-2 m-none col-4 col-sm-4">
+             <h6 class="mb-3">Für Restaurants</h6>
+             <ul>
+                <li><a href="#">Partner werden</a></li>
+                <li><a href="#">Restaurant hinzufügen</a></li>
+                <li><a href="#">Restaurant werben</a></li>
+                <li><a href="#">Hilfe</a></li>
+                <li><a href="#">Affiliatte</a></li>
+             </ul>
+          </div>
+       </div>
+    </div>
+ </section>
+ 
+ 
+ 
+ 
+ <footer class="pt-4 pb-4 text-center">
+    <div class="container">
+       <p class="mt-0 mb-0">© Alle Rechte vorbehalten 2024 Mahlzeit Express</p>
+       <small class="mt-0 mb-0"> Made with <i class="fas fa-heart heart-icon text-danger"></i> by
+       <a class="text-danger" target="_blank" href="#">Team 3</a>
+       </small>
+    </div>
+ </footer>
