@@ -1,19 +1,54 @@
-{% extends "frontend/base_detail.html" %}
+{% extends "frontend/base_detail_checkout.html" %}
 
 {% block title %}Kasse{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Kasse</h1>
+
+
+    <!-- Formular zur Eingabe der Versandinformationen -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4 class="mb-0">Versandinformationen</h4>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('checkout_bp.process_checkout') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Straße </label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Hausnummer</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">PLZ</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Ort</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-Mail</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+            
     
     <!-- Warenkorbdaten anzeigen -->
     <div class="bg-white rounded shadow-sm mb-4 p-4 osahan-cart-item">
         <h5 class="mb-1 text-black">Ihre Warenkorb</h5>
         <p class="mb-4 text-muted">{{ cart|length }} Artikel im Warenkorb</p> <!-- Anzahl der Artikel im Warenkorb -->
 
-        <div class="generator-bg rounded shadow-sm mb-4 p-4 osahan-cart-item">
-            <h5 class="mb-1 text-white">Ihre Warenkorb</h5>
-            <p class="mb-4 text-white">{{ cart|length }} Artikel im Warenkorb</p>  <!-- Anzahl der Artikel im Warenkorb -->
+        <div class="bg rounded shadow-sm mb-4 p-4 osahan-cart-item">
+            <!--<h5 class="mb-1 text-white">Ihre Warenkorb</h5>
+            <p class="mb-4 text-white">{{ cart|length }} Artikel im Warenkorb</p>-->
         
             <div class="bg-white rounded shadow-sm mb-2">
                 {% for product_id, item in cart.items() %}
@@ -63,48 +98,38 @@
                  <!--Anzeige des Prozentsatzes der Steuer an der Gesamtsumme -->
                  {% set tax_percentage = (total_tax / total_cost) * 100 if total_cost > 0 else 0 %}
 
-                <p class="text-muted mb-1 d-flex justify-content-between">
-                    <span>MwSt./USt.-Anteil:</span> <span class="text">{{ '{:.2f}'.format(tax_percentage) }} %</span>   <!--Steuer Prozentsatz an der Gesamtsumme -->
-                </p>
+                <!--<p class="text-muted mb-1 d-flex justify-content-between">
+                    <span>MwSt./USt.-Anteil:</span> <span class="text">{{ '{:.2f}'.format(tax_percentage) }} %</span>   
+                </p>-->
         <hr>
+                <!-- WICHIG!!!! Hier mit Steueranteil ungeklärt -->
+                <!--<h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                    <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost + total_tax) }} €</span>
+                </h6>-->
+
                 <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
-                    <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost + total_tax) }} €</span>  <!-- Grand Total Element mit zwei Dezimalstellen -->
+                    <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost) }} €</span>  <!-- Grand Total Element mit zwei Dezimalstellen -->
                 </h6>
+
+
                 <p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p>
             </div>
-            <a href="{{ url_for('checkout_bp.checkout') }}" class="btn btn-success btn-block btn-lg">Zur Kasse gehen <i class="icofont-long-arrow-right"></i></a>
+            <a href="{{ url_for('checkout_bp.checkout') }}" class="btn btn-success btn-block btn-lg">Jetzt bestellen <i class="icofont-long-arrow-right"></i></a>
         
         </div>
+
+    </form>
+</div>
+</div>
         
 
     <!-- Formular zur Eingabe der Versandinformationen -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <h4 class="mb-0">Versandinformationen</h4>
-        </div>
-        <div class="card-body">
-            <form action="{{ url_for('checkout_bp.process_checkout') }}" method="POST">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="address">Adresse</label>
-                    <input type="text" class="form-control" id="address" name="address" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">E-Mail</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Bestellung abschließen</button>
-            </form>
-        </div>
-    </div>
+    
 </div>
 
 {% endblock content %}
 
-{% include 'frontend/client_details_frontend/footer.html' %}
+
 
 
 

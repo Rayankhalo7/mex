@@ -3,6 +3,8 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 from app.routes.add_to_cart import get_total_cost  # Importiere die get_total_cost Funktion für die Berechnung
 from app.models.product import Product
+from app.models.client_model import Client
+from datetime import datetime
 
 # Blueprint für Checkout erstellen
 checkout_bp = Blueprint('checkout_bp', __name__, template_folder='templates/frontend')
@@ -12,6 +14,8 @@ def checkout():
     """
     Zeigt die Checkout-Seite mit den Inhalten des Warenkorbs und den Berechnungen für Gesamtkosten und Steuer.
     """
+    client = Client.query.get(id)
+    current_time = datetime.now()
     # Warenkorbdaten aus der Session holen
     cart = session.get('cart', {})
     if not cart:
@@ -41,7 +45,7 @@ def checkout():
         else:
             tax_details[tax_rate] = tax
 
-    return render_template('frontend/checkout.html', cart=cart, total_cost=total_cost, total_tax=total_tax, grand_total=grand_total, tax_details=tax_details)
+    return render_template('frontend/checkout.html', cart=cart, total_cost=total_cost, total_tax=total_tax, grand_total=grand_total, tax_details=tax_details, client=client, current_time=current_time)
 
 @checkout_bp.route('/process_checkout', methods=['POST'])
 def process_checkout():
