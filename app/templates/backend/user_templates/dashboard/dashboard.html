@@ -1,8 +1,15 @@
-{% include 'backend/user_templates/dashboard/header.html' %}
-<section class="section pt-4 pb-4 osahan-account-page">
-    <div class="container">
-       <div class="row">
-         {% include 'backend/user_templates/dashboard/sidebar.html' %}
+{% extends "backend/user_templates/dashboard/base_dashboard.html" %}
+
+
+
+
+{% block title %}{% endblock %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+
+{% block content %}
+
 
 
           <div class="col-md-9">
@@ -113,14 +120,9 @@
           </div>
 
 
-
-
-
-       </div>
-    </div>
- </section>
- {% include 'backend/user_templates/dashboard/footer.html' %}
-
+ {% endblock content %}
+ 
+ {% block javascripts %}
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -171,3 +173,4 @@
    {% endif %}
    {% endwith %}
 </script>
+{% endblock javascripts %}

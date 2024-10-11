@@ -444,14 +444,14 @@
                         <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  
                     </h6>
             
-                     <!-- Steuersatz durch Brottu mal 100%-->
+                     <!-- Steuersatz durch Brottu mal 100%
                      {% set tax_percentage = (total_tax / total_cost) * 100 if total_cost > 0 else 0 %}
                     <p class="text-muted mb-1 d-flex justify-content-between">
                         <span>MwSt./USt.-Anteil:</span> <span class="text">{{ '{:.2f}'.format(tax_percentage) }} %</span>   
-                    </p>
+                    </p>-->
             <hr>
                     <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
-                        <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost + total_tax) }} €</span>  
+                        <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost) }} €</span>  
                     </h6>
                     <p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p>
                 </div>
