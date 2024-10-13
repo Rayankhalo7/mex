@@ -1,4 +1,5 @@
-from flask import Blueprint, session, redirect, url_for, flash, request, jsonify
+# app/routes/add_to_cart.py
+from flask import Blueprint, session, redirect, url_for, flash, request, jsonify, render_template
 from flask_login import current_user
 from app.models.product import Product  # Importiere das Produktmodell
 
@@ -103,37 +104,58 @@ def remove_from_cart(product_id):
     return jsonify({"status": "error", "message": "Produkt nicht im Warenkorb"})
 
 
-# Route zum Abrufen der Gesamtkosten des Warenkorbs
+@cart_bp.route('/cart')
+def show_cart():
+    cart = session.get('cart', {})
+    
+    # Berechne die Anzahl der Artikel
+    total_items = sum(item['quantity'] for item in cart.values())
+    
+    # Rendere das Template und übergebe `cart` und `total_items`
+    return render_template('cart.html', cart=cart, total_items=total_items)
+
+
 @cart_bp.route('/get_total_cost', methods=['GET'])
 def get_total_cost():
-    cart = session.get('cart', {})
-    total_cost = 0.0  # Gesamtkosten der Artikel im Warenkorb (inkl. Steuer)
-    total_tax = 0.0  # Gesamtsteuerbetrag
+    # Debugging: Zeige den Inhalt der Session an
+    print(f"Session-Warenkorb: {session.get('cart')}")
 
-    # Berechne die Gesamtkosten und Steuern basierend auf dem Preis, der die Steuer enthält
+    cart = session.get('cart', {})
+    total_cost = 0.0
+    total_tax = 0.0
+    tax_details = {}
+    total_items = 0  # Variable zur Berechnung der Gesamtartikelanzahl
+
+    # Berechne die Gesamtkosten und Steuern basierend auf dem Preis
     for product_id, item in cart.items():
         product = Product.query.get(product_id)
         if product:
             item_total = item['price'] * item['quantity']
             total_cost += item_total
-            
-            # Berechne den Steueranteil basierend auf dem Preis, der die Steuer enthält
             tax_rate = product.tax_rate if product.tax_rate is not None else 0.0
-            # Steuer aus dem Gesamtpreis herausrechnen: (Preis * Steuerprozentsatz) / (100 + Steuerprozentsatz)
             tax = item_total * (tax_rate / (100 + tax_rate))
             total_tax += tax
+            if tax_rate in tax_details:
+                tax_details[tax_rate] += tax
+            else:
+                tax_details[tax_rate] = tax
 
+            # Berechne die Gesamtanzahl der Artikel
+            total_items += item['quantity']
+        else:
+            print(f"Product with ID {product_id} not found")
 
-        
-
-    grand_total = total_cost  # Da der Steuerbetrag bereits im Preis enthalten ist
+    grand_total = total_cost
 
     return jsonify({
-        "total_cost": total_cost,  # Gesamtkosten (inkl. Steuer)
-        "tax": total_tax,  # Steueranteil aus dem Preis herausgerechnet
-        "grand_total": grand_total  # Grand Total = Subtotal, da die Steuer schon enthalten ist
-
-        
-
+        "total_cost": total_cost,
+        "tax": total_tax,
+        "grand_total": grand_total,
+        "tax_details": tax_details,
+        "cart": cart,
+        "total_items": total_items  # Rückgabe der Gesamtartikelanzahl
     })
+
+
+
 

@@ -207,37 +207,55 @@
                                 <p class="mb-2 text-black">
                                     <i class="icofont-email text-primary mr-2"></i> {{ client.email }}
                                 </p>
-                                
+
                                 <p class="mb-2 text-black">
-
-                                 {% set weekday_map = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
-{% set current_day = weekday_map[current_time.strftime('%A')] %}
-
-{% if client.opening_hours|length > 0 %}
-    <!-- Finde die Öffnungszeiten für den heutigen Tag -->
-    {% set today_opening_hours = client.opening_hours|selectattr('day_of_week', 'equalto', current_day)|first %}
-
-    {% if today_opening_hours %}
-        <!-- Anzeige des Wochentags und der Öffnungszeiten -->
-        <i class="icofont-clock-time text-primary mr-2"></i>
-        <strong>{{ today_opening_hours.day_of_week }}:</strong> 
-        {{ today_opening_hours.open_time.strftime('%H:%M') }} - {{ today_opening_hours.close_time.strftime('%H:%M') }}
-
-        <!-- Überprüfe, ob der Client geöffnet ist -->
-        {% set now_time = current_time.time() %}
-        {% if today_opening_hours.open_time <= now_time <= today_opening_hours.close_time %}
-            <span class="badge badge-success"> geöffnet</span>
-        {% else %}
-            <span class="badge badge-danger"> geschlossen </span>
-        {% endif %}
-    {% else %}
-        <i class="icofont-clock-time text-primary mr-2"></i><strong>Öffnungszeiten:</strong> Heute geschlossen
-    {% endif %}
-{% else %}
-    <i class="icofont-clock-time text-primary mr-2"></i><strong>Öffnungszeiten:</strong> Keine Angaben
-{% endif %}
-
+                                    {% set weekday_map = {
+                                        'Monday': 'Montag',
+                                        'Tuesday': 'Dienstag',
+                                        'Wednesday': 'Mittwoch',
+                                        'Thursday': 'Donnerstag',
+                                        'Friday': 'Freitag',
+                                        'Saturday': 'Samstag',
+                                        'Sunday': 'Sonntag'
+                                    } %}
+                                    {% set current_day = current_time.strftime('%A') %}
+                                
+                                    {% if client.opening_hours|length > 0 %}
+                                        <!-- Schleife durch alle Tage der Woche -->
+                                        {% for weekday, weekday_name in weekday_map.items() %}
+                                            <!-- Finde die Öffnungszeiten für den jeweiligen Wochentag -->
+                                            {% set day_opening_hours = client.opening_hours|selectattr('day_of_week', 'equalto', weekday_name)|first %}
+                                            
+                                            {% if day_opening_hours %}
+                                                <!-- Anzeige des Wochentags und der Öffnungszeiten -->
+                                                <i class="icofont-clock-time text-primary mr-2"></i>
+                                                <strong>{{ weekday_name }}:</strong> 
+                                                {{ day_opening_hours.open_time.strftime('%H:%M') }} - {{ day_opening_hours.close_time.strftime('%H:%M') }}
+                                                
+                                                <!-- Nur für den aktuellen Tag den geöffnet/geschlossen-Status anzeigen -->
+                                                {% if weekday == current_day %}
+                                                    {% set now_time = current_time.time() %}
+                                                    {% if day_opening_hours.open_time <= now_time <= day_opening_hours.close_time %}
+                                                        <span class="badge badge-success"> geöffnet</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger"> geschlossen </span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                <!-- Wochentag ohne Öffnungszeiten anzeigen -->
+                                                <i class="icofont-clock-time text-primary mr-2"></i>
+                                                <strong>{{ weekday_name }}:</strong> Geschlossen
+                                            {% endif %}
+                                            <br>
+                                        {% endfor %}
+                                    {% else %}
+                                        <i class="icofont-clock-time text-primary mr-2"></i><strong>Öffnungszeiten:</strong> Keine Angaben
+                                    {% endif %}
                                 </p>
+                                
+                                
+                                
+                                
 
 
 
@@ -397,7 +415,7 @@
                   <div class="pb-2">
               <div class="bg-white rounded shadow-sm text-white mb-4 p-4 clearfix restaurant-detailed-earn-pts card-icon-overlap">
                 <h5 class="mb-1 text">Ihre Warenkorb</h5>
-                <p class="mb-4 text">{{ cart|length }} Artikel im Warenkorb</p>  <!-- Anzahl der Artikel im Warenkorb -->
+                <p class="mb-4 text" id="cart-count">{{ total_items }} Artikel im Warenkorb</p>
             
                 <div class="bg-white rounded shadow-sm mb-2">
                     {% for product_id, item in cart.items() %}
@@ -409,7 +427,8 @@
                             </div>
                             <div class="media-body">
                                 <!-- Produktname anzeigen -->
-                                <p class="mt-1 mb-0 text-black">{{ item['quantity'] }}x {{ item['name'] }}</p>
+                                <p class="mt-1 mb-0 text-black"><p class="mt-1 mb-0 text-black product-name" data-name="{{ item['name'] }}">{{ item['quantity'] }}x {{ item['name'] }}</p>
+                            </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
@@ -418,7 +437,7 @@
                                 <input class="count-number-input text-center" type="text" value="{{ item['quantity'] }}" readonly="" style="width: 40px;">
                                 <button class="btn btn-outline-secondary btn-sm right inc ml-1"> <i class="icofont-plus"></i> </button>
             
-                               <!-- <button class="btn btn-outline-danger btn-sm right remove ml-1"> <i class="icofont-trash"></i> </button>-->
+                                <button class="btn btn-outline-danger btn-sm right remove ml-1"> <i class="icofont-trash"></i> </button>
                             </span>
                             <span class="ml-3 text font-weight-bold" style="color: black !important;">{{ '{:.2f}'.format(item['price'] * item['quantity']) }} €</span> <!-- Produktpreis x Menge mit zwei Dezimalstellen -->
                         </div>
@@ -432,23 +451,21 @@
                         <span>Zwischensumme:</span> <span class="text" id="total-cost">{{ '{:.2f}'.format(total_cost) }} €</span>  <!-- Subtotal Element mit zwei Dezimalstellen -->
                     </h6>
             
-                    <!-- Steuerdetails pro Steuersatz anzeigen -->
-                    {% for rate, tax_amount in tax_details.items() %}
-                    <p class="text-muted mb-1 d-flex justify-content-between">
-                        <span>MwSt./USt. {{ rate }} %:</span> <span class="text-muted mb-1 text-right">{{ '{:.2f}'.format(tax_amount) }} €</span>  
-                    </p>
-                    {% endfor %}
+                    <div id="tax-details">
+                        {% for rate, tax_amount in tax_details.items() %}
+                        <p class="text-muted mb-1 d-flex justify-content-between">
+                            <span>MwSt./USt. {{ rate }} %:</span> <span class="text-muted mb-1 text-right">{{ '{:.2f}'.format(tax_amount) }} €</span>  
+                        </p>
+                        {% endfor %}
+                    </div>
+                    
                     
                     
                     <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
                         <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  
                     </h6>
             
-                     <!-- Steuersatz durch Brottu mal 100%
-                     {% set tax_percentage = (total_tax / total_cost) * 100 if total_cost > 0 else 0 %}
-                    <p class="text-muted mb-1 d-flex justify-content-between">
-                        <span>MwSt./USt.-Anteil:</span> <span class="text">{{ '{:.2f}'.format(tax_percentage) }} %</span>   
-                    </p>-->
+                     
             <hr>
                     <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
                         <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost) }} €</span>  
