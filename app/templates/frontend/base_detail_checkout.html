@@ -29,6 +29,9 @@
 
       
 
+
+      
+
 <style>
     .custom-toast {
     top: 120px !important;  /* Bewegt die Benachrichtigung 250px von oben nach unten */
@@ -38,8 +41,9 @@
    </head>
    <body>
 
-    
+    {% include 'frontend/client_details_frontend/header.html' %}
 
+    
 
       
     {% block content %}
@@ -110,119 +114,153 @@
     {% endif %}
     {% endwith %}
   </script>
-  
-  
-  <!-- JavaScript für das dynamische Hinzufügen und Entfernen von Produkten -->
-  <script>
-     document.addEventListener('DOMContentLoaded', () => {
-         // Event-Listener für die Erhöhen-Buttons
-         document.querySelectorAll('.inc').forEach(button => {
-             button.addEventListener('click', function(event) {
-                 const productId = this.closest('.gold-members').getAttribute('data-product-id');
-                 fetch(`/increase_quantity/${productId}`, { method: 'POST' })
-                     .then(response => response.json())
-                     .then(data => {
-                         if (data.status === 'success') {
-                             // Aktualisiere die Menge im Warenkorb
-                             this.previousElementSibling.value = data.quantity;
-                             updateTotalCost();
-                         } else {
-                             alert(data.message);
-                         }
-                     });
-             });
-         });
-  
-         // Event-Listener für die Verringern-Buttons
-         document.querySelectorAll('.dec').forEach(button => {
-             button.addEventListener('click', function(event) {
-                 const productId = this.closest('.gold-members').getAttribute('data-product-id');
-                 fetch(`/decrease_quantity/${productId}`, { method: 'POST' })
-                     .then(response => response.json())
-                     .then(data => {
-                         if (data.status === 'success') {
-                             // Aktualisiere die Menge im Warenkorb oder entferne das Produkt
-                             if (data.message === 'Produkt entfernt') {
-                                 this.closest('.gold-members').remove();
-                             } else {
-                                 this.nextElementSibling.value = data.quantity;
-                             }
-                             updateTotalCost();
-                         } else {
-                             alert(data.message);
-                         }
-                     });
-             });
-         });
-     });
-  
-     // Funktion zum Aktualisieren der Gesamtkosten
-     function updateTotalCost() {
-         fetch('/cart', { method: 'GET' })
-             .then(response => response.text())
-             .then(html => {
-                 // Finde das Subtotal im HTML und aktualisiere es
-                 const tempDiv = document.createElement('div');
-                 tempDiv.innerHTML = html;
-                 const subtotal = tempDiv.querySelector('.text-danger').innerText;
-                 document.querySelector('.text-danger').innerText = subtotal;
-             });
-     }
-  </script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Event-Listener für die Erhöhen- und Verringern-Buttons
-        document.querySelectorAll('.inc, .dec').forEach(button => {
-            button.addEventListener('click', function(event) {
-                const productId = this.closest('.gold-members').getAttribute('data-product-id');
-                const isIncrease = this.classList.contains('inc');
-                const url = isIncrease ? `/cart/increase_quantity/${productId}` : `/cart/decrease_quantity/${productId}`;
-                
-                fetch(url, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // Aktualisiere die Seite nach dem Erhöhen oder Verringern
-                            location.reload();
-                        } else {
-                            toastr.error(data.message, 'Fehler');  // Fehlernachricht anzeigen
-                        }
-                    });
+ 
+
+ <script>
+    $(document).ready(function() {
+        // Funktion zum Erhöhen der Menge
+        $(document).on('click', '.inc', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/increase_quantity/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreicher Erhöhung
+                        toastr.success('Die Menge des Produkts wurde erhöht.');
+
+                        // Aktualisiere die Anzahl vor dem Produktnamen
+                        let quantityInput = $(`[data-product-id="${productId}"] .count-number-input`);
+                        quantityInput.val(response.quantity);
+                        let productName = $(`[data-product-id="${productId}"] .product-name`);
+                        productName.text(`${response.quantity}x ${productName.data('name')}`);
+
+                        // Aktualisiere den Preis
+                        let pricePerUnit = $(`[data-product-id="${productId}"]`).data('price-per-unit');
+                        let newPrice = (pricePerUnit * response.quantity).toFixed(2);
+                        $(`[data-product-id="${productId}"] .text.font-weight-bold`).text(`${newPrice} €`);
+
+                        // Aktualisiere Gesamtsumme, Steuer und Anzahl im Warenkorb
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Erhöhen der Menge.');
+                    console.log('Fehler beim Erhöhen der Menge:', error);
+                }
             });
         });
 
-        // Initialisiere die Gesamtkosten beim Laden der Seite
-        updateTotalCost();
-    });
+        // Funktion zum Verringern der Menge
+        $(document).on('click', '.dec', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/decrease_quantity/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreicher Verringerung
+                        toastr.success('Die Menge des Produkts wurde verringert.');
 
-    // Funktion zum Aktualisieren der Gesamtsumme, Steuern und des Gesamtbetrags des Warenkorbs
-    function updateTotalCost() {
-        fetch('/cart/get_total_cost', { method: 'GET' })
-            .then(response => response.json())
-            .then(data => {
-                // Elemente für Gesamtkosten, Steuern und Gesamtbetrag finden
-                document.querySelector('#total-cost').innerText = `${data.total_cost.toFixed(2)} €`;
-                document.querySelector('#tax').innerText = `${data.tax.toFixed(2)} €`;
-                document.querySelector('#grand-total').innerText = `${data.grand_total.toFixed(2)} €`;
+                        if (response.quantity > 0) {
+                            // Aktualisiere die Menge und den Preis in der UI
+                            let quantityInput = $(`[data-product-id="${productId}"] .count-number-input`);
+                            quantityInput.val(response.quantity);
+                            let productName = $(`[data-product-id="${productId}"] .product-name`);
+                            productName.text(`${response.quantity}x ${productName.data('name')}`);
+                            
+                            // Berechne den neuen Preis
+                            let pricePerUnit = $(`[data-product-id="${productId}"]`).data('price-per-unit');
+                            let newPrice = (pricePerUnit * response.quantity).toFixed(2);
+                            $(`[data-product-id="${productId}"] .text.font-weight-bold`).text(`${newPrice} €`);
+                        } else {
+                            // Wenn die Menge auf 0 sinkt, entferne das Produkt
+                            toastr.info('Das Produkt wurde aus dem Warenkorb entfernt.');
+                            $(`[data-product-id="${productId}"]`).remove();
+                        }
 
-                // Steuerdetails aktualisieren
-                const taxDetailsContainer = document.querySelector('#tax-details');
-                taxDetailsContainer.innerHTML = '';  // Vorhandene Inhalte löschen
-
-                // Durch alle Steuerdetails iterieren und anzeigen
-                for (const [rate, taxAmount] of Object.entries(data.tax_details)) {
-                    const taxDetailElement = document.createElement('p');
-                    taxDetailElement.className = 'text-muted mb-1 d-flex justify-content-between';
-                    taxDetailElement.innerHTML = `<span>MwSt./USt. ${parseFloat(rate).toFixed(1)} %:</span> <span class="text-muted mb-1 text-right">${taxAmount.toFixed(2)} €</span>`;
-                    taxDetailsContainer.appendChild(taxDetailElement);
+                        // Aktualisiere die Gesamtsumme und Steuer
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Verringern der Menge.');
+                    console.log('Fehler beim Verringern der Menge:', error);
                 }
-
-                // Steuerprozentsatz an der Gesamtsumme berechnen und anzeigen
-                const taxPercentage = (data.tax / (data.total_cost + data.tax)) * 100;
-                document.querySelector('#tax-percentage').innerText = `${taxPercentage.toFixed(2)} %`;
             });
-    }
+        });
+        
+        // Entfernen eines Produkts
+        $(document).on('click', '.remove', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/remove_from_cart/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreichem Entfernen
+                        toastr.info('Das Produkt wurde aus dem Warenkorb entfernt.');
+
+                        // Entferne das Produkt aus der UI
+                        $(`[data-product-id="${productId}"]`).remove();
+
+                        // Aktualisiere Gesamtkosten und Steuer
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Entfernen des Produkts.');
+                    console.log('Fehler beim Entfernen des Produkts:', error);
+                }
+            });
+        });
+    
+        // Funktion zur Aktualisierung der Gesamtkosten und Steuer
+        function updateCartSummary() {
+            $.ajax({
+                url: '/cart/get_total_cost',
+                type: 'GET',
+                success: function(response) {
+                    // Gesamtkosten und Steuer aktualisieren
+                    $('#total-cost').text(`${response.total_cost.toFixed(2)} €`);
+                    $('#total-cost-header').text(`${response.total_cost.toFixed(2)} €`);
+                    $('#tax').text(`${response.tax.toFixed(2)} €`);
+                    $('#tax-header').text(`${response.tax.toFixed(2)} €`);
+                    $('#grand-total-header').text(`${response.grand_total.toFixed(2)} €`);
+                    $('#grand-total').text(`${response.grand_total.toFixed(2)} €`);
+                    $('#cart-count-header').text(`${response.total_items}`);
+                    $('#cart-count').text(`${response.total_items} Artikel im Warenkorb`);
+
+                    // Steuerdetails pro Steuersatz aktualisieren
+                    let taxDetailsHtml = '';
+                    for (let rate in response.tax_details) {
+                        let taxAmount = response.tax_details[rate].toFixed(2);
+                        taxDetailsHtml += `<p class="text-muted mb-1 d-flex justify-content-between">
+                            <span>MwSt./USt. ${rate} %:</span> <span class="text-muted mb-1 text-right">${taxAmount} €</span>  
+                        </p>`;
+                    }
+                    $('#tax-details-header').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
+                    $('#tax-details').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Abrufen der Gesamtkosten.');
+                    console.log('Fehler beim Abrufen der Gesamtkosten:', error);
+                }
+            });
+        }
+
+        // Initialisiere beim Laden der Seite
+        updateCartSummary();
+    });
 </script>
+
+
+    
+        
+    
+  
+  <!-- JavaScript für das dynamische Hinzufügen und Entfernen von Produkten -->
+  
 {% endblock javascripts %}
  
  </body>

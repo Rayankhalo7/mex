@@ -225,8 +225,12 @@
                 success: function(response) {
                     // Gesamtkosten und Steuer aktualisieren
                     $('#total-cost').text(`${response.total_cost.toFixed(2)} €`);
+                    $('#total-cost-header').text(`${response.total_cost.toFixed(2)} €`);
                     $('#tax').text(`${response.tax.toFixed(2)} €`);
+                    $('#tax-header').text(`${response.tax.toFixed(2)} €`);
+                    $('#grand-total-header').text(`${response.grand_total.toFixed(2)} €`);
                     $('#grand-total').text(`${response.grand_total.toFixed(2)} €`);
+                    $('#cart-count-header').text(`${response.total_items}`);
                     $('#cart-count').text(`${response.total_items} Artikel im Warenkorb`);
 
                     // Steuerdetails pro Steuersatz aktualisieren
@@ -237,11 +241,8 @@
                             <span>MwSt./USt. ${rate} %:</span> <span class="text-muted mb-1 text-right">${taxAmount} €</span>  
                         </p>`;
                     }
+                    $('#tax-details-header').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
                     $('#tax-details').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
-                },
-                error: function(xhr, status, error) {
-                    toastr.error('Fehler beim Abrufen der Gesamtkosten.');
-                    console.log('Fehler beim Abrufen der Gesamtkosten:', error);
                 }
             });
         }
