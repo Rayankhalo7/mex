@@ -27,6 +27,7 @@ class Order(db.Model):
     delivered_date = db.Column(db.DateTime, nullable=True)  # Datum der Lieferung
     canceled_at = db.Column(db.DateTime, nullable=True)  # Datum der Stornierung (falls storniert)
     status = db.Column(db.String(50), nullable=False, default='pending')  # Status der Bestellung (z.B. "pending")
+    delivery_time = db.Column(db.Integer, nullable=True)  # Lieferzeit in Minuten
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
