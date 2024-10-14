@@ -1,6 +1,6 @@
 # app/routes/frontend.py
 
-from flask import Blueprint, render_template, request, abort, session, flash
+from flask import Blueprint, render_template, redirect, url_for, request, abort, session, flash
 from app.models.client_model import Client
 from app.models.user_model import User
 from app import db
@@ -10,6 +10,7 @@ from app.models.rating import Rating
 from app.models.lieferzeiten import Lieferzeiten
 from datetime import datetime
 from app.models.product import Product
+from app.models.client_model import Client
 
 # Blueprint für das Frontend erstellen
 frontend_bp = Blueprint('frontend_bp', __name__, template_folder='templates/frontend')
@@ -100,3 +101,41 @@ def client_detail(client_id):
         total_tax=total_tax,
         tax_details=tax_details  # Übergabe der Steuerdetails an das Template
     )
+
+
+@frontend_bp.route('/thank_you')
+def thank_you():
+    # Client-ID aus der Session holen
+    client_id = session.get('thank_you_cart_client_id')
+    client = Client.query.get(client_id) if client_id else None
+
+    if not client:
+        #flash('Kein Client zugeordnet. Bitte wähle einen gültigen Client.', 'warning')
+        return redirect(url_for('frontend_bp.home'))
+
+    cart = session.get('thank_you_cart', {})
+
+    if not cart:
+        flash('Dein Warenkorb ist leer.', 'warning')
+        return redirect(url_for('frontend_bp.home'))
+
+    # Berechne die Gesamtkosten, Steuern und Steuerdetails
+    total_cost = 0.0
+    total_tax = 0.0
+    tax_details = {}
+    
+    if cart:
+        total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+    # Session-Daten nach der Bestätigung löschen
+    session.pop('thank_you_cart_client_id', None)
+    session.pop('thank_you_cart', None)
+
+    return render_template('frontend/thank_you.html', client=client, cart=cart, total_cost=total_cost, total_tax=total_tax, tax_details=tax_details)
+
+
+ 
+    
+
+
+

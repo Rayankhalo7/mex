@@ -70,15 +70,18 @@
                       <div class="col-sm-8 pl-0">
                          <div class="tab-content h-100" id="v-pills-tabContent">
 
-                            <div class="tab-pane fade  show active" id="v-pills-cash" role="tabpanel" aria-labelledby="v-pills-cash-tab">
-                                <h6 class="mb-3 mt-0 mb-3">Cash</h6>
-                                <p>Please keep exact change handy to help us serve you better</p>
-                                <hr>
-                                <form>
-                                   <a href="thanks.html" class="btn btn-success btn-block btn-lg">PAY $1329
-                                   <i class="icofont-long-arrow-right"></i></a>
-                                 </form>
-                             </div>
+                           <div class="tab-pane fade show active" id="v-pills-cash" role="tabpanel" aria-labelledby="v-pills-cash-tab">
+                              <h6 class="mb-3 mt-0 mb-3">Cash</h6>
+                              <p>Please keep exact change handy to help us serve you better</p>
+                              <hr>
+                              <form action="{{ url_for('checkout_bp.process_checkout') }}" method="POST">
+                                  <!-- Weitere relevante Eingabefelder oder versteckte Felder für die Bestellung -->
+                                  <input type="hidden" name="payment_type" value="cash">
+                                  <button type="submit" class="btn btn-success btn-block btn-lg">PAY ${{ grand_total }}
+                                  <i class="icofont-long-arrow-right"></i></button>
+                              </form>
+                          </div>
+                          
                              
                             <div class="tab-pane fade" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
                                <h6 class="mb-3 mt-0 mb-3">Add new card</h6>

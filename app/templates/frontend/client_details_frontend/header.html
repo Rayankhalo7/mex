@@ -41,7 +41,11 @@
                      <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid mb-4" alt="{{ client.clientname }}">
                      <h6 class="mb-0">{{client.clientname}}</h6>
                      <p class="text-secondary mb-0">{{client.street}} {{ client.house_number}}, {{client.postal_code}} {{client.city}}</p>
-                     <small><a class="text-primary font-weight-bold" href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}">Menü anzeigen</a></small>
+                     {% if client %}
+    <small><a class="text-primary font-weight-bold" href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}">Menü anzeigen</a></small>
+{% else %}
+    <small>Kein Client zugeordnet</small>
+{% endif %}
                   </div>
                   <div class="dropdown-cart-top-body border-top p-4">
                      <div class="bg-white">

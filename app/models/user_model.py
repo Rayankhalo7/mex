@@ -28,6 +28,8 @@ class User(db.Model, UserMixin):
     # Registerierungszeit speichern
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+    user_orders = db.relationship('Order', backref='order_user', lazy=True)
+
     def set_password(self, password):
         """
         Setzt das Passwort mit MD5-Verschlüsselung.

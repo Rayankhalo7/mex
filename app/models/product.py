@@ -15,3 +15,5 @@ class Product(db.Model):
 
     is_must_popular = db.Column(db.Boolean, default=False)  # Produkt gehört zu "Must Popular"
     is_bestseller = db.Column(db.Boolean, default=False)    # Produkt gehört zu "Bestseller"
+
+    

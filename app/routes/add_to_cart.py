@@ -16,21 +16,16 @@ def add_to_cart(product_id):
 
     cart = session['cart']
 
-    # Setze den `tax_rate` für das Produkt
-    tax_rate = product.tax_rate if product.tax_rate else 0.0
-
-    
+    # Speichere die client_id in der Session
     if 'cart_client_id' in session and session['cart_client_id'] != product.client_id:
-        # Leere den Warenkorb und setze den Client ID neu
         session['cart'] = {}
         session['cart_client_id'] = product.client_id
         flash('Der Warenkorb wurde geleert, da Sie zu einem anderen Client gewechselt haben.', 'info')
 
-    
     if 'cart_client_id' not in session:
         session['cart_client_id'] = product.client_id
 
-    
+    # Hinzufügen des Produkts zum Warenkorb
     if str(product_id) in cart:
         cart[str(product_id)]['quantity'] += 1
     else:
@@ -40,7 +35,7 @@ def add_to_cart(product_id):
             'price': product.price,
             'image': product.image,
             'client_id': product.client_id,
-            'tax_rate': tax_rate,  
+            'tax_rate': product.tax_rate,
             'is_must_popular': product.is_must_popular,
             'is_bestseller': product.is_bestseller
         }
@@ -48,6 +43,7 @@ def add_to_cart(product_id):
     session['cart'] = cart
     flash(f"{product.name} erfolgreich zum Warenkorb hinzugefügt!", 'success')
     return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=product.client_id))
+
 
 
 # Route zum Erhöhen der Produktmenge im Warenkorb
