@@ -15,50 +15,46 @@
                   <h4 class="mb-1">Lieferadresse</h4>
                   <h6 class="mb-3 text-black-50">An diese Adressen liefern</h6>
                   <div class="row">
-                      <div class="col-md-6">
-                          <div class="bg-white card addresses-item mb-4 border border-success">
-                              <div class="gold-members p-4">
-                                  <div class="media">
-                                      <div class="mr-3"><i class="icofont-ui-home icofont-3x"></i></div>
-                                      <div class="media-body">
-                                          <h6 class="mb-1 text-black">Adresse</h6>
-                                          <p class="text-black">
-                                              {{ current_user.street }} {{ current_user.house_number }},
-                                              <br>{{ current_user.postal_code }} {{ current_user.city }}
-                                          </p>
-                                          <p class="mb-0 text-black font-weight-bold">
-                                              <!--<a class="btn btn-sm btn-success mr-2" href="#" onclick="selectAddress('{{ current_user.street }}', '{{ current_user.house_number }}', '{{ current_user.postal_code }}', '{{ current_user.city }}')">HIER LIEFERN</a>-->
-                                              {% if client.lieferzeiten %}
-                                              <span class="btn btn-success">{{ client.lieferzeiten[0].zeit_bis.strftime('%M') }} MIN</span>
-                                              {% else %}
-                                             <span>Keine Lieferzeit verfügbar</span>
-                                             {% endif %}
-                                          </p>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <div class="col-md-6">
-                        <div class="bg-white card addresses-item mb-4 border border-success">
-                            <div class="gold-members p-4">
-                              <div class="media">
-                                 
-                                 <div class="media-body">
-                                     <h6 class="mb-1 text-black">Meine Daten</h6>
-                                     <p class="text-black">Name: 
-                                         {{ current_user.username }}
-                                         <br>Telefonnummer: {{ current_user.phone_number }}
-                                         <br>E-Mail: {{current_user.email}}
-                                         
-                                     </p>
-                                     <p class="mb-0 text-black font-weight-bold">
-                                       <br>
-                                   </p>
-                                     
-                                 </div>
-                             </div>
+                     <div class="col-md-6 d-flex align-items-stretch">
+                        <div class="bg-white card addresses-item mb-4 border border-success w-100">
+                            <div class="gold-members p-4 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="icofont-ui-home icofont-3x mr-3 text"></i>
+                                    <h6 class="mb-0 text-black">Adresse</h6>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted mb-2">
+                                        {{ current_user.street }} {{ current_user.house_number }},
+                                        <br>{{ current_user.postal_code }} {{ current_user.city }}
+                                    </p>
+                                </div>
+                                <div class="mt-auto">
+                                    <p class="mb-0 text-black font-weight-bold">
+                                        {% if client.lieferzeiten %}
+                                            <span class="btn btn-success">{{ client.lieferzeiten[0].zeit_bis.strftime('%M') }} MIN</span>
+                                        {% else %}
+                                            <span class="text-muted">Keine Lieferzeit verfügbar</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="col-md-6 d-flex align-items-stretch">
+                        <div class="bg-white card addresses-item mb-4 border border-success w-100">
+                            <div class="gold-members p-4 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="icofont-user icofont-3x mr-3 text"></i>
+                                    <h6 class="mb-0 text-black">Meine Daten</h6>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted mb-2">
+                                        <strong>Name:</strong> {{ current_user.username }}
+                                        <br><strong>Telefonnummer:</strong> {{ current_user.phone_number }}
+                                        <br><strong>E-Mail:</strong> {{ current_user.email }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
