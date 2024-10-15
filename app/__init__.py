@@ -124,6 +124,9 @@ def create_app():
         from app.routes.checkout import checkout_bp
         app.register_blueprint(checkout_bp, url_prefix='/')
 
+        from app.routes.statistics_routes import statistics_bp
+        app.register_blueprint(statistics_bp)
+
 
         from app.models.order import Order 
         from app.models.order_item import OrderItem

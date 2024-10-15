@@ -8,6 +8,7 @@ from datetime import datetime
 from app.models.order import Order
 from app.models.order_item import OrderItem
 from app import db
+from app.models.lieferzeiten import Lieferzeiten
 
 
 # Blueprint für Checkout erstellen
@@ -94,6 +95,9 @@ def process_checkout():
             flash("Bitte geben Sie eine Telefonnummer an.", "error")
             return redirect(url_for('checkout_bp.checkout'))
         phone = current_user.phone_number
+
+
+    
 
 
     # Bestellung erstellen

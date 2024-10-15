@@ -1,0 +1,291 @@
+{% block title %}Bestellungen{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .info-box {
+        text-align: center;
+        margin-top: 10px;
+    }
+    .info-box h4 {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+    .info-box p {
+        font-size: 1rem;
+        margin-top: 0;
+        font-weight: bold;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-8">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h2 class="fs-5 fw-bold mb-0">Letzte Bestellungen</h2>
+                            </div>
+                            <div class="col text-end">
+                                <a href="{{ url_for('admin_bp.all_orders') }}" class="btn btn-sm btn-primary">Alle ansehen</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="border-bottom" scope="col">Bestellnummer</th>
+                                <th class="border-bottom" scope="col">Datum</th>
+                                <th class="border-bottom" scope="col">Status</th>
+                                <th class="border-bottom" scope="col">Betrag</th>
+                            </tr>
+                            </thead>
+                            <tbody id="ordersTable">
+                                <!-- Dynamische Zeilen hier -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Bestellstatus-Übersicht Sektion -->
+        <div class="card border-0 shadow mb-4">
+            <div class="card-header">
+                <h2 class="fs-5 fw-bold mb-0">Bestellstatus-Übersicht</h2>
+            </div>
+            <div class="card-body">
+                <div id="orderStatusOverview">
+                    <!-- Dynamische Inhalte werden hier eingefügt -->
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="col-12 col-xl-4">
+        <!-- Chart.js Balkendiagramm -->
+        <div class="card border-0 shadow mb-4">
+            <div class="card-header">
+                <h2 class="fs-5 fw-bold mb-0">Bestellübersicht</h2>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="orderChart"></canvas>
+                </div>
+                <div class="info-box">
+                    <h4>Gesamtbestellungen:</h4>
+                    <p id="totalOrdersNumber">0</p>
+                </div>
+                <div class="info-box">
+                    <h4>Bestellungen im letzten Monat:</h4>
+                    <p id="lastMonthOrdersNumber">0</p>
+                </div>
+                <div class="info-box">
+                    <h4>Offene Bestellungen:</h4>
+                    <p id="pendingOrdersNumber">0</p>
+                </div>
+            </div>
+        </div>
+        <!-- Chart.js Kreisdiagramm -->
+        <div class="card border-0 shadow mb-4">
+            <div class="card-header">
+                <h2 class="fs-5 fw-bold mb-0">Einnahmen</h2>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="orderPieChart"></canvas>
+                </div>
+                <div class="info-box">
+                    <h4>Gesamteinnahmen:</h4>
+                    <p id="totalRevenueNumber">0 EUR</p>
+                </div>
+                <div class="info-box">
+                    <h4>Einnahmen im letzten Monat:</h4>
+                    <p id="lastMonthRevenueNumber">0 EUR</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bestellungen letzte Woche -->
+        <div class="card border-0 shadow mb-4">
+            <div class="card-header">
+                <h2 class="fs-5 fw-bold mb-0">Bestellungen letzte Woche</h2>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="orderWeeklyChart"></canvas>
+                </div>
+                <div class="info-box">
+                    <h4>Gesamtanzahl der Bestellungen letzte Woche:</h4>
+                    <p id="weeklyTotalOrdersNumber">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    fetch('/admin/statistics')
+        .then(response => response.json())
+        .then(data => {
+            // Fülle die Tabelle mit Bestelldaten
+            const ordersTable = document.getElementById('ordersTable');
+            data.orders.slice(0, 10).forEach(order => {
+                const row = `<tr>
+                                <td>${order.order_number}</td>
+                                <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                                <td>${order.status}</td>
+                                <td>${order.total_amount} EUR</td>
+                            </tr>`;
+                ordersTable.insertAdjacentHTML('beforeend', row);
+            });
+
+            // Setze die Zahlen unterhalb der Diagramme
+            document.getElementById('totalOrdersNumber').textContent = data.total_orders;
+            document.getElementById('lastMonthOrdersNumber').textContent = data.last_month_orders;
+            document.getElementById('pendingOrdersNumber').textContent = data.pending_orders;
+            document.getElementById('totalRevenueNumber').textContent = `${data.total_revenue} EUR`;
+            document.getElementById('lastMonthRevenueNumber').textContent = `${data.last_month_revenue} EUR`;
+
+            // Gesamtanzahl der Bestellungen letzte Woche
+            const totalWeeklyOrders = Object.values(data.orders_per_day).reduce((acc, val) => acc + val, 0);
+            document.getElementById('weeklyTotalOrdersNumber').textContent = totalWeeklyOrders;
+
+            // Chart.js Balkendiagramm für Bestellungen
+            var ctx = document.getElementById('orderChart').getContext('2d');
+            var orderChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gesamtbestellungen', 'Letzter Monat', 'Offene Bestellungen'],
+                    datasets: [{
+                        label: 'Bestellungen',
+                        data: [data.total_orders, data.last_month_orders, data.pending_orders],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Chart.js Kreisdiagramm für Einnahmen
+            var ctxPie = document.getElementById('orderPieChart').getContext('2d');
+            var orderPieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Gesamteinnahmen', 'Einnahmen im letzten Monat'],
+                    datasets: [{
+                        label: 'Einnahmen',
+                        data: [data.total_revenue, data.last_month_revenue],
+                        backgroundColor: [
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Chart.js Balkendiagramm für Bestellungen letzte Woche
+            var ctxWeekly = document.getElementById('orderWeeklyChart').getContext('2d');
+            var orderWeeklyChart = new Chart(ctxWeekly, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.orders_per_day), // Wochentage
+                    datasets: [{
+                        label: 'Bestellungen',
+                        data: Object.values(data.orders_per_day), // Bestellungen pro Tag
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Bestellstatus-Übersicht als Fortschrittsbalken
+        const orderStatusOverview = document.getElementById('orderStatusOverview');
+        const statuses = {
+            "pending": "Ausstehend",
+            "confirmed": "Bestätigt",
+            "delivered": "Geliefert",
+            "canceled": "Storniert"
+        };
+
+        for (const [status, label] of Object.entries(statuses)) {
+            const count = data.order_status[status] || 0;
+            const percentage = (count / data.total_orders) * 100 || 0;
+
+            const statusHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>${label}</span>
+                    <span>${count} (${Math.round(percentage)}%)</span>
+                </div>
+                <div class="progress mb-2" style="height: 10px;">
+                    <div class="progress-bar" role="progressbar" style="width: ${percentage}%; background-color: ${getProgressColor(status)};" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <small class="text-muted">${label}: ${count} Bestellungen</small>
+                </div>
+            `;
+
+            orderStatusOverview.insertAdjacentHTML('beforeend', statusHTML);
+        }
+
+        // Funktion zur Festlegung der Farben für jeden Status
+        function getProgressColor(status) {
+            switch (status) {
+                case 'pending':
+                    return '#ffc107'; // Gelb
+                case 'confirmed':
+                    return '#28a745'; // Grün
+                case 'delivered':
+                    return '#007bff'; // Blau
+                case 'canceled':
+                    return '#dc3545'; // Rot
+                default:
+                    return '#6c757d'; // Grau
+            }
+        }
+    })
+        .catch(error => console.error('Error fetching statistics:', error));
+</script>
+{% endblock javascripts %}

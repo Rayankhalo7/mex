@@ -1,4 +1,5 @@
 # app/models/order.py
+import uuid  # Für die Generierung einer eindeutigen Nummer
 from app import db
 from datetime import datetime
 
@@ -36,7 +37,26 @@ class Order(db.Model):
 
     # Beziehung zum Benutzer und zum Client
     user = db.relationship('User', backref='orders', lazy=True)
-    client = db.relationship('Client', backref='client_order_list', lazy=True)  # Ändere den `backref` hier in einen eindeutigen Namen
+    client = db.relationship('Client', backref='client_order_list', lazy=True)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.order_number:
+            self.order_number = self.generate_order_number()
+        if not self.invoice_no:
+            self.invoice_no = self.generate_invoice_number()
+
+    def generate_order_number(self):
+        """
+        Generiert eine eindeutige Bestellnummer, die mit 'ORD' beginnt und eine UUID enthält.
+        """
+        return f"ORD-{uuid.uuid4().hex[:8].upper()}"
+
+    def generate_invoice_number(self):
+        """
+        Generiert eine eindeutige Rechnungsnummer, die mit 'INV' beginnt und eine UUID enthält.
+        """
+        return f"INV-{uuid.uuid4().hex[:8].upper()}"
 
     def __repr__(self):
         return f'<Order {self.order_number}>'
