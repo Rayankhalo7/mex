@@ -79,8 +79,8 @@
                           </a>
                       </li>
                       <li class="nav-item {% if 'processed-orders' in segment %} active {% endif %}">
-                          <a class="nav-link" href="{{ url_for('admin_bp.processed_orders') }}">
-                              <span class="sidebar-text">Bearbeitete</span>
+                          <a class="nav-link" href="{{ url_for('admin_bp.pending_orders') }}">
+                              <span class="sidebar-text">Ausstehende</span>
                           </a>
                       </li>
                       <li class="nav-item {% if 'delivered-orders' in segment %} active {% endif %}">

@@ -31,10 +31,10 @@
                                 <form method="POST" action="{{ url_for('admin_bp.update_order_status', order_id=order.id) }}">
                                     <label for="status"><strong>Status:</strong></label>
                                     <select name="status" id="status" class="form-select">
-                                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-                                        <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
-                                        <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
-                                        <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Ausstehend</option>
+                                        <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Bestätigt</option>
+                                        
+                                        <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Geliefert</option>
                                     </select>
                                     <button type="submit" class="btn btn-primary mt-3">Status aktualisieren</button>
                                 </form>

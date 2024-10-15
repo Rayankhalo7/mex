@@ -402,11 +402,76 @@ def view_order(order_id):
                            total_tax=total_tax)
 
 
+@admin_bp.route('/edit_order/<int:order_id>', methods=['GET', 'POST'])
+def edit_order(order_id):
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+    
+    admin = Admin.query.get(session['admin_id'])
+    
+    order = Order.query.get_or_404(order_id)
+    # Berechnungen im Backend
+    total_netto = 0
+    total_brutto = 0
+    total_tax = 0
+
+    # Berechne die Summen für die Bestellung
+    for item in order.items:
+        netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
+        tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
+        total_netto += netto_price * item.quantity  # Netto-Summe
+        total_brutto += item.price * item.quantity  # Brutto-Summe
+        total_tax += tax_amount * item.quantity  # Steuer-Summe
+
+    # Rundung der Summen auf 2 Dezimalstellen
+    total_netto = round(total_netto, 2)
+    total_brutto = round(total_brutto, 2)
+    total_tax = round(total_tax, 2)
+
+    if request.method == 'POST':
+        # Aktualisiere die Bestellinformationen
+        order.phone = request.form.get('phone')
+        order.address = request.form.get('address')
+        order.payment_type = request.form.get('payment_type')
+        order.amount = request.form.get('amount')
+        order.total_amount = request.form.get('total_amount')  # Falls du den Gesamtbetrag ändern möchtest
+
+        # Status aktualisieren, wenn vorhanden
+        new_status = request.form.get('status')
+        if new_status:
+            order.status = new_status
+        
+        # Speichere die Änderungen in der Datenbank
+        db.session.commit()
+        flash('Bestellung erfolgreich aktualisiert!', 'success')
+        return redirect(url_for('admin_bp.view_order', order_id=order_id))
+    
+    return render_template('bestellungen/admin_edit_order.html',admin=admin, order=order, 
+                           total_netto=total_netto, total_brutto=total_brutto, 
+                           total_tax=total_tax)
+
+
+@admin_bp.route('/delete_order/<int:order_id>', methods=['POST'])
+def delete_order(order_id):
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+    
+    order = Order.query.get_or_404(order_id)
+    
+    # Lösche die Bestellung
+    db.session.delete(order)
+    db.session.commit()
+    
+    flash('Bestellung erfolgreich gelöscht!', 'success')
+    return redirect(url_for('admin_bp.all_orders'))
 
 
 
 
-# Route für Verwalten von Bestellungen
+
+
+
+# Route für alle Bestellungen
 @admin_bp.route('/all_orders', methods=['GET'])
 def all_orders():
     if "adminname" not in session:
@@ -419,9 +484,10 @@ def all_orders():
     orders = Order.query.all()
 
     # Übergabe der `admin`-Variable und `orders`-Liste an das Template
-    return render_template('bestellungen/admin_all_orders.html', allData=orders, admin=admin,enumerate=enumerate, page_name="Alle Bestellungen")
+    return render_template('bestellungen/admin_all_orders.html', allData=orders, admin=admin, enumerate=enumerate, page_name="Alle Bestellungen")
 
 
+# Route für bestätigte Bestellungen
 @admin_bp.route('/confirmed_orders', methods=['GET'])
 def confirmed_orders():
     if "adminname" not in session:
@@ -436,21 +502,24 @@ def confirmed_orders():
     # Übergabe der `admin`-Variable und der bestätigten Bestellungen an das Template
     return render_template('bestellungen/admin_confirmed_orders.html', allData=confirmed_orders, admin=admin, enumerate=enumerate, page_name="Confirmed Orders")
 
-@admin_bp.route('/processed_orders', methods=['GET'])
-def processed_orders():
+
+# Route für ausstehende (Pending) Bestellungen
+@admin_bp.route('/pending_orders', methods=['GET'])
+def pending_orders():
     if "adminname" not in session:
         return redirect(url_for('admin_bp.login'))
+
+    # Lade alle Bestellungen mit dem Status 'pending'
+    pending_orders = Order.query.filter_by(status='pending').all()
 
     # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
     admin = Admin.query.get(session['admin_id'])
 
-    # Hol alle bearbeiteten Bestellungen aus der Datenbank
-    processed_orders = Order.query.filter_by(status='processing').all()
-
-    # Übergabe der `admin`-Variable und der bearbeiteten Bestellungen an das Template
-    return render_template('bestellungen/admin_processed_orders.html', allData=processed_orders, admin=admin, enumerate=enumerate, page_name="Processed Orders")
+    # Übergabe der `admin`-Variable und `pending_orders`-Liste an das Template
+    return render_template('bestellungen/admin_pending_orders.html', allData=pending_orders, admin=admin, enumerate=enumerate, page_name="Pending Orders")
 
 
+# Route für ausgelieferte Bestellungen
 @admin_bp.route('/delivered_orders', methods=['GET'])
 def delivered_orders():
     if "adminname" not in session:
@@ -470,13 +539,14 @@ def delivered_orders():
 def update_order_status(order_id):
     # Bestellstatus aktualisieren
     order = Order.query.get_or_404(order_id)
-    new_status = request.form.get('status')
-    
+    new_status = request.form.get('status')  # Nimm den neuen Status aus dem Formular
+
     if new_status:
-        order.status = new_status
-        db.session.commit()
+        order.status = new_status  # Aktualisiere den Status
+        db.session.commit()  # Speichere die Änderung in der Datenbank
         flash('Bestellstatus erfolgreich aktualisiert!', 'success')
     else:
         flash('Fehler beim Aktualisieren des Status.', 'error')
 
-    return redirect(url_for('admin_bp.view_order', order_id=order_id))
+    return redirect(url_for('admin_bp.view_order', order_id=order_id))  # Zurück zur Bestelldetailseite
+

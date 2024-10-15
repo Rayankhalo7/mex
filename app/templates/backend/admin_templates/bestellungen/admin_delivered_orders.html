@@ -1,13 +1,13 @@
 {% extends "admin_dashboard/layout/base.html" %}
 
-{% block title %} Delivered Orders {% endblock %}
+{% block title %} Gelieferte Bestellungen {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="row">
         <div class="col-12 col-xl-12">
             <div class="card card-body border-0 shadow mb-4">
-                <h2 class="h5 mb-4">Delivered Orders</h2>
+                <h2 class="h5 mb-4">Gelieferte Bestellungen</h2>
 
                 <div class="card border-0 shadow">
                     <div class="card-body">
@@ -15,41 +15,56 @@
                             <table id="datatable" class="table table-centered table-nowrap mb-0 rounded">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-0 rounded-start">#</th> <!-- Spalte für laufende Nummer -->
-                                        <th class="border-0">Date</th>
-                                        <th class="border-0">Invoice</th>
-                                        <th class="border-0">Amount</th>
-                                        <th class="border-0">Payment Method</th>
+                                        <th class="border-bottom rounded-start">#</th> <!-- Spalte für laufende Nummer -->
+                                        <th class="border-0">Datum</th>
+                                        <th class="border-0">Rechnung</th>
+                                        <th class="border-0">Betrag</th>
+                                        <th class="border-0">Zahlungsmethode</th>
                                         <th class="border-0">Status</th>
-                                        <th class="border-0"></th> <!-- Für Aktionen wie Ansicht -->
+                                        <th class="border-0">Aktionen</th> <!-- Für Aktionen wie Ansicht -->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <!-- Iteriere durch alle Bestellungen, sortiere sie absteigend nach Datum -->
                                     {% for index, order in enumerate(allData | sort(attribute='order_date', reverse=True)) %}
-                                    <tr class="border-bottom"> <!-- Bootstrap border-bottom Klasse -->
+                                    <tr class="border-bottom"> <!-- Zeilen sind jetzt klar durch Linien getrennt -->
                                         <!-- Laufende Nummer -->
-                                        <td class="border-0">{{ index + 1 }}</td>
+                                        <td class="border-bottom">{{ index + 1 }}</td>
 
-                                        <!-- Order Date -->
-                                        <td class="border-0">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                        <!-- Bestelldatum -->
+                                        <td class="border-bottom">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
 
-                                        <!-- Invoice Number -->
-                                        <td class="border-0">{{ order.invoice_no or 'None' }}</td>
+                                        <!-- Rechnungsnummer -->
+                                        <td class="border-bottom">{{ order.invoice_no or 'Keine' }}</td>
 
-                                        <!-- Amount -->
-                                        <td class="border-0">{{ order.total_amount }}</td>
+                                        <!-- Betrag -->
+                                        <td class="border-bottom">{{ order.total_amount }} EUR</td>
 
-                                        <!-- Payment Method -->
-                                        <td class="border-0">{{ order.payment_method or 'None' }}</td>
+                                        <!-- Zahlungsmethode -->
+                                        <td class="border-bottom">{{ order.payment_method or 'Keine' }}</td>
 
                                         <!-- Status -->
-                                        <td class="border-0 fw-bold">
-                                            <span class="badge bg-success">{{ order.status }}</span>
+                                        <td class="border-bottom fw-bold">
+                                            <span class="badge 
+                                                {% if order.status == 'pending' %} bg-primary 
+                                                {% elif order.status == 'completed' %} bg-success 
+                                                {% elif order.status == 'delivered' %} bg-info 
+                                                {% else %} bg-warning {% endif %}">
+                                                
+                                                {% if order.status == 'pending' %}
+                                                    Ausstehend
+                                                {% elif order.status == 'confirmed' %}
+                                                    Bestätigt
+                                                {% elif order.status == 'delivered' %}
+                                                    Geliefert
+                                                {% else %}
+                                                    {{ order.status }}  <!-- "Completed" und andere nicht übersetzte Status -->
+                                                {% endif %}
+                                            </span>
                                         </td>
 
-                                        <!-- Action Button -->
-                                        <td class="border-0">
+                                        <!-- Aktion -->
+                                        <td class="border-bottom">
                                             <div class="dropdown">
                                                 <a href="#" class="text-secondary" id="dropdownMenuLink{{ order.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span class="sidebar-icon">
@@ -57,21 +72,25 @@
                                                     </span>
                                                 </a>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ order.id }}">
-                                                    <a class="dropdown-item" href="{{ url_for('admin_bp.view_order', order_id=order.id) }}">View</a>
+                                                    <a class="dropdown-item" href="{{ url_for('admin_bp.view_order', order_id=order.id) }}">Ansehen</a>
+                                                    <a class="dropdown-item" href="{{ url_for('admin_bp.edit_order', order_id=order.id) }}">Bearbeiten</a>
+                                                    <form action="{{ url_for('admin_bp.delete_order', order_id=order.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
+                                                        <button type="submit" class="dropdown-item text-danger">Löschen</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
 
                                     {% endfor %}
-                                    <!-- End of Order Item -->
+                                    <!-- Ende der Bestellung -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div> <!-- End of card -->
-        </div> <!-- End of col -->
-    </div> <!-- End of row -->
+            </div> <!-- Ende der Karte -->
+        </div> <!-- Ende der Spalte -->
+    </div> <!-- Ende der Zeile -->
 </div>
 {% endblock content %}
