@@ -47,7 +47,7 @@ def home():
     # Alle Clients aus der Datenbank abrufen
     clients = Client.query.all()
     if not clients:
-        return render_template('frontend/no_clients.html')  # Falls keine Clients vorhanden sind, andere Seite anzeigen
+        return render_template('frontend/home.html')  # Falls keine Clients vorhanden sind, andere Seite anzeigen
 
     return render_template('frontend/home.html', clients=clients)
 

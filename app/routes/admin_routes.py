@@ -11,6 +11,7 @@ from app.models.client_model import Client
 from hashlib import md5
 from app import serializer
 from flask import flash
+from app.models.order import Order
 
 
 
@@ -363,3 +364,119 @@ def send_password_set_email(client):
 
     # Sende die E-Mail
     mail.send(msg)
+
+
+
+
+@admin_bp.route('/view_order/<int:order_id>', methods=['GET'])
+def view_order(order_id):
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+    
+    admin = Admin.query.get(session['admin_id'])
+
+    # Lade die Bestellung basierend auf der übergebenen order_id
+    order = Order.query.get_or_404(order_id)
+
+    # Berechnungen im Backend
+    total_netto = 0
+    total_brutto = 0
+    total_tax = 0
+
+    # Berechne die Summen für die Bestellung
+    for item in order.items:
+        netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
+        tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
+        total_netto += netto_price * item.quantity  # Netto-Summe
+        total_brutto += item.price * item.quantity  # Brutto-Summe
+        total_tax += tax_amount * item.quantity  # Steuer-Summe
+
+    # Rundung der Summen auf 2 Dezimalstellen
+    total_netto = round(total_netto, 2)
+    total_brutto = round(total_brutto, 2)
+    total_tax = round(total_tax, 2)
+
+    # Übergebe die Bestellung und die berechneten Summen an das Template
+    return render_template('bestellungen/admin_view_order.html', admin=admin, order=order, 
+                           total_netto=total_netto, total_brutto=total_brutto, 
+                           total_tax=total_tax)
+
+
+
+
+
+
+# Route für Verwalten von Bestellungen
+@admin_bp.route('/all_orders', methods=['GET'])
+def all_orders():
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Hol alle Bestellungen aus der Datenbank
+    orders = Order.query.all()
+
+    # Übergabe der `admin`-Variable und `orders`-Liste an das Template
+    return render_template('bestellungen/admin_all_orders.html', allData=orders, admin=admin,enumerate=enumerate, page_name="Alle Bestellungen")
+
+
+@admin_bp.route('/confirmed_orders', methods=['GET'])
+def confirmed_orders():
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Hol alle bestätigten Bestellungen aus der Datenbank
+    confirmed_orders = Order.query.filter_by(status='confirmed').all()
+
+    # Übergabe der `admin`-Variable und der bestätigten Bestellungen an das Template
+    return render_template('bestellungen/admin_confirmed_orders.html', allData=confirmed_orders, admin=admin, enumerate=enumerate, page_name="Confirmed Orders")
+
+@admin_bp.route('/processed_orders', methods=['GET'])
+def processed_orders():
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Hol alle bearbeiteten Bestellungen aus der Datenbank
+    processed_orders = Order.query.filter_by(status='processing').all()
+
+    # Übergabe der `admin`-Variable und der bearbeiteten Bestellungen an das Template
+    return render_template('bestellungen/admin_processed_orders.html', allData=processed_orders, admin=admin, enumerate=enumerate, page_name="Processed Orders")
+
+
+@admin_bp.route('/delivered_orders', methods=['GET'])
+def delivered_orders():
+    if "adminname" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Hol alle ausgelieferten Bestellungen aus der Datenbank
+    delivered_orders = Order.query.filter_by(status='delivered').all()
+
+    # Übergabe der `admin`-Variable und der ausgelieferten Bestellungen an das Template
+    return render_template('bestellungen/admin_delivered_orders.html', allData=delivered_orders, admin=admin, enumerate=enumerate, page_name="Delivered Orders")
+
+
+@admin_bp.route('/update_order_status/<int:order_id>', methods=['POST'])
+def update_order_status(order_id):
+    # Bestellstatus aktualisieren
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get('status')
+    
+    if new_status:
+        order.status = new_status
+        db.session.commit()
+        flash('Bestellstatus erfolgreich aktualisiert!', 'success')
+    else:
+        flash('Fehler beim Aktualisieren des Status.', 'error')
+
+    return redirect(url_for('admin_bp.view_order', order_id=order_id))

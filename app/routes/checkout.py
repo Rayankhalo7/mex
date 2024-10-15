@@ -21,7 +21,7 @@ def checkout():
     """
     # Warenkorbdaten aus der Session holen
     cart = session.get('cart', {})
-    
+     
     if not cart:
         flash('Ihr Warenkorb ist leer. Fügen Sie zuerst Produkte hinzu.', 'warning')
         return redirect(url_for('frontend_bp.home'))
@@ -85,6 +85,16 @@ def process_checkout():
     if not client:
         flash('Kein Client zugeordnet. Bitte wähle einen gültigen Client.', 'warning')
         return redirect(url_for('frontend_bp.home'))
+    
+
+    # Telefonnummer aus dem Formular oder aus dem Benutzerprofil
+    phone = request.form.get('phone')
+    if not phone:
+        if not current_user.phone_number:
+            flash("Bitte geben Sie eine Telefonnummer an.", "error")
+            return redirect(url_for('checkout_bp.checkout'))
+        phone = current_user.phone_number
+
 
     # Bestellung erstellen
     order = Order(
@@ -92,11 +102,11 @@ def process_checkout():
         client_id=client.id,
         name=current_user.username,   # Benutzername wird in der Bestellung gespeichert
         email=current_user.email,
-        phone=current_user.phone_number,     # Telefonnummer des Benutzers (korrektes Feld)
+        phone=phone,     # Telefonnummer des Benutzers (korrektes Feld)
         address=f"{current_user.street} {current_user.house_number}, {current_user.postal_code} {current_user.city}",  # Adresse des Benutzers
         payment_type=payment_type,
         amount=total_cost,            # Gesamtkosten der Bestellung
-        total_amount=total_cost + total_tax,  # Gesamtsumme inklusive Steuern
+        total_amount=total_cost,  # Gesamtsumme inklusive Steuern
         status='pending'  # Status der Bestellung, standardmäßig "pending"
     )
 
@@ -124,10 +134,7 @@ def process_checkout():
     # Erfolgsnachricht anzeigen und Warenkorb leeren
     flash('Bestellung erfolgreich abgeschlossen!', 'success')
     session.pop('cart', None)  # Warenkorb nach Abschluss leeren
-    session.pop('cart_client_id', None)  # Setze auch den `cart_client_id` zurück
+    session.pop('cart_client_id', None)  # Setze auch den cart_client_id zurück
     session.pop('tax_details', None)  # Steuerinformationen ebenfalls zurücksetzen
 
     return redirect(url_for('frontend_bp.thank_you'))
-
-
-

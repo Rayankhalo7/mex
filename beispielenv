@@ -3,7 +3,7 @@ SECRET_KEY=zufällige key
 
 # SQLAlchemy settings
 DEV_DATABASE_URI=sqlite:///dev.db
-SQLALCHEMY_DATABASE_URI=mysql://root:passwort@localhost/dbname
+SQLALCHEMY_DATABASE_URI=mysql://root:passwort@localhost/mahlzeit_dbneu
 
 # Mail settings
 MAIL_SERVER=smtp.gmail.com
