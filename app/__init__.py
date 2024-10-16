@@ -9,6 +9,7 @@ from flask_login import LoginManager, current_user
 import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
 
 # Initialisiere den Serializer als globale Variable
 serializer = None
@@ -28,6 +29,8 @@ def create_app():
     global serializer
     
     app = Flask(__name__, template_folder='templates', static_folder='static')
+
+    csrf = CSRFProtect(app)
 
     # Cache-Konfiguration hinzufügen
     app.config['CACHE_TYPE'] = os.getenv('CACHE_TYPE', 'simple')  # Mögliche Typen: 'redis', 'filesystem', 'memcached', etc.
@@ -127,8 +130,15 @@ def create_app():
         from app.routes.statistics_routes import statistics_bp
         app.register_blueprint(statistics_bp)
 
+        from app.routes.client_statistics import client_statistics_bp
+        app.register_blueprint(client_statistics_bp)
+
 
         from app.models.order import Order 
         from app.models.order_item import OrderItem
+
+        #from app.routes.paypal_sandbox import paypal_sandbox_bp
+       # app.register_blueprint(paypal_sandbox_bp, url_prefix='/paypal')
+
 
     return app

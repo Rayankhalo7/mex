@@ -1,0 +1,137 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %} Bestellung bearbeiten {% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Bestellung bearbeiten</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('client_bp.edit_order', order_id=order.id) }}">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="order_number"><strong>Bestellnummer</strong></label>
+                                        <input type="text" id="order_number" class="form-control" value="{{ order.order_number }}" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="name"><strong>Kunde</strong></label>
+                                        <input type="text" id="name" name="name" class="form-control" value="{{ order.name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="clientname"><strong>Client</strong></label>
+                                        <input type="text" id="clientname" class="form-control" value="{{ order.client.clientname }}" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phone"><strong>Telefonnummer</strong></label>
+                                        <input type="text" id="phone" name="phone" class="form-control" value="{{ order.phone }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="address"><strong>Adresse</strong></label>
+                                        <input type="text" id="address" name="address" class="form-control" value="{{ order.address }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="payment_type"><strong>Zahlungsmethode</strong></label>
+                                        <input type="text" id="payment_type" name="payment_type" class="form-control" value="{{ order.payment_type }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="amount"><strong>Betrag (Netto)</strong></label>
+                                        <input type="number" id="amount" name="amount" class="form-control" value="{{ order.amount }}" step="0.01" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="total_amount"><strong>Gesamtbetrag (Brutto)</strong></label>
+                                        <input type="number" id="total_amount" name="total_amount" class="form-control" value="{{ order.total_amount }}" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status ändern -->
+                            <div class="mb-3">
+                                <label for="status"><strong>Status:</strong></label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Ausstehend</option>
+                                    <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Bestätigt</option>
+                                    <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Abgeschlossen</option>
+                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Geliefert</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-success mt-3">Änderungen speichern</button>
+                            <a href="{{ url_for('client_bp.view_order', order_id=order.id) }}" class="btn btn-secondary mt-3">Abbrechen</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bestellte Artikel -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Bestellte Artikel</h5>
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Produktname</th>
+                                <th>Menge</th>
+                                <th>Preis (Netto)</th>
+                                <th>Steuersatz</th>
+                                <th>Steuerbetrag</th>
+                                <th>Preis (Brutto)</th>
+                                <th>Gesamt (Brutto)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                    
+                                <!-- Netto-Preis (bereits im Backend berechnet) -->
+                                {% set netto_price = (item.price / (1 + (item.product.tax_rate / 100))) | round(2) %}
+                                <td>{{ netto_price }} EUR</td>
+                    
+                                <!-- Steuersatz -->
+                                <td>{{ item.product.tax_rate }}%</td>
+                    
+                                <!-- Steuerbetrag -->
+                                {% set tax_amount = (item.price - netto_price) | round(2) %}
+                                <td>{{ tax_amount }} EUR</td>
+                    
+                                <!-- Brutto-Preis -->
+                                <td>{{ item.price }} EUR</td>
+                    
+                                <!-- Gesamtpreis (Brutto) -->
+                                <td>{{ (item.price * item.quantity) | round(2) }} EUR</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Gesamtsumme (Netto):</th>
+                                <th>{{ total_netto }} EUR</th>
+                                <th></th>
+                                <th>{{ total_tax }} EUR</th>
+                                <th></th>
+                                <th><strong>{{ total_brutto }} EUR</strong></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

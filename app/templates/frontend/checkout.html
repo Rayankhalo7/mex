@@ -82,88 +82,56 @@
               </div>
                 <div class="pt-2"></div>
                 <div class="bg-white rounded shadow-sm p-4 osahan-payment">
-                   <h4 class="mb-1">Choose payment method</h4>
-                   <h6 class="mb-3 text-black-50">Credit/Debit Cards</h6>
-                   <div class="row">
-                      <div class="col-sm-4 pr-0">
-                         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-
-                            <a class="nav-link active" id="v-pills-cash-tab" data-toggle="pill" href="#v-pills-cash" role="tab" aria-controls="v-pills-cash" aria-selected="false"><i class="icofont-money"></i> Pay on Delivery</a>
-                            
-                            <a class="nav-link " id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="icofont-credit-card"></i> Credit/Debit Cards</a>
-                            
-                            
-                         </div>
-                      </div>
-                      <div class="col-sm-8 pl-0">
-                         <div class="tab-content h-100" id="v-pills-tabContent">
-
+                    <h4 class="mb-1">Wähle Zahlungsmethode</h4>
+                    <div class="row">
+                       <div class="col-sm-4 pr-0">
+                          <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                             <a class="nav-link active" id="v-pills-cash-tab" data-toggle="pill" href="#v-pills-cash" role="tab" aria-controls="v-pills-cash" aria-selected="true">
+                                <i class="icofont-money"></i> Barzahlung
+                             </a>
+                             <a class="nav-link" id="v-pills-paypal-tab" data-toggle="pill" href="#v-pills-paypal" role="tab" aria-controls="v-pills-paypal" aria-selected="false">
+                                <i class="icofont-paypal"></i> PayPal
+                             </a>
+                          </div>
+                       </div>
+                       <div class="col-sm-8 pl-0">
+                        <div class="tab-content h-100" id="v-pills-tabContent">
+                           <!-- Cash Payment Option -->
                            <div class="tab-pane fade show active" id="v-pills-cash" role="tabpanel" aria-labelledby="v-pills-cash-tab">
-                              <h6 class="mb-3 mt-0 mb-3">Cash</h6>
-                              <p>Please keep exact change handy to help us serve you better</p>
+                              <h6 class="mb-3 mt-0">Barzahlung</h6>
+                              <p>Bitte halte den exakten Betrag bereit, um den Ablauf zu erleichtern.</p>
                               <hr>
                               <form action="{{ url_for('checkout_bp.process_checkout') }}" method="POST">
-                                  <!-- Weitere relevante Eingabefelder oder versteckte Felder für die Bestellung -->
-                                  <input type="hidden" name="payment_type" value="cash">
-                                  <button type="submit" class="btn btn-success btn-block btn-lg">PAY ${{ grand_total }}
-                                  <i class="icofont-long-arrow-right"></i></button>
-                              </form>
-                          </div>
-                          
-                             
-                            <div class="tab-pane fade" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                               <h6 class="mb-3 mt-0 mb-3">Add new card</h6>
-                               <p>WE ACCEPT <span class="osahan-card">
-                                  <i class="icofont-visa-alt"></i> <i class="icofont-mastercard-alt"></i> <i class="icofont-american-express-alt"></i> <i class="icofont-payoneer-alt"></i> <i class="icofont-apple-pay-alt"></i> <i class="icofont-bank-transfer-alt"></i> <i class="icofont-discover-alt"></i> <i class="icofont-jcb-alt"></i>
-                                  </span>
-                               </p>
-                               <form>
-                                  <div class="form-row">
-                                     <div class="form-group col-md-12">
-                                        <label for="inputPassword4">Card number</label>
-                                        <div class="input-group">
-                                           <input type="number" class="form-control" placeholder="Card number">
-                                           <div class="input-group-append">
-                                              <button class="btn btn-outline-secondary" type="button" id="button-addon2"><i class="icofont-card"></i></button>
-                                           </div>
-                                        </div>
-                                     </div>
-                                     <div class="form-group col-md-8">
-                                        <label>Valid through(MM/YY)
-                                        </label>
-                                        <input type="number" class="form-control" placeholder="Enter Valid through(MM/YY)">
-                                     </div>
-                                     <div class="form-group col-md-4">
-                                        <label>CVV
-                                        </label>
-                                        <input type="number" class="form-control" placeholder="Enter CVV Number">
-                                     </div>
-                                     <div class="form-group col-md-12">
-                                        <label>Name on card
-                                        </label>
-                                        <input type="text" class="form-control" placeholder="Enter Card number">
-                                     </div>
-                                     <div class="form-group col-md-12">
-                                        <div class="custom-control custom-checkbox">
-                                           <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                           <label class="custom-control-label" for="customCheck1">Securely save this card for a faster checkout next time.</label>
-                                        </div>
-                                     </div>
-                                     <div class="form-group col-md-12 mb-0">
-                                        <a href="thanks.html" class="btn btn-success btn-block btn-lg">PAY $1329
-                                        <i class="icofont-long-arrow-right"></i></a>
-                                     </div>
-                                  </div>
-                               </form>
-                            </div>
+                                {{ cash_form.hidden_tag() }}
+                                <input type="hidden" name="payment_type" value="cash">
+                                <button type="submit" class="btn btn-success btn-block btn-lg">
+                                    ZAHLEN €{{ grand_total }}
+                                    <i class="icofont-long-arrow-right"></i>
+                                </button>
+                            </form>
+                           </div>
+                      
+                           <!-- PayPal Payment Option -->
+                           <div class="tab-pane fade" id="v-pills-paypal" role="tabpanel" aria-labelledby="v-pills-paypal-tab">
+                              <h6 class="mb-3 mt-0">Mit PayPal zahlen</h6>
+                              <p>Sie werden zu PayPal weitergeleitet, um die Zahlung abzuschließen.</p>
+                              <hr>
+                              <form action="{{ url_for('checkout_bp.process_checkout') }}" method="POST">
+                                {{ paypal_form.hidden_tag() }}
+                                <input type="hidden" name="payment_type" value="paypal">
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    Mit PayPal zahlen €{{ grand_total }}
+                                    <i class="icofont-long-arrow-right"></i>
+                                </button>
+                            </form>
                             
-                            
-                            
-                            
-                         </div>
+                           </div>
+                        </div>
                       </div>
-                   </div>
-                </div>
+                      
+                    </div>
+                 </div>
+                 
              </div>
           </div>
           <div class="col-md-4 ">

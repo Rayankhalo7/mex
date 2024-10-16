@@ -16,6 +16,7 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="border-bottom rounded-start">#</th> <!-- Spalte für laufende Nummer -->
+                                        <th class="border-0">Kunde</th>
                                         <th class="border-0">Datum</th>
                                         <th class="border-0">Rechnung</th>
                                         <th class="border-0">Betrag</th>
@@ -30,6 +31,8 @@
                                     <tr class="border-bottom"> <!-- Zeilen sind jetzt klar durch Linien getrennt -->
                                         <!-- Laufende Nummer -->
                                         <td class="border-bottom">{{ index + 1 }}</td>
+
+                                        <td>{{current_user.username}}</td>
 
                                         <!-- Bestelldatum -->
                                         <td class="border-bottom">{{ order.order_date.strftime('%Y-%m-%d') }}</td>

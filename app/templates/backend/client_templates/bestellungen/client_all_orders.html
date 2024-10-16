@@ -1,13 +1,13 @@
-{% extends "admin_dashboard/layout/base.html" %}
+{% extends "client_dashboard/layout/base.html" %}
 
-{% block title %} Ausstehende Bestellungen {% endblock %}
+{% block title %} Meine Bestellungen {% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="row">
         <div class="col-12 col-xl-12">
             <div class="card card-body border-0 shadow mb-4">
-                <h2 class="h5 mb-4">Ausstehende Bestellungen</h2>
+                <h2 class="h5 mb-4">Meine Bestellungen</h2>
 
                 <div class="card border-0 shadow">
                     <div class="card-body">
@@ -15,42 +15,29 @@
                             <table id="datatable" class="table table-centered table-nowrap mb-0 rounded">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="border-0 rounded-start">#</th> <!-- Spalte für laufende Nummer -->
+                                        <th class="border-0 rounded-start">#</th>
                                         <th class="border-0">Kunde</th>
                                         <th class="border-0">Datum</th>
                                         <th class="border-0">Rechnung</th>
                                         <th class="border-0">Betrag</th>
                                         <th class="border-0">Zahlungsmethode</th>
                                         <th class="border-0">Status</th>
-                                        <th class="border-0">Aktionen</th> <!-- Für Aktionen wie Ansicht -->
+                                        <th class="border-0">Aktionen</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Iteriere durch alle Bestellungen, sortiere sie absteigend nach Datum -->
                                     {% for index, order in enumerate(allData | sort(attribute='order_date', reverse=True)) %}
-                                    <tr class="border-bottom"> <!-- Zeilen sind jetzt klar durch Linien getrennt -->
-                                        <!-- Laufende Nummer -->
-                                        <td class="border-bottom">{{ index + 1 }}</td>
-
+                                    <tr class="border-bottom">
+                                        <td>{{ index + 1 }}</td>
                                         <td>{{current_user.username}}</td>
-
-                                        <!-- Bestelldatum -->
-                                        <td class="border-bottom">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
-
-                                        <!-- Rechnungsnummer -->
-                                        <td class="border-bottom">{{ order.invoice_no or 'Keine' }}</td>
-
-                                        <!-- Betrag -->
-                                        <td class="border-bottom">{{ order.total_amount }} EUR</td>
-
-                                        <!-- Zahlungsmethode -->
-                                        <td class="border-bottom">{{ order.payment_method or 'Keine' }}</td>
-
-                                        <!-- Status -->
-                                        <td class="border-bottom fw-bold">
+                                        <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ order.invoice_no or 'Keine' }}</td>
+                                        <td>{{ order.total_amount }} €</td>
+                                        <td>{{ order.payment_method or 'Keine' }}</td>
+                                        <td class="fw-bold">
                                             <span class="badge 
                                                 {% if order.status == 'pending' %} bg-primary 
-                                                {% elif order.status == 'completed' %} bg-success 
+                                                {% elif order.status == 'confirmed' %} bg-success 
                                                 {% elif order.status == 'delivered' %} bg-info 
                                                 {% else %} bg-warning {% endif %}">
                                                 
@@ -61,13 +48,11 @@
                                                 {% elif order.status == 'delivered' %}
                                                     Geliefert
                                                 {% else %}
-                                                    {{ order.status }}  <!-- "Completed" und andere nicht übersetzte Status -->
+                                                    {{ order.status }}
                                                 {% endif %}
                                             </span>
                                         </td>
-
-                                        <!-- Aktion -->
-                                        <td class="border-bottom">
+                                        <td>
                                             <div class="dropdown">
                                                 <a href="#" class="text-secondary" id="dropdownMenuLink{{ order.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <span class="sidebar-icon">
@@ -75,18 +60,16 @@
                                                     </span>
                                                 </a>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ order.id }}">
-                                                    <a class="dropdown-item" href="{{ url_for('admin_bp.view_order', order_id=order.id) }}">Ansehen</a>
-                                                    <a class="dropdown-item" href="{{ url_for('admin_bp.edit_order', order_id=order.id) }}">Bearbeiten</a>
-                                                    <form action="{{ url_for('admin_bp.delete_order', order_id=order.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
+                                                    <a class="dropdown-item" href="{{ url_for('client_bp.view_order', order_id=order.id) }}">Ansehen</a>
+                                                    <a class="dropdown-item" href="{{ url_for('client_bp.edit_order', order_id=order.id) }}">Bearbeiten</a>
+                                                    <form action="{{ url_for('client_bp.delete_order', order_id=order.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
                                                         <button type="submit" class="dropdown-item text-danger">Löschen</button>
                                                     </form>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-
                                     {% endfor %}
-                                    <!-- Ende der Bestellung -->
                                 </tbody>
                             </table>
                         </div>

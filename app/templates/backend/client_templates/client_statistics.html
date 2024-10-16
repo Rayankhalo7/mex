@@ -30,7 +30,7 @@
                                 <h2 class="fs-5 fw-bold mb-0">Letzte Bestellungen</h2>
                             </div>
                             <div class="col text-end">
-                                <a href="{{ url_for('admin_bp.all_orders') }}" class="btn btn-sm btn-primary">Alle ansehen</a>
+                                <a href="{{ url_for('client_bp.all_orders') }}" class="btn btn-sm btn-primary">Alle ansehen</a>
                             </div>
                         </div>
                     </div>
@@ -133,7 +133,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    fetch('/admin/statistics')
+    fetch('/client/statistics')
     .then(response => response.json())
     .then(data => {
         // Fülle die Tabelle mit Bestelldaten

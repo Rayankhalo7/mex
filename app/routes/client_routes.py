@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, session, url_for, flash, current_app, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Message
 from app.models.client_model import Client
@@ -10,6 +10,7 @@ import os
 from app import serializer
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import flash
+from app.models.order import Order
 
 
 
@@ -333,4 +334,163 @@ def logout():
     session.pop('client_id', None)
     
     return redirect(url_for('client_bp.login'))
+
+
+
+
+@client_bp.route('/view_order/<int:order_id>', methods=['GET'])
+def view_order(order_id):
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+    
+    client = Client.query.get(session['client_id'])
+
+    # Lade die Bestellung basierend auf der übergebenen order_id und überprüfe, ob sie zum Client gehört
+    order = Order.query.filter_by(id=order_id, client_id=client.id).first_or_404()
+
+    # Berechnungen im Backend
+    total_netto = 0
+    total_brutto = 0
+    total_tax = 0
+
+    # Berechne die Summen für die Bestellung
+    for item in order.items:
+        netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
+        tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
+        total_netto += netto_price * item.quantity  # Netto-Summe
+        total_brutto += item.price * item.quantity  # Brutto-Summe
+        total_tax += tax_amount * item.quantity  # Steuer-Summe
+
+    # Rundung der Summen auf 2 Dezimalstellen
+    total_netto = round(total_netto, 2)
+    total_brutto = round(total_brutto, 2)
+    total_tax = round(total_tax, 2)
+
+    return render_template('bestellungen/client_view_order.html', client=client, order=order, 
+                           total_netto=total_netto, total_brutto=total_brutto, 
+                           total_tax=total_tax)
+
+
+@client_bp.route('/edit_order/<int:order_id>', methods=['GET', 'POST'])
+def edit_order(order_id):
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+    
+    client = Client.query.get(session['client_id'])
+    
+    order = Order.query.filter_by(id=order_id, client_id=client.id).first_or_404()
+    
+    total_netto = 0
+    total_brutto = 0
+    total_tax = 0
+
+    for item in order.items:
+        netto_price = item.price / (1 + (item.product.tax_rate / 100))
+        tax_amount = item.price - netto_price
+        total_netto += netto_price * item.quantity
+        total_brutto += item.price * item.quantity
+        total_tax += tax_amount * item.quantity
+
+    total_netto = round(total_netto, 2)
+    total_brutto = round(total_brutto, 2)
+    total_tax = round(total_tax, 2)
+
+    if request.method == 'POST':
+        order.phone = request.form.get('phone')
+        order.address = request.form.get('address')
+        order.payment_type = request.form.get('payment_type')
+        order.amount = request.form.get('amount')
+        order.total_amount = request.form.get('total_amount')
+
+        new_status = request.form.get('status')
+        if new_status:
+            order.status = new_status
+        
+        db.session.commit()
+        flash('Bestellung erfolgreich aktualisiert!', 'success')
+        return redirect(url_for('client_bp.view_order', order_id=order_id))
+    
+    return render_template('bestellungen/client_edit_order.html', client=client, order=order, 
+                           total_netto=total_netto, total_brutto=total_brutto, 
+                           total_tax=total_tax)
+
+
+@client_bp.route('/delete_order/<int:order_id>', methods=['POST'])
+def delete_order(order_id):
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+    
+    client = Client.query.get(session['client_id'])
+    order = Order.query.filter_by(id=order_id, client_id=client.id).first_or_404()
+
+    db.session.delete(order)
+    db.session.commit()
+    
+    flash('Bestellung erfolgreich gelöscht!', 'success')
+    return redirect(url_for('client_bp.all_orders'))
+
+
+@client_bp.route('/all_orders', methods=['GET'])
+def all_orders():
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+
+    # Hol alle Bestellungen für diesen Client
+    orders = Order.query.filter_by(client_id=client.id).all()
+
+    return render_template('bestellungen/client_all_orders.html', allData=orders, client=client, enumerate=enumerate, page_name="Alle Bestellungen")
+
+
+@client_bp.route('/confirmed_orders', methods=['GET'])
+def confirmed_orders():
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+
+    confirmed_orders = Order.query.filter_by(client_id=client.id, status='confirmed').all()
+
+    return render_template('bestellungen/client_confirmed_orders.html', allData=confirmed_orders, client=client, enumerate=enumerate, page_name="Confirmed Orders")
+
+
+@client_bp.route('/pending_orders', methods=['GET'])
+def pending_orders():
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+
+    pending_orders = Order.query.filter_by(client_id=client.id, status='pending').all()
+
+    return render_template('bestellungen/client_pending_orders.html', allData=pending_orders, client=client, enumerate=enumerate, page_name="Pending Orders")
+
+
+@client_bp.route('/delivered_orders', methods=['GET'])
+def delivered_orders():
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+
+    client = Client.query.get(session['client_id'])
+
+    delivered_orders = Order.query.filter_by(client_id=client.id, status='delivered').all()
+
+    return render_template('bestellungen/client_delivered_orders.html', allData=delivered_orders, client=client, enumerate=enumerate, page_name="Delivered Orders")
+
+
+@client_bp.route('/update_order_status/<int:order_id>', methods=['POST'])
+def update_order_status(order_id):
+    client = Client.query.get(session['client_id'])
+    order = Order.query.filter_by(id=order_id, client_id=client.id).first_or_404()
+
+    new_status = request.form.get('status')
+    if new_status:
+        order.status = new_status
+        db.session.commit()
+        flash('Bestellstatus erfolgreich aktualisiert!', 'success')
+    else:
+        flash('Fehler beim Aktualisieren des Status.', 'error')
+
+    return redirect(url_for('client_bp.view_order', order_id=order_id))
 

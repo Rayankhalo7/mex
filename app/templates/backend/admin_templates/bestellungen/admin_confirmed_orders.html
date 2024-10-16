@@ -16,6 +16,7 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="border-0 rounded-start">#</th> <!-- Spalte für laufende Nummer -->
+                                        <th class="border-0">Kunde</th>
                                         <th class="border-0">Date</th>
                                         <th class="border-0">Invoice</th>
                                         <th class="border-0">Amount</th>
@@ -30,6 +31,8 @@
                                     <tr class="border-bottom"> <!-- Bootstrap border-bottom Klasse -->
                                         <!-- Laufende Nummer -->
                                         <td class="border-bottom">{{ index + 1 }}</td>
+
+                                        <td>{{current_user.username}}</td>
 
                                         <!-- Order Date -->
                                         <td class="border-bottom">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
