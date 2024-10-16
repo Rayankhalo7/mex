@@ -86,7 +86,11 @@ def process_checkout():
     if not client:
         flash('Kein Client zugeordnet. Bitte wähle einen gültigen Client.', 'warning')
         return redirect(url_for('frontend_bp.home'))
-    
+
+    # Überprüfen, ob die Adresse des Benutzers vollständig ist
+    if not (current_user.street and current_user.house_number and current_user.postal_code and current_user.city):
+        flash("Bitte geben Sie eine vollständige Adresse an, um fortzufahren.", "warning")
+        return redirect(url_for('checkout_bp.checkout'))
 
     # Telefonnummer aus dem Formular oder aus dem Benutzerprofil
     phone = request.form.get('phone')
@@ -96,17 +100,13 @@ def process_checkout():
             return redirect(url_for('checkout_bp.checkout'))
         phone = current_user.phone_number
 
-
-    
-
-
     # Bestellung erstellen
     order = Order(
         user_id=current_user.id,
         client_id=client.id,
         name=current_user.username,   # Benutzername wird in der Bestellung gespeichert
         email=current_user.email,
-        phone=phone,     # Telefonnummer des Benutzers (korrektes Feld)
+        phone=phone,     # Telefonnummer des Benutzers
         address=f"{current_user.street} {current_user.house_number}, {current_user.postal_code} {current_user.city}",  # Adresse des Benutzers
         payment_type=payment_type,
         amount=total_cost,            # Gesamtkosten der Bestellung
