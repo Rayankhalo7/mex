@@ -1,0 +1,126 @@
+{% extends "client_dashboard/layout/base.html" %}
+
+{% block title %}Restaurant Profil{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-8">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4" style="font-weight: bold; color: #000;">Allgemeine Informationen</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Name des Restaurants:</label>
+                        <p class="text-dark">{{ client.clientname }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">E-Mail des Restaurants:</label>
+                        <p class="text-dark">{{ client.email }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Telefonnummer:</label>
+                        <p class="text-dark">{{ client.phone_number }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Registriert am:</label>
+                        <p class="text-dark">{{ client.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adresse -->
+            <h2 class="h5 my-4" style="font-weight: bold; color: #000;">Adresse</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Straße:</label>
+                        <p class="text-dark">{{ client.street }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">PLZ:</label>
+                        <p class="text-dark">{{ client.postal_code }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Hausnummer:</label>
+                        <p class="text-dark">{{ client.house_number }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Stadt:</label>
+                        <p class="text-dark">{{ client.city }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Öffnungszeiten -->
+            <h2 class="h5 my-4" style="font-weight: bold; color: #000;">Öffnungszeiten</h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Wochentag</th>
+                                    <th>Öffnet um</th>
+                                    <th>Schließt um</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hours in opening_hours %}
+                                <tr>
+                                    <td>{{ hours.day_of_week }}</td>
+                                    <td>{{ hours.open_time }}</td>
+                                    <td>{{ hours.close_time }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lieferzeiten -->
+            <h2 class="h5 my-4" style="font-weight: bold; color: #000;">Lieferzeiten</h2>
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Von</th>
+                                    <th>Bis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hours in lieferzeiten %}
+                                <tr>
+                                    <td>{{ hours.zeit_von }}</td>
+                                    <td>{{ hours.zeit_bis }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-xl-4">
+        <!-- Profilübersicht -->
+        <div class="card shadow border-0 text-center mb-4">
+            <div class="profile-cover rounded-top" style="background-image: url('{{ url_for('static', filename='frontend/themes/img/profile-cover.jpg') }}'); height: 150px; background-size: cover; background-position: center;">
+            </div>
+            <div class="card-body pb-5">
+                <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}" class="avatar-xl rounded-circle mx-auto mt-n5 mb-4" width="140" alt="Profilbild">
+                <h4 style="font-weight: bold; color: #000;">{{ client.clientname }}</h4>
+                <p class="text-muted">{{ client.email }}</p>
+                <p>Status: {% if client.status == 1 %}<span class="badge bg-success">Aktiv</span>{% else %}<span class="badge bg-danger">Inaktiv</span>{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

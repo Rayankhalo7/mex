@@ -11,6 +11,8 @@ from app import serializer
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import flash
 from app.models.order import Order
+from app.models.lieferzeiten import Lieferzeiten
+from app.models.opening_hours import OpeningHours
 
 
 
@@ -212,6 +214,21 @@ def dashboard():
     # Lade das Client-Objekt
     client = Client.query.get(session['client_id'])
     return render_template("client_dashboard.html", client=client, page_name="Dashboard")
+
+
+# client Dashboard
+@client_bp.route("/allgemein")
+def allgemein():
+    if "clientname" not in session:
+        return redirect(url_for('client_bp.login'))
+    
+    # Lade das Client-Objekt
+    client = Client.query.get(session['client_id'])
+    opening_hours = OpeningHours.query.filter_by(client_id=client.id).all()
+    lieferzeiten = Lieferzeiten.query.filter_by(client_id=client.id).all()
+    return render_template("client_allgemein.html", client=client, opening_hours=opening_hours, lieferzeiten=lieferzeiten, page_name="allgemein")
+
+
 
 
 
