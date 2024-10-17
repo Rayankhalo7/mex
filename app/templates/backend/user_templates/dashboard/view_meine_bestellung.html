@@ -59,7 +59,7 @@
                                 <div class="col">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h4>Bestelldetails
+                                            <h4>Bestelldetails<br>
                                                 <span class="text-danger">Rechnung: {{ order.invoice_no }}</span>
                                             </h4>
                                         </div>
@@ -128,7 +128,23 @@
             <tbody>
                 {% for item in order_items %}
                 <tr>
-                    <td><img src="{{ url_for('static', filename=item.product.image) }}" class="img-thumbnail" style="width:50px; height:50px"></td>
+                    
+                            
+                        
+                    <td>
+                        {% if item.product.image %}
+                            <img class="mr-3 rounded-pill" 
+                                 src="{{ url_for('static', filename='upload/client_produktbilder/' + item.product.client_id|string + '/' + item.product.image) }}" 
+                                 alt="{{ item.product.name }}" 
+                                 style="width: 50px; height: 50px;">
+                        {% else %}
+                            <!-- Platzhalterbild anzeigen, falls kein Produktbild vorhanden ist -->
+                            <img class="mr-3 rounded-pill" 
+                                 src="{{ url_for('static', filename='frontend/themes/img/default-product.jpg') }}" 
+                                 alt="{{ item.product.name }}" 
+                                 style="width: 100px; max-height: 100px;">
+                        {% endif %}
+                    </td>
                     <td>{{ item.product.name }}</td>
                     <td>{{ order.client.clientname }}</td>
                     <td>{{ item.product.tax_rate }} %</td>
@@ -139,14 +155,19 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+    </div><hr>
 
-    <div class="d-flex flex-column align-items-end mt-4">
+    <div class="d-flex flex-column align-items-end mt-2">
         <h5 class="mb-2 text-right">
             <p class="mb-1">
-                <span><strong>MwSt./USt. Insgesamt:</strong> </span>
-                <span class="text" id="tax">{{ total_tax | round(2) }}0 €</span>
+                <span><strong>Zwischensumme:</strong> </span>
+                <span class="text" id="tax">{{ total_price | round(2) }}0 €</span>
             </p>
+            <p class="mb-1">
+                <span><strong>MwSt./USt. Insgesamt:</strong> </span>
+                <span class="text" id="tax">{{ total_tax | round(2) }} €</span>
+            </p>
+            <hr>
             <h5 class="mb-1">
                 <span><strong>Gesamtpreis:</strong> </span>
                 <span><strong>{{ total_price }}0 €</strong></span>

@@ -255,7 +255,7 @@ def meine_bestellungen():
     user = current_user  # Der aktuell eingeloggte Benutzer
     try:
         # Bestellungen des aktuellen Benutzers aus der Datenbank abrufen
-        orders = Order.query.filter_by(user_id=user.id).order_by(Order.order_date.desc()).all()
+        orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.order_date.desc()).all()
         
         # Render the template with the orders
         return render_template(

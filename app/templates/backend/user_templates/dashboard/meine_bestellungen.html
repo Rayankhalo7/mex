@@ -118,24 +118,24 @@
     {% endwith %}
 
     // DataTables initialization
-    $(document).ready(function() {
-        $('#datatable').DataTable({
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "language": {
-                "paginate": {
-                    "previous": "Zurück",
-                    "next": "Weiter"
-                },
-                "search": "Suchen:",
-                "lengthMenu": "Zeige _MENU_ Einträge",
-                "info": "Zeige _START_ bis _END_ von _TOTAL_ Einträgen",
-                "zeroRecords": "Keine passenden Bestellungen gefunden",
-                "infoEmpty": "Keine Bestellungen verfügbar"
-            }
-        });
-    });
+    $('#datatable').DataTable({
+    "paging": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "order": [[ 1, "desc" ]], // Sortiere nach der zweiten Spalte (Datum), absteigend
+    "language": {
+        "paginate": {
+            "previous": "Zurück",
+            "next": "Weiter"
+        },
+        "search": "Suchen:",
+        "lengthMenu": "Zeige _MENU_ Einträge",
+        "info": "Zeige _START_ bis _END_ von _TOTAL_ Einträgen",
+        "zeroRecords": "Keine passenden Bestellungen gefunden",
+        "infoEmpty": "Keine Bestellungen verfügbar"
+    }
+});
+
 </script>
 {% endblock javascripts %}
