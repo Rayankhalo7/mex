@@ -33,6 +33,7 @@
                                         <!-- Buttons zum Bearbeiten und Löschen -->
                                         <a href="{{ url_for('client_opening_hours_bp.edit_opening_hours', id=hours.id) }}" class="btn btn-warning">Bearbeiten</a>
                                         <form action="{{ url_for('client_opening_hours_bp.delete_opening_hours', id=hours.id) }}" method="POST" style="display:inline-block;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-danger">Löschen</button>
                                         </form>
                                     </td>

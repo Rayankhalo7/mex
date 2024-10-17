@@ -4,17 +4,67 @@
 
 {% block content %}
 
-<section class="section pt-5 pb-5 osahan-not-found-page">
+<section class="section pt-5 pb-5 osahan-order-confirmation">
     <div class="container">
        <div class="row">
           <div class="col-md-12 text-center pt-5 pb-5">
-             <img class="img-fluid mb-5" src="img/thanks.png" alt="404">
-             <h1 class="mt-2 mb-2 text-success">Congratulations!</h1>
-             <p class="mb-5">You have successfully placed your order</p>
-             <a class="btn btn-primary btn-lg" href="orders.html#orders">View Order :)</a>
+             <!-- Bildbereich mit sanfter Animation -->
+             <img class="img-fluid mb-4 animate__animated animate__fadeInDown" src="{{ url_for('static', filename='frontend/themes/img/danke.jpg') }}" alt="Danke" style="max-width: 300px;">
+             
+             <!-- Überschrift mit Farbverlauf für einen modernen Look -->
+             <h1 class="mt-2 mb-2 text-success animate__animated animate__zoomIn" style="font-size: 2.5rem; font-weight: bold; background: linear-gradient(to right, #00c6ff, #0072ff); -webkit-background-clip: text; color: transparent;">
+                 Danke für Ihre Bestellung!
+             </h1>
+
+             <!-- Untertitel mit leichtem Text und sanfter Animation -->
+             <p class="mb-4 animate__animated animate__fadeInUp" style="color: #6c757d; font-size: 1.2rem;">
+                 Ihre Bestellung wurde erfolgreich aufgegeben und wird zubereitet.
+             </p>
+
+             <!-- Fortschrittsbalken mit abgerundeten Ecken und sanfter Bewegung -->
+             <div id="progress-container" class="progress mb-4" style="height: 20px; border-radius: 50px; overflow: hidden; background-color: #f0f0f0;">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; background-color: #28a745;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <span style="font-size: 0.9rem;">Ihre Bestellung wird zubereitet...</span>
+                </div>
+             </div>
+
+             <!-- Haken-Icon (verborgen bis der Fortschrittsbalken 100% erreicht) -->
+             <div id="checkmark" class="animate__animated" style="display: none; font-size: 3rem; color: #28a745;">
+                <i class="fas fa-check-circle"></i>
+             </div>
+
+             <br><br>
+
+             <!-- Schaltfläche mit weichen Schatten und Hover-Effekt -->
+             <a class="btn btn-lg" href="#" style="background-color: #ff5722; color: white; padding: 10px 30px; border-radius: 25px; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;">
+                 Bestellung ansehen :)
+             </a>
           </div>
        </div>
     </div>
- </section>
+</section>
 
- {% endblock content %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let progressBar = document.getElementById('progress-bar');
+        let progressContainer = document.getElementById('progress-container');
+        let checkmark = document.getElementById('checkmark');
+        let width = 0;
+        let interval = setInterval(function () {
+            if (width >= 100) {
+                clearInterval(interval);
+                // Verberge den Fortschrittsbalken
+                progressContainer.style.display = 'none';
+                // Zeige den Haken und animiere ihn
+                checkmark.style.display = 'block';
+                checkmark.classList.add('animate__zoomIn');
+            } else {
+                width++;
+                progressBar.style.width = width + '%';
+                progressBar.setAttribute('aria-valuenow', width);
+            }
+        }, 50); // Die Geschwindigkeit des Fortschrittsbalkens (50ms)
+    });
+</script>
+
+{% endblock content %}

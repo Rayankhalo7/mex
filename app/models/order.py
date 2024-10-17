@@ -33,7 +33,7 @@ class Order(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Beziehung zu den Produkten in der Bestellung (über die Zwischentabelle order_items)
-    items = db.relationship('OrderItem', backref='order', lazy=True)
+    items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
 
     # Beziehung zum Benutzer und zum Client
     user = db.relationship('User', backref='orders', lazy=True)

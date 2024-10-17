@@ -29,6 +29,7 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <form method="POST" action="{{ url_for('admin_bp.update_order_status', order_id=order.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <label for="status"><strong>Status:</strong></label>
                                     <select name="status" id="status" class="form-select">
                                         <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Ausstehend</option>

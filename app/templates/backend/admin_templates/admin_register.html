@@ -36,6 +36,7 @@
                             {% endwith %}
                             
                             <form action="{{ url_for('admin_bp.register') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <!-- Form -->
                                 <div class="form-group mb-4">
                                     <label for="email">Restaurant Name</label>

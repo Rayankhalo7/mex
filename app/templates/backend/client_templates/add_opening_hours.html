@@ -9,6 +9,7 @@
             <h2 class="h5 mb-4">Öffnungszeiten hinzufügen</h2>
 
             <form method="POST" action="{{ url_for('client_opening_hours_bp.add_opening_hours') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label for="day_of_week" class="form-label">Wochentag</label>
                     <select id="day_of_week" name="day_of_week" class="form-control" required>

@@ -21,6 +21,7 @@
                             
 
                             <form action="{{ url_for('user_bp.passwort_aendern') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <!-- Altes Passwort -->
                                 <div class="row">
                                     <div class="col-lg-6">

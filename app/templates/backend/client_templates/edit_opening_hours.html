@@ -10,6 +10,7 @@
 
             <!-- Bearbeitungsformular für die Öffnungszeiten -->
             <form method="POST" action="{{ url_for('client_opening_hours_bp.edit_opening_hours', id=opening_hours.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label for="day_of_week" class="form-label">Wochentag</label>
                     <select id="day_of_week" name="day_of_week" class="form-control" required>

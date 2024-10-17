@@ -63,6 +63,7 @@
                                                     <a class="dropdown-item" href="{{ url_for('admin_bp.view_order', order_id=order.id) }}">Ansehen</a>
                                                     <a class="dropdown-item" href="{{ url_for('admin_bp.edit_order', order_id=order.id) }}">Bearbeiten</a>
                                                     <form action="{{ url_for('admin_bp.delete_order', order_id=order.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                         <button type="submit" class="dropdown-item text-danger">Löschen</button>
                                                     </form>
                                                 </div>

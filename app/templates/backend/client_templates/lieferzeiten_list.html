@@ -31,6 +31,7 @@
                                         <!-- Buttons zum Bearbeiten und Löschen -->
                                         <a href="{{ url_for('client_lieferzeiten_bp.edit_lieferzeiten', id=hours.id) }}" class="btn btn-warning">Bearbeiten</a>
                                         <form action="{{ url_for('client_lieferzeiten_bp.delete_lieferzeiten', id=hours.id) }}" method="POST" style="display:inline-block;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-danger">Löschen</button>
                                         </form>
                                     </td>

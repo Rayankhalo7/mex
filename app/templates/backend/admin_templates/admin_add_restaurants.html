@@ -34,6 +34,7 @@
     
                 <!-- Formular zum Hinzufügen eines neuen Clients -->
                 <form action="{{ url_for('admin_bp.add_restaurants') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="clientname" class="form-label">Client Name</label>
                         <input type="text" class="form-control" id="clientname" name="clientname" required>

@@ -24,6 +24,7 @@
                                 <div class="card-body text-center">
                                     <!-- Button zum Löschen des Bildes -->
                                     <form action="{{ url_for('client_galerie_bp.delete_galerie_image', id=image.id) }}" method="POST" style="display:inline-block;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
                                     </form>
                                 </div>

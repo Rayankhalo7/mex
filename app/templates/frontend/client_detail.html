@@ -366,6 +366,7 @@
                                <p class="mb-2">Bewerten Sie den Ort</p>
                                <div class="mb-4">
                                    <form method="POST" action="{{ url_for('rating_bp.rate_client', client_id=client.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                        <span class="star-rating">
                                            <!-- Sterne für die Bewertung -->
                                            {% for i in range(1, 6) %}

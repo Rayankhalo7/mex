@@ -26,6 +26,7 @@
                      <!-- End Flash Messages Block -->
 
                      <form action="{{ url_for('user_bp.register') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-label-group">
                            
                            <input type="text" class="form-control" name="username" id="username" placeholder="Username" required>

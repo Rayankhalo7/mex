@@ -41,6 +41,7 @@
                                         <!-- Buttons zum Bearbeiten und Löschen -->
                                         <a href="{{ url_for('client_banner_bp.edit_banner', id=banner.id) }}" class="btn btn-warning btn-sm">Bearbeiten</a>
                                         <form action="{{ url_for('client_banner_bp.delete_banner', id=banner.id) }}" method="POST" style="display:inline-block;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
                                         </form>
                                     </td>

@@ -6,6 +6,7 @@
         <div class="card card-body border-0 shadow mb-4">
 <h1>Kategorie bearbeiten</h1>
 <form action="{{ url_for('client_category_bp.edit_category', id=category.id) }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3">
         <label for="name" class="form-label">Name der Kategorie</label>
         <input type="text" class="form-control" id="name" name="name" value="{{ category.name }}" required>

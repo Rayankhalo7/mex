@@ -58,6 +58,7 @@
                                         <!-- Buttons zum Bearbeiten und Löschen -->
                                         <a href="{{ url_for('client_product_bp.edit_product', id=product.id) }}" class="btn btn-warning">Bearbeiten</a>
                                         <form action="{{ url_for('client_product_bp.delete_product', id=product.id) }}" method="POST" style="display:inline-block;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-danger">Löschen</button>
                                         </form>
                                     </td>

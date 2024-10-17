@@ -8,6 +8,7 @@
         <div class="card card-body border-0 shadow mb-4">
             <h2 class="h5 mb-4">Lieferzeiten bearbeiten</h2>
             <form method="POST" action="{{ url_for('client_lieferzeiten_bp.edit_lieferzeiten', id=lieferzeiten.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label for="zeit_von" class="form-label">Lieferzeit von</label>
                     <input type="time" id="zeit_von" name="zeit_von" class="form-control" value="{{ lieferzeiten.zeit_von }}" required>
