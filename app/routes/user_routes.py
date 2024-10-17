@@ -276,37 +276,61 @@ def meine_bestellungen():
 def meine_bestellung(order_id):
     try:
         user = current_user
-        order = Order.query.filter_by(id=order_id, user_id=user.id).first_or_404()
-        order_items = OrderItem.query.filter_by(order_id=order.id).all()
         
-        total_price = sum(item.price * item.quantity for item in order_items)
+        # Debugging: Prüfe, ob der Benutzer korrekt geladen wird
+        print(f"Benutzer ID: {user.id}")
+        
+        # Versuche, die Bestellung zu laden
+        order = Order.query.filter_by(id=order_id, user_id=user.id).first_or_404()
+        print(f"Bestellung gefunden: {order.id}")
+        
+        # Lade die Bestellpositionen
+        order_items = OrderItem.query.filter_by(order_id=order.id).all()
+        print(f"Anzahl der Bestellpositionen: {len(order_items)}")
+
+        if not order_items:
+            print("Keine Bestellpositionen gefunden")
+
+        # Berechnungen im Backend
         total_netto = 0
         total_brutto = 0
         total_tax = 0
 
-        for item in order.items:
+        for item in order_items:
             netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
             tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
             total_netto += netto_price * item.quantity  # Netto-Summe
             total_brutto += item.price * item.quantity  # Brutto-Summe
             total_tax += tax_amount * item.quantity  # Steuer-Summe
 
+        # Summen auf 2 Dezimalstellen runden
+        total_netto = round(total_netto, 2)
+        total_brutto = round(total_brutto, 2)
+        total_tax = round(total_tax, 2)
+
+        # Debugging: Überprüfe die berechneten Werte
+        print(f"Total Netto: {total_netto}, Total Brutto: {total_brutto}, Total Steuer: {total_tax}")
+
         return render_template(
             'backend/user_templates/dashboard/view_meine_bestellung.html',
             user=user,
-            
             order=order,
             order_items=order_items,
-            total_price=total_price,
-            page_name="Bestelldetails",total_tax=total_tax
+            total_price=total_brutto,
+            page_name="Bestelldetails",
+            total_tax=total_tax,
+            total_netto=total_netto
         )
+
     except NotFound:
+        print("Bestellung wurde nicht gefunden!")
         flash('Bestellung nicht gefunden.', 'danger')
         return redirect(url_for('user_bp.meine_bestellungen'))
     except Exception as e:
-        flash('Fehler beim Abrufen der Bestelldetails. Bitte versuche es erneut.', 'danger')
         print(f"Fehler beim Abrufen der Bestelldetails: {e}")
+        flash('Fehler beim Abrufen der Bestelldetails. Bitte versuche es erneut.', 'danger')
         return redirect(url_for('user_bp.meine_bestellungen'))
+
 
 
 
