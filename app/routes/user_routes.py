@@ -280,6 +280,16 @@ def meine_bestellung(order_id):
         order_items = OrderItem.query.filter_by(order_id=order.id).all()
         
         total_price = sum(item.price * item.quantity for item in order_items)
+        total_netto = 0
+        total_brutto = 0
+        total_tax = 0
+
+        for item in order.items:
+            netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
+            tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
+            total_netto += netto_price * item.quantity  # Netto-Summe
+            total_brutto += item.price * item.quantity  # Brutto-Summe
+            total_tax += tax_amount * item.quantity  # Steuer-Summe
 
         return render_template(
             'backend/user_templates/dashboard/view_meine_bestellung.html',
@@ -288,7 +298,7 @@ def meine_bestellung(order_id):
             order=order,
             order_items=order_items,
             total_price=total_price,
-            page_name="Bestelldetails"
+            page_name="Bestelldetails",total_tax=total_tax
         )
     except NotFound:
         flash('Bestellung nicht gefunden.', 'danger')
