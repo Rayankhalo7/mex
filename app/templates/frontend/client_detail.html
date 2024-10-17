@@ -413,67 +413,72 @@
 
                <div class="col-md-4">
                   <div class="pb-2">
-              <div class="bg-white rounded shadow-sm text-white mb-4 p-4 clearfix restaurant-detailed-earn-pts card-icon-overlap">
-                <h5 class="mb-1 text">Ihre Warenkorb</h5>
-                <p class="mb-4 text" ><span class="mb-4 text" id="cart-count">{{ total_items }}</span> Artikle im Warenkorb</p>
-            
-                <div class="bg-white rounded shadow-sm mb-2">
-                    {% for product_id, item in cart.items() %}
-                    <div class="gold-members p-2 border-bottom d-flex align-items-center justify-content-between" data-product-id="{{ product_id }}" data-price-per-unit="{{ item['price'] }}">
-                        <div class="media align-items-center">
-                            <div class="mr-2">
-                                <!-- Produktbild anzeigen -->
-                                <img src="{{ url_for('static', filename='upload/client_produktbilder/' ~ item['client_id'] ~ '/' ~ item['image']) }}" alt="{{ item['name'] }}" style="width: 50px; height: 50px;" class="rounded-pill">
-                            </div>
-                            <div class="media-body">
-                                <!-- Produktname anzeigen -->
-                                <p class="mt-1 mb-0 text-black"><p class="mt-1 mb-0 text-black product-name" data-name="{{ item['name'] }}">{{ item['quantity'] }}x {{ item['name'] }}</p>
-                            </p>
+                    
+
+                    <div class="">
+                        <div class="bg-white text-white mb-4 pt-3 p-3 clearfix restaurant-detailed-earn-pts card-icon-overlap">
+                          <h5 class="mb-1 text">Ihre Warenkorb</h5>
+                          <p class="mb-4 text" id="cart-count">{{ total_items }} Artikel im Warenkorb</p>
+                        
+                          <div class="bg-white rounded shadow-sm mb-2 ">
+                              {% for product_id, item in cart.items() %}
+                              <div class="gold-members p-2 d-flex align-items-center justify-content-between" data-product-id="{{ product_id }}" data-price-per-unit="{{ item['price'] }}">
+                                  <div class="media align-items-center">
+                                      <div class="mr-2">
+                                          <!-- Produktbild anzeigen -->
+                                          <img src="{{ url_for('static', filename='upload/client_produktbilder/' ~ item['client_id'] ~ '/' ~ item['image']) }}" alt="{{ item['name'] }}" style="width: 50px; height: 50px;" class="rounded-pill">
+                                      </div>
+                                      <div class="media-body">
+                                          <!-- Produktname anzeigen -->
+                                          <p class="mt-1 mb-0 text-black"><p class="mt-1 mb-0 text-black product-name" data-name="{{ item['name'] }}">{{ item['quantity'] }}x {{ item['name'] }}</p>
+                                      </p>
+                                      </div>
+                                  </div>
+                                  <div class="d-flex align-items-center">
+                                      <span class="count-number">
+                                          <button class="btn btn-outline-secondary btn-sm left dec mr-1"> <i class="icofont-minus"></i> </button>
+                                          <input class="count-number-input text-center" type="text" value="{{ item['quantity'] }}" readonly="" style="width: 40px;">
+                                          <button class="btn btn-outline-secondary btn-sm right inc ml-1"> <i class="icofont-plus"></i> </button>
+                        
+                                          <button class="btn btn-outline-danger btn-sm right remove ml-1"> <i class="icofont-trash"></i> </button>
+                                      </span>
+                                      <span class="ml-3 text font-weight-bold" style="color: black !important;">{{ '{:.2f}'.format(item['price'] * item['quantity']) }} €</span> <!-- Produktpreis x Menge mit zwei Dezimalstellen -->
+                                  </div>
+                              </div>
+                              {% endfor %}
+                          </div>
+                        
+                          <!-- Gesamtsumme und Steuer anzeigen -->
+                          <div class="mb-2 rounded bg-white p-2 clearfix">
+                              <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                                  <span>Zwischensumme:</span> <span class="text" id="total-cost">{{ '{:.2f}'.format(total_cost) }} €</span>  <!-- Subtotal Element mit zwei Dezimalstellen -->
+                              </h6>
+                        
+                              <div id="tax-details">
+                                  {% for rate, tax_amount in tax_details.items() %}
+                                  <p class="text-muted mb-1 d-flex justify-content-between">
+                                      <span>MwSt./USt. {{ rate }} %:</span> <span class="text-muted mb-1 text-right">{{ '{:.2f}'.format(tax_amount) }} €</span>  
+                                  </p>
+                                  {% endfor %}
+                              </div>
+                              
+                              
+                              
+                              <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                                  <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  
+                              </h6>
+                        
+                               
+                        <hr>
+                              <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                                  <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost) }} €</span>  
+                              </h6>
+                              <p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p>
+                          </div>
+                          <a href="{{ url_for('checkout_bp.checkout') }}" class="btn btn-success btn-block btn-lg">Zur Kasse gehen <i class="icofont-long-arrow-right"></i></a>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <span class="count-number">
-                                <button class="btn btn-outline-secondary btn-sm left dec mr-1"> <i class="icofont-minus"></i> </button>
-                                <input class="count-number-input text-center" type="text" value="{{ item['quantity'] }}" readonly="" style="width: 40px;">
-                                <button class="btn btn-outline-secondary btn-sm right inc ml-1"> <i class="icofont-plus"></i> </button>
-            
-                                <button class="btn btn-outline-danger btn-sm right remove ml-1"> <i class="icofont-trash"></i> </button>
-                            </span>
-                            <span class="ml-3 text font-weight-bold" style="color: black !important;">{{ '{:.2f}'.format(item['price'] * item['quantity']) }} €</span> <!-- Produktpreis x Menge mit zwei Dezimalstellen -->
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            
-                <!-- Gesamtsumme und Steuer anzeigen -->
-                <div class="mb-2 bg-white rounded p-2 clearfix">
-                    <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
-                        <span>Zwischensumme:</span> <span class="text" id="total-cost">{{ '{:.2f}'.format(total_cost) }} €</span>  <!-- Subtotal Element mit zwei Dezimalstellen -->
-                    </h6>
-            
-                    <div id="tax-details">
-                        {% for rate, tax_amount in tax_details.items() %}
-                        <p class="text-muted mb-1 d-flex justify-content-between">
-                            <span>MwSt./USt. {{ rate }} %:</span> <span class="text-muted mb-1 text-right">{{ '{:.2f}'.format(tax_amount) }} €</span>  
-                        </p>
-                        {% endfor %}
-                    </div>
                     
-                    
-                    
-                    <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
-                        <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{ '{:.2f}'.format(total_tax) }} €</span>  
-                    </h6>
-            
-                     
-            <hr>
-                    <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
-                        <span>Gesamtsumme:</span> <span class="text" id="grand-total">{{ '{:.2f}'.format(total_cost) }} €</span>  
-                    </h6>
-                    <p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p>
-                </div>
-                <a href="{{ url_for('checkout_bp.checkout') }}" class="btn btn-success btn-block btn-lg">Zur Kasse gehen <i class="icofont-long-arrow-right"></i></a>
-                  </div>
               </div>
                  
 

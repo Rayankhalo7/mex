@@ -151,7 +151,3 @@ def get_total_cost():
         "cart": cart,
         "total_items": total_items  # Rückgabe der Gesamtartikelanzahl
     })
-
-
-
-

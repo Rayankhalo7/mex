@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from paypalrestsdk import Payment
 from app.models.client_model import Client
@@ -21,7 +21,10 @@ paypalrestsdk.configure({
     "client_secret": os.getenv("PAYPAL_CLIENT_SECRET")
 })
 
-@checkout_bp.route('/checkout', methods=['GET'])
+
+
+
+@checkout_bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():
     cart = session.get('cart', {})
@@ -132,6 +135,9 @@ def process_checkout():
             db.session.add(order_item)
 
     db.session.commit()
+    # Setzen der Session-Daten für die "thank_you" Seite
+    session['thank_you_cart_client_id'] = client.id
+    session['thank_you_cart'] = cart
 
     # Falls PayPal als Zahlungsart gewählt wurde
     if payment_type == 'paypal':
@@ -238,3 +244,38 @@ def payment_cancel():
     session.pop('paypal_order_id', None)
     flash('Zahlung wurde abgebrochen.', 'warning')
     return redirect(url_for('checkout_bp.checkout'))
+
+
+
+@checkout_bp.route('/cart/increase_quantity/<int:product_id>', methods=['POST'])
+@login_required
+def increase_quantity(product_id):
+    cart = session.get('cart', {})
+    if str(product_id) in cart:
+        cart[str(product_id)]['quantity'] += 1
+        session['cart'] = cart
+        return jsonify({'status': 'success', 'quantity': cart[str(product_id)]['quantity']})
+    return jsonify({'status': 'error', 'message': 'Produkt nicht gefunden'}), 404
+
+@checkout_bp.route('/cart/decrease_quantity/<int:product_id>', methods=['POST'])
+@login_required
+def decrease_quantity(product_id):
+    cart = session.get('cart', {})
+    if str(product_id) in cart:
+        if cart[str(product_id)]['quantity'] > 1:
+            cart[str(product_id)]['quantity'] -= 1
+            session['cart'] = cart
+            return jsonify({'status': 'success', 'quantity': cart[str(product_id)]['quantity']})
+        else:
+            return jsonify({'status': 'error', 'message': 'Menge kann nicht weiter verringert werden'}), 400
+    return jsonify({'status': 'error', 'message': 'Produkt nicht gefunden'}), 404
+
+@checkout_bp.route('/cart/remove_from_cart/<int:product_id>', methods=['POST'])
+@login_required
+def remove_from_cart(product_id):
+    cart = session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+        session['cart'] = cart
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error', 'message': 'Produkt nicht gefunden'}), 404
