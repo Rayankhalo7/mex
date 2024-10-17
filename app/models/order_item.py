@@ -10,6 +10,7 @@ class OrderItem(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=True)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)  # Preis pro Produkt in der Bestellung
+    total_tax = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 

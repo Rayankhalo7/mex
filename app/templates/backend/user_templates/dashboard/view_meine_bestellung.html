@@ -1,0 +1,159 @@
+{% extends "backend/user_templates/dashboard/base_dashboard.html" %}
+
+{% block title %}Meine Bestellungen{% endblock %}
+
+{% block content %}
+
+
+            
+
+            <div class="col-md-9">
+                <div class="osahan-account-page-right rounded shadow-sm bg-white p-4 h-100">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                            <h4 class="font-weight-bold mt-0 mb-4">Bestelldetails</h4>
+
+                            <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2">
+
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4>Versanddetails</h4>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered border-primary mb-0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th width="50%">Versandname:</th>
+                                                            <td>{{ order.name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Versandtelefon:</th>
+                                                            <td>{{ order.phone }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Versand-E-Mail:</th>
+                                                            <td>{{ order.email }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Versandadresse:</th>
+                                                            <td>{{ order.address }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Bestelldatum:</th>
+                                                            <td>{{ order.order_date.strftime('%d.%m.%Y') }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Restaurantname</th>
+                                                            <td>#</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> <!-- end col -->
+
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4>Bestelldetails
+                                                <span class="text-danger">Rechnung: {{ order.invoice_no }}</span>
+                                            </h4>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered border-primary mb-0">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th width="50%">Name:</th>
+                                                            <td>{{ order.user.name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Telefon:</th>
+                                                            <td>{{ order.user.phone_number }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">E-Mail:</th>
+                                                            <td>{{ order.user.email }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Zahlungsmethode:</th>
+                                                            <td>{{ order.payment_method }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Transaktions-ID:</th>
+                                                            <td>{{ order.transaction_id }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Rechnung:</th>
+                                                            <td class="text-danger">{{ order.invoice_no }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Bestellbetrag:</th>
+                                                            <td>{{ order.amount }} €</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th width="50%">Bestellstatus:</th>
+                                                            <td><span class="badge bg-success">{{ order.status }}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> <!-- end col -->
+
+                            </div> <!-- end row -->
+
+                            <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-1 mt-4">
+                                <div class="col">
+                                    <div class="card p-4">
+                                        <h5 class="mt-4">Produkte</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Bild</th>
+                    <th>Produktname</th>
+                    <th>Restaurantname</th>
+                    <th>Produkt Steuer</th>
+                    <th>Menge</th>
+                    <th>Preis</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td><img src="{{ url_for('static', filename=item.product.image) }}" class="img-thumbnail" style="width:50px; height:50px"></td>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ order.client.clientname }}</td>
+                    <td>{{ item.product.tax_rate }} %</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price }} € (Gesamt: {{ item.price * item.quantity }} €)</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <h6 >
+            <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax">{{total_tax}} €</span>  
+        </h6><br>
+        <h5><strong>Gesamtpreis: {{ total_price }} €</strong><p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p></h5>
+    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> 
+
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock content %}

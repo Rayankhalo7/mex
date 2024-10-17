@@ -23,12 +23,51 @@
 
       <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
 
-<style>
-    .custom-toast {
-    top: 120px !important;  /* Bewegt die Benachrichtigung 250px von oben nach unten */
+      <style>
+        .custom-toast {
+            top: 120px !important;  /* Bewegt die Benachrichtigung 120px von oben nach unten */
+        }
+    
+        .form-select.form-select-sm {
+    border: 2px solid #B0B0B0 !important; /* Rahmenfarbe */
+    border-radius: 10px !important; /* Abgerundete Ecken */
+    padding: 5px 10px !important; /* Innenabstand */
+    font-size: 16px !important; /* Textgröße */
+    width: 60px !important; /* Optional, um die Breite festzulegen */
+    appearance: none !important; /* Standard-Dropdown-Pfeil entfernen */
+    background: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><polygon fill="%23333" points="0,0 10,10 20,0"/></svg>') no-repeat right 15px center !important; /* Position des Icons nach rechts verschieben */
+    background-size: 10px !important; /* Größe des Icons */
+    }
+    
+
+    /* Standard Pagination Link */
+.page-link {
+  position: relative;
+  display: block;
+  padding: .5rem .75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: #000 !important;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-</style>
+/* Aktives Pagination Element */
+.page-item.active .page-link {
+  background-color: #000 !important; /* Schwarzer Hintergrund */
+  color: #fff !important; /* Weiße Schrift */
+  border-color: #000 !important;
+}
+
+/* Hover-Effekt für Pagination Links */
+.page-link:hover {
+  background-color: #000 !important; /* Schwarzer Hintergrund beim Hover */
+  color: #fff !important; /* Weiße Schrift beim Hover */
+  border-color: #000 !important;
+}
+
+    </style>
    </head>
    <body>
 
@@ -224,6 +263,8 @@
             });
     }
 </script>
+
+
 {% endblock javascripts %}
  
  </body>

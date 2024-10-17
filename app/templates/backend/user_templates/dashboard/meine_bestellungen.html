@@ -1,0 +1,141 @@
+{% extends "backend/user_templates/dashboard/base_dashboard.html" %}
+
+{% block title %}Meine Bestellungen{% endblock %}
+
+{% block content %}
+<div class="col-md-9">
+    <div class="osahan-account-page-right rounded shadow-sm bg-white p-4 h-100">
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                <h4 class="font-weight-bold mt-0 mb-4">Meine Bestellungen</h4>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        {% if orders %}
+                            <table class="table table-hover" id="datatable">
+                                <thead>
+                                    <tr>
+                                        <th>Bestellnummer</th>
+                                        <th>Datum</th>
+                                        <th>Gesamtbetrag</th>
+                                        <th>Status</th>
+                                        <th>Aktion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.order_number }}</td>
+                                        <td>{{ order.order_date.strftime('%d.%m.%Y %H:%M') }}</td>
+                                        <td>{{ order.total_amount }} EUR</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if order.status == 'pending' %} bg-warning 
+                                                {% elif order.status == 'confirmed' %} bg-success 
+                                                {% elif order.status == 'delivered' %} bg-info 
+                                                {% else %} bg-secondary {% endif %}">
+                                                {% if order.status == 'pending' %}
+                                                    Ausstehend
+                                                {% elif order.status == 'confirmed' %}
+                                                    Bestätigt
+                                                {% elif order.status == 'delivered' %}
+                                                    Geliefert
+                                                {% else %}
+                                                    {{ order.status }}
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <a href="#" class="text-secondary" id="dropdownMenuLink{{ order.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="sidebar-icon">
+                                                        <i class="fas fa-eye"></i>
+                                                    </span>
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink{{ order.id }}">
+                                                    <li><a class="dropdown-item" href="{{ url_for('user_bp.meine_bestellung', order_id=order.id) }}">Ansehen</a></li>
+                                                </ul>
+                                                
+                                            </div>
+                                        </td>
+                                        
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="text-center">Keine Bestellungen gefunden.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+
+<!-- Specific Page JS goes HERE  -->
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<script type="text/javascript">
+    // Toastr options configuration
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right custom-toast",
+        "timeOut": "2500",
+        "extendedTimeOut": "1000"
+    }
+
+    // Handle flashed messages
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            var type = "{{ category }}"; 
+            switch(type){
+                case 'info':
+                    toastr.info("{{ message }}");
+                    break;
+                case 'success':
+                    toastr.success("{{ message }}");
+                    break;
+                case 'warning':
+                    toastr.warning("{{ message }}");
+                    break;
+                case 'error':
+                    toastr.error("{{ message }}");
+                    break;
+            }
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    // DataTables initialization
+    $(document).ready(function() {
+        $('#datatable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "language": {
+                "paginate": {
+                    "previous": "Zurück",
+                    "next": "Weiter"
+                },
+                "search": "Suchen:",
+                "lengthMenu": "Zeige _MENU_ Einträge",
+                "info": "Zeige _START_ bis _END_ von _TOTAL_ Einträgen",
+                "zeroRecords": "Keine passenden Bestellungen gefunden",
+                "infoEmpty": "Keine Bestellungen verfügbar"
+            }
+        });
+    });
+</script>
+{% endblock javascripts %}

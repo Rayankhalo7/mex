@@ -1,5 +1,5 @@
 # app/routes/user_routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from flask_mail import Message
 from flask_login import login_user, logout_user, login_required, current_user
 from itsdangerous import URLSafeTimedSerializer
@@ -8,7 +8,11 @@ import time
 import os
 from app.models.user_model import User
 from app import db, mail
+from app.models.order import Order
 from flask import request
+from werkzeug.exceptions import NotFound
+from app.models.order_item import OrderItem
+from app.models.client_model import Client
 
 # Definiere die erlaubten Dateiendungen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -243,6 +247,84 @@ def passwort_aendern():
 
     # Rendere die Seite mit eventuellen Fehlern, falls das Formular nicht korrekt ausgefüllt wurde
     return render_template('backend/user_templates/dashboard/passwort_aendern.html', user=user, errors=errors, page_name="Passwort ändern")
+
+
+@user_bp.route("/meine_bestellungen", methods=["GET"])
+@login_required
+def meine_bestellungen():
+    user = current_user  # Der aktuell eingeloggte Benutzer
+    try:
+        # Bestellungen des aktuellen Benutzers aus der Datenbank abrufen
+        orders = Order.query.filter_by(user_id=user.id).order_by(Order.order_date.desc()).all()
+        
+        # Render the template with the orders
+        return render_template(
+            'backend/user_templates/dashboard/meine_bestellungen.html',
+            user=user,
+            orders=orders,
+            page_name="Meine Bestellungen"
+        )
+    except Exception as e:
+        flash('Fehler beim Abrufen der Bestellungen. Bitte versuche es erneut.', 'danger')
+        print(f"Fehler beim Abrufen der Bestellungen: {e}")
+        return render_template('backend/user_templates/dashboard/meine_bestellungen.html', user=user, orders=[], page_name="Meine Bestellungen", enumerate=enumerate)
+
+
+
+@user_bp.route("/meine_bestellung/<int:order_id>", methods=["GET"])
+@login_required
+def meine_bestellung(order_id):
+    try:
+        user = current_user
+        order = Order.query.filter_by(id=order_id, user_id=user.id).first_or_404()
+        order_items = OrderItem.query.filter_by(order_id=order.id).all()
+        
+        total_price = sum(item.price * item.quantity for item in order_items)
+
+        return render_template(
+            'backend/user_templates/dashboard/view_meine_bestellung.html',
+            user=user,
+            
+            order=order,
+            order_items=order_items,
+            total_price=total_price,
+            page_name="Bestelldetails"
+        )
+    except NotFound:
+        flash('Bestellung nicht gefunden.', 'danger')
+        return redirect(url_for('user_bp.meine_bestellungen'))
+    except Exception as e:
+        flash('Fehler beim Abrufen der Bestelldetails. Bitte versuche es erneut.', 'danger')
+        print(f"Fehler beim Abrufen der Bestelldetails: {e}")
+        return redirect(url_for('user_bp.meine_bestellungen'))
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+   
+    
+
+
+
+
+
+
+
+
+
+
+
 
 
 
