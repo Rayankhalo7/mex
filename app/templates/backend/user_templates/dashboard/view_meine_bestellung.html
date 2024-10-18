@@ -140,10 +140,11 @@
                                             </td>
                                             <td>{{ item.product.name }}</td>
                                             <td>{{ order.client.clientname }}</td>
-                                            <td>{{ item.product.tax_rate }} %</td>
+                                            <td>{{ item.product.tax_rate }} %<br>
+                                                {{ (item.price - (item.price / (1 + (item.product.tax_rate / 100)))) | round(2) }} EUR</td>
 
                                             <!-- Steuerbetrag aus der Route -->
-                                            <td>{{ (item.price - (item.price / (1 + (item.product.tax_rate / 100)))) | round(2) }} EUR</td>
+                                            <td>{{ ((item.price - (item.price / (1 + (item.product.tax_rate / 100)))) * item.quantity) | round(2) }} EUR</td>
                                             <td>{{ item.quantity }}</td>
                                             <td>{{ item.price }} € (Gesamt: {{ item.price * item.quantity }} €)</td>
                                         </tr>
