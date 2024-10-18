@@ -1,6 +1,6 @@
 # app/__init__.py
 
-from flask import Flask, g
+from flask import Flask, g, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
@@ -11,6 +11,7 @@ from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
 from app.models import *
+
 
 # Initialisiere den Serializer als globale Variable
 serializer = None
@@ -82,6 +83,22 @@ def create_app():
     def before_request():
         g.user = current_user
 
+
+    # Context processor to inject cart and client into all templates
+    @app.context_processor
+    def inject_globals():
+        client = None
+        cart = session.get('cart', {})
+        total_cost = sum(item['price'] * item['quantity'] for item in cart.values()) if cart else 0
+        tax_details = calculate_tax(cart) if cart else {}
+        total_tax = calculate_tax(cart) if cart else {}
+    
+        if 'cart_client_id' in session:
+          client = Client.query.get(session['cart_client_id'])
+        
+        return dict(client=client, cart=cart, total_cost=total_cost, tax_details=tax_details, total_tax=total_tax)
+
+
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
     # Blueprint-Registrierungen innerhalb von `app.app_context()` vornehmen, um Zirkularimporte zu vermeiden
@@ -143,3 +160,6 @@ def create_app():
 
 
     return app
+
+
+

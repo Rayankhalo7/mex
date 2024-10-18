@@ -1,4 +1,4 @@
 # Ignoriere die .env-Datei
 .env
 
-venv/
+venv

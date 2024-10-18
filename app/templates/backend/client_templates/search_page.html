@@ -1,0 +1,123 @@
+<section class="pt-5 pb-5 homepage-search-block position-relative d-flex align-items-center" style="min-height: 70vh; justify-items: center; justify-content: center; display: flex;">
+    <div class="banner-overlay w-100">
+        <div class="container">
+            <div class="row d-flex align-items-center py-lg-4">
+                <div class="col-lg-8 mx-auto">
+                    <div class="homepage-search-title text-center">
+                        <h1 class="mb-2 display-4 text-shadow text-white font-weight-normal"><span class="font-weight-bold">Bestelle jetzt einfach dein Lieblingsessen</span></h1>
+                        <h5 class="mb-5 text-shadow text-white-50 font-weight-normal">Listen der besten Restaurants, Cafés und Bars in Deutschland</h5>
+                    </div>
+                    
+                    <!-- Suchformular -->
+                    <div class="homepage-search-form">
+                        <form class="form-noborder" action="{{ url_for('client_bp.search_restaurants') }}" method="GET">
+                            <div class="form-row">
+                                <div class="col-lg-10 col-md-7 col-sm-12 form-group">
+                                    <input type="text" id="search_address" name="search_address" placeholder="Geben Sie hier Ihre Adresse ein" class="form-control form-control-lg">
+                                    <a class="locate-me" href="#" id="locate-me"><i class="icofont-ui-pointer"></i> Mein Standort</a>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-12 form-group">
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg btn-gradient">Suchen</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+ 
+                    <!-- Suchergebnisse -->
+                    <div class="search-results mt-4">
+                        <h2 class="h5 mb-4">Suchergebnisse für Restaurants</h2>
+ 
+                        <!-- Überprüfen, ob es Suchergebnisse gibt -->
+                        {% if restaurants %}
+                        <div class="card border-0 shadow mb-4">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-centered table-nowrap mb-0 rounded">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th class="border-0">Restaurant Name</th>
+                                                <th class="border-0">Adresse</th>
+                                                <th class="border-0">Status</th>
+                                                <th class="border-0">Entfernung</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for restaurant in restaurants %}
+                                            <tr>
+                                                <!-- Restaurant-Name -->
+                                                <td class="border-0">
+                                                    <a href="#" class="d-flex align-items-start">
+                                                        <img class="me-2 image image-small rounded-circle" alt="Image placeholder" src="{% if restaurant.photo %}{{ url_for('static', filename=restaurant.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}">
+                                                        <div>
+                                                            <span class="h6">{{ restaurant.clientname }}</span>
+                                                            <br>
+                                                            <small class="text-muted">{{ restaurant.email }}</small>
+                                                        </div>
+                                                    </a>
+                                                </td>
+ 
+                                                <!-- Restaurant-Adresse -->
+                                                <td class="border-0">
+                                                    {{ restaurant.street }} {{ restaurant.house_number }}, {{ restaurant.city.name }} {{ restaurant.postal_code }}
+                                                </td>
+ 
+                                                <!-- Status des Restaurants -->
+                                                <td class="border-0">
+                                                    {% if restaurant.status == 1 %}
+                                                        <span class="badge bg-success">Aktiv</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Inaktiv</span>
+                                                    {% endif %}
+                                                </td>
+ 
+                                                <!-- Entfernung -->
+                                                <td class="border-0">
+                                                    {% if restaurant.distance %}
+                                                        {{ restaurant.distance }} km
+                                                    {% else %}
+                                                        <span class="text-muted">Nicht verfügbar</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                            <p>Keine Restaurants in der Nähe gefunden.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ </section>
+ 
+ <script>
+     document.getElementById('locate-me').addEventListener('click', function(event) {
+         event.preventDefault();  // Verhindert den Standard-Anchor-Tag-Klick
+ 
+         if (navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition(function(position) {
+                 var latitude = position.coords.latitude;
+                 var longitude = position.coords.longitude;
+ 
+                 // Nutze Geolocation-Koordinaten, um die Adresse zu finden
+                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                     .then(response => response.json())
+                     .then(data => {
+                         var address = data.display_name;
+                         document.getElementById('search_address').value = address;
+                     })
+                     .catch(error => console.error('Error fetching address:', error));
+             }, function(error) {
+                 alert('Fehler beim Abrufen des Standorts: ' + error.message);
+             });
+         } else {
+             alert('Geolocation wird von diesem Browser nicht unterstützt.');
+         }
+     });
+ </script>
+ 

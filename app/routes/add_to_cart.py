@@ -8,24 +8,29 @@ from app.models.client_model import Client  # Importiere das Client-Modell
 cart_bp = Blueprint('cart', __name__)
 
 # Route zum Hinzufügen von Produkten zum Warenkorb
-@cart_bp.route('/add_to_cart/<int:product_id>', methods=['GET', 'POST'])
-def add_to_cart(product_id):
+@cart_bp.route('/add_to_cart/<int:client_id>/<int:product_id>', methods=['GET', 'POST'])
+def add_to_cart(client_id, product_id):
+    # Abrufen des Produkts
     product = Product.query.get_or_404(product_id)
-    client_id = product.client_id
+    
+    # Falls das Produkt nicht zum angegebenen Client gehört, einen Fehler zurückgeben
+    if product.client_id != client_id:
+        flash('Das Produkt gehört zu einem anderen Client.', 'danger')
+        return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=client_id))
 
-    # Warenkorb aus der Session holen oder neuen Warenkorb erstellen
+    # Warenkorb aus der Session holen oder einen neuen erstellen
     cart = session.get('cart', {})
 
-    # Wenn kein Client in der Session gespeichert ist, setze den aktuellen Client
+    # Überprüfen, ob ein Client im Warenkorb existiert
     if 'cart_client_id' not in session:
         session['cart_client_id'] = client_id
-    # Wenn der aktuelle Client nicht derselbe wie der gespeicherte ist, leere den Warenkorb
+    # Wenn der Client im Warenkorb nicht übereinstimmt, Warenkorb leeren und Client wechseln
     elif session['cart_client_id'] != client_id:
         flash("Du kannst nur Produkte von einem Client gleichzeitig im Warenkorb haben. Der Warenkorb wurde geleert.", "danger")
-        session['cart'] = {}  # Leere den Warenkorb
+        session['cart'] = {}
         session['cart_client_id'] = client_id
 
-    # Hinzufügen des Produkts zum Warenkorb
+    # Produkt zum Warenkorb hinzufügen oder die Menge erhöhen
     if str(product_id) in cart:
         cart[str(product_id)]['quantity'] += 1
     else:
@@ -34,15 +39,19 @@ def add_to_cart(product_id):
             'name': product.name,
             'price': product.price,
             'image': product.image,
-            'client_id': product.client_id,
+            'client_id': client_id,
             'tax_rate': product.tax_rate,
             'is_must_popular': product.is_must_popular,
             'is_bestseller': product.is_bestseller
         }
 
+    # Warenkorb in der Session speichern und Session als verändert markieren
     session['cart'] = cart
+    session.modified = True  # Markiert die Session als modifiziert
+
+    # Erfolgsmeldung
     flash(f"{product.name} erfolgreich zum Warenkorb hinzugefügt!", 'success')
-    return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=product.client_id))
+    return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=client_id))
 
 
 # Route zum Erhöhen der Produktmenge im Warenkorb
