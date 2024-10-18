@@ -42,8 +42,11 @@ class Client(db.Model):
 
     # city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'), nullable=False)
-
     city = db.relationship('City', backref='clients')
+
+    # Neue Felder für Breiten- und Längengrad
+    latitude = db.Column(db.Float, nullable=True)  # Breitengrad
+    longitude = db.Column(db.Float, nullable=True)  # Längengrad
 
     def set_password(self, password):
         # Verwende hashlib, um den md5-Hash zu generieren

@@ -77,6 +77,15 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="latitude" class="form-label">Breitengrad</label>
+                        <input type="text" class="form-control" id="latitude" name="latitude" value="{{client.latitude}}" placeholder="{{client.latitude}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="longitude" class="form-label">Längengrad</label>
+                        <input type="text" class="form-control" id="longitude" name="longitude" value="{{client.longitude}}" placeholder="{{client.longitude}}">
+                    </div>
                     
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>

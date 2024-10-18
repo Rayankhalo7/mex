@@ -318,6 +318,8 @@ def add_restaurants():
         house_number = request.form.get('house_number')
         postal_code = request.form.get('postal_code')
         city_id = request.form.get('city')  # Hol die ausgewählte Stadt
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
         status = request.form.get('status', type=int)  # 1 für aktiv, 0 für inaktiv
 
         # Überprüfe, ob der `clientname` oder die `email` bereits existieren
@@ -339,6 +341,8 @@ def add_restaurants():
             house_number=house_number,
             postal_code=postal_code,
             city_id=city_id,  # Verknüpfe den Client mit der ausgewählten Stadt
+            latitude=float(latitude) if latitude else None,
+            longitude=float(longitude) if longitude else None,
             status=status,
             password_hash=temporary_md5_hash  # Setze den temporären md5-Hash
         )
@@ -354,6 +358,25 @@ def add_restaurants():
         return redirect(url_for('admin_bp.all_restaurants'))  # Gehe zurück zur Übersicht
 
     return render_template('admin_add_restaurants.html', admin=admin, cities=cities, page_name="Restaurant hinzufügen")
+
+def send_password_set_email(client):
+    """Funktion zum Senden der E-Mail, um ein Passwort festzulegen."""
+    # Erstelle einen sicheren Token basierend auf der Client-ID
+    token = serializer.dumps(client.id, salt='password-set')
+
+    # Erstelle die URL für das Zurücksetzen des Passworts
+    password_set_url = url_for('client_bp.client_password_set_admin', token=token, _external=True)
+
+    # Erstelle die E-Mail-Nachricht
+    msg = Message("Passwort festlegen", sender="rayankhalo7@gmail.com", recipients=[client.email])
+    msg.body = render_template('email/password_set_email.txt', client=client, password_set_url=password_set_url)
+    msg.html = render_template('email/password_set_email.html', client=client, password_set_url=password_set_url)
+
+    # Sende die E-Mail
+    mail.send(msg)
+
+
+
 
 @admin_bp.route('/edit_restaurant/<int:client_id>', methods=['GET', 'POST'])
 def edit_restaurant(client_id):
@@ -377,6 +400,8 @@ def edit_restaurant(client_id):
         client.house_number = request.form.get('house_number')
         client.postal_code = request.form.get('postal_code')
         client.city_id = request.form.get('city')  # Aktualisiere die Stadt
+        client.latitude = float(request.form.get('latitude')) if request.form.get('latitude') else None
+        client.longitude = float(request.form.get('longitude')) if request.form.get('longitude') else None
         client.status = request.form.get('status', type=int)
 
         db.session.commit()
@@ -405,24 +430,6 @@ def delete_restaurant(client_id):
     return redirect(url_for('admin_bp.all_restaurants'))
 
 
-
-
-
-def send_password_set_email(client):
-    """Funktion zum Senden der E-Mail, um ein Passwort festzulegen."""
-    # Erstelle einen sicheren Token basierend auf der Client-ID
-    token = serializer.dumps(client.id, salt='password-set')
-
-    # Erstelle die URL für das Zurücksetzen des Passworts
-    password_set_url = url_for('client_bp.client_password_set_admin', token=token, _external=True)
-
-    # Erstelle die E-Mail-Nachricht
-    msg = Message("Passwort festlegen", sender="expressmahlzeit@gmail.com", recipients=[client.email])
-    msg.body = render_template('email/password_set_email.txt', client=client, password_set_url=password_set_url)
-    msg.html = render_template('email/password_set_email.html', client=client, password_set_url=password_set_url)
-
-    # Sende die E-Mail
-    mail.send(msg)
 
 
 
