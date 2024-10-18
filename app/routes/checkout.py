@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from paypalrestsdk import Payment
 from app.models.client_model import Client
-from app.routes.add_to_cart import get_total_cost
+from app.routes.add_to_cart import get_total_cost_api
 from app.models.order import Order
 from app.models.order_item import OrderItem
 from app import db
@@ -28,11 +28,12 @@ paypalrestsdk.configure({
 @login_required
 def checkout():
     cart = session.get('cart', {})
+
     if not cart:
         flash('Ihr Warenkorb ist leer. Fügen Sie zuerst Produkte hinzu.', 'warning')
         return redirect(url_for('frontend_bp.home'))
 
-    response = get_total_cost()
+    response = get_total_cost_api()
     data = response.json
 
     total_cost = data.get('total_cost', 0)
@@ -85,7 +86,7 @@ def process_checkout():
         flash('Ihr Warenkorb ist leer. Fügen Sie zuerst Produkte hinzu.', 'warning')
         return redirect(url_for('frontend_bp.home'))
 
-    response = get_total_cost()
+    response = get_total_cost_api()
     data = response.json
     total_cost = data.get('total_cost', 0)
     total_tax = data.get('tax', 0)

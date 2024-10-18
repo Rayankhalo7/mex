@@ -245,7 +245,17 @@ def profile():
     
     client = Client.query.get(session['client_id'])
     
+    if request.method == "POST":
+        # Hole die neue Stadt-ID aus dem Formular (Angenommen, city enthält die ID)
+        new_city_id = request.form.get("city")
+        
+        # Überprüfen, ob der Benutzer die Stadt ändern möchte
+        if new_city_id and int(new_city_id) != client.city.id:  # Vergleiche die IDs, ohne sie zuzuweisen
+            flash("Das Ändern der Stadt ist nicht erlaubt.", "error")
+            return redirect(url_for('client_bp.profile'))  # Um zu vermeiden, dass das Formular erneut gesendet wird
+
     return render_template("client_profile.html", client=client, page_name="Profil")
+
 
 
 
@@ -258,48 +268,43 @@ def profile_update():
 
     client = Client.query.get(session['client_id'])
 
-    # Aktualisiere die Felder mit den Formulardaten
+    # Hole die neue Stadt aus dem Formular
+    new_city = request.form.get('city')
+
+    # Prüfe, ob der Benutzer versucht, die Stadt zu ändern
+    if new_city and new_city != client.city.name:  # Vergleiche den Namen der Stadt
+        flash("Das Ändern der Stadt ist nicht erlaubt.", "error")
+        return redirect(url_for('client_bp.profile'))  # Verhindere die weitere Bearbeitung
+
+    # Aktualisiere die Felder mit den Formulardaten, aber ignoriere die Stadt
     client.clientname = request.form.get('clientname')
     client.email = request.form.get('email')
     client.phone_number = request.form.get('phone_number')
     client.street = request.form.get('street')
     client.house_number = request.form.get('house_number')
     client.postal_code = request.form.get('postal_code')
-    client.city = request.form.get('city')
+    # client.city.name bleibt unverändert
 
     # Überprüfe, ob ein neues Bild hochgeladen wurde
     if 'photo' in request.files:
         file = request.files['photo']
         if file and file.filename != '' and allowed_file(file.filename):
-            print(f"Dateiname: {file.filename}")  # Debugging-Information
             filename = secure_filename(file.filename)
             file_ext = filename.rsplit('.', 1)[1].lower()
             new_filename = f"{int(time.time())}.{file_ext}"  # Einzigartiger Dateiname basierend auf Zeitstempel
 
             # Verwende den richtigen Pfad relativ zum app-Ordner
             upload_folder = os.path.join(current_app.root_path, 'static', 'upload', 'client_bilder', 'client_profile')
+            os.makedirs(upload_folder, exist_ok=True)  # Prüfe, ob das Verzeichnis existiert, wenn nicht, erstelle es
 
-            # Prüfe, ob das Verzeichnis existiert, wenn nicht, erstelle es
-            os.makedirs(upload_folder, exist_ok=True)
-
-            # Speichere die Datei
             file_path = os.path.join(upload_folder, new_filename)
-            print(f"Speicherpfad: {file_path}")  # Debugging-Information
             file.save(file_path)
 
             # Speichere den relativen Pfad in der Datenbank
             client.photo = os.path.join('upload', 'client_bilder', 'client_profile', new_filename).replace('\\', '/')
-            print(f"Relativer Pfad in der DB: {client.photo}")  # Debugging-Information
-
-            # Debug-Ausgabe
-            print(f"Datei gespeichert: {file_path}")
-        else:
-            print("Keine gültige Datei hochgeladen oder Dateityp nicht erlaubt")  # Debugging-Information
 
     # Speichere die Änderungen in der Datenbank
     db.session.commit()
-
-    
 
     flash('Profil erfolgreich aktualisiert!', 'success')
     return redirect(url_for('client_bp.profile'))

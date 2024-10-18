@@ -10,6 +10,7 @@ from app.models.rating import Rating
 from app.models.lieferzeiten import Lieferzeiten
 from datetime import datetime
 from app.models.product import Product
+from app.models.cities import City
 
 
 # Blueprint für das Frontend erstellen
@@ -44,6 +45,8 @@ def calculate_total_cost_and_tax(cart):
 
 @frontend_bp.route('/')
 def home():
+
+    
     # Alle Clients aus der Datenbank abrufen
     clients = Client.query.all()
 
@@ -59,6 +62,7 @@ def home():
 
     # Warenkorb aus der Session abrufen
     cart = session.get('cart', {})
+    cities = City.query.all()
 
     # Berechnung der Gesamtkosten, Steuern und Steuerdetails
     total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
@@ -74,7 +78,8 @@ def home():
         total_cost=total_cost,
         tax_details=tax_details,
         total_tax=total_tax,
-        total_items=total_items
+        total_items=total_items,
+        cities=cities
     )
 
 # Route für die Client-Detailseite

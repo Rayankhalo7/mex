@@ -25,10 +25,14 @@
                         <div class="p-3 position-relative">
                             <div class="list-card-body">
                                 <h6 class="mb-1"><a href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}" class="text-black">{{ client.clientname }}</a></h6>
-                                <p class="text-gray mb-3">{{ client.street }} {{ client.house_number }}, {{ client.city }}</p>
-                                
+                                {% if client.city %}
+                                    <p class="text-secondary mb-0">{{ client.street }} {{ client.house_number }}, {{ client.postal_code }} {{ client.city.name }}</p>
+                                {% else %}
+                                    <p class="text-secondary mb-0">Adresse nicht verfügbar</p>
+                                {% endif %}
+
                                 <!-- Überprüfe, ob Öffnungszeiten vorhanden sind -->
-                                {% if client.opening_hours|length > 0 %}
+                                {% if client.opening_hours and client.opening_hours|length > 0 %}
                                     <p class="text-gray mb-3 time"><i class="icofont-wall-clock"></i> Öffnungszeiten: 
                                     {{ client.opening_hours[0].open_time.strftime('%H:%M') }} - {{ client.opening_hours[0].close_time.strftime('%H:%M') }}</p>
                                 {% else %}

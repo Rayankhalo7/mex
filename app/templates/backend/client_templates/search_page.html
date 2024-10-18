@@ -1,3 +1,7 @@
+{% extends "frontend/base_resault.html" %}
+{% block title %}Suchergebnisse{% endblock %}
+
+{% block content %}
 <section class="pt-5 pb-5 homepage-search-block position-relative d-flex align-items-center" style="min-height: 70vh; justify-items: center; justify-content: center; display: flex;">
     <div class="banner-overlay w-100">
         <div class="container">
@@ -94,30 +98,40 @@
         </div>
     </div>
  </section>
+ {% endblock content %}
+
+
+ {% block javascripts %}
  
  <script>
      document.getElementById('locate-me').addEventListener('click', function(event) {
-         event.preventDefault();  // Verhindert den Standard-Anchor-Tag-Klick
- 
-         if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(function(position) {
-                 var latitude = position.coords.latitude;
-                 var longitude = position.coords.longitude;
- 
-                 // Nutze Geolocation-Koordinaten, um die Adresse zu finden
-                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                     .then(response => response.json())
-                     .then(data => {
-                         var address = data.display_name;
-                         document.getElementById('search_address').value = address;
-                     })
-                     .catch(error => console.error('Error fetching address:', error));
-             }, function(error) {
-                 alert('Fehler beim Abrufen des Standorts: ' + error.message);
-             });
-         } else {
-             alert('Geolocation wird von diesem Browser nicht unterstützt.');
-         }
-     });
+    event.preventDefault();  // Verhindert den Standard-Anchor-Tag-Klick
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            // Nutze Geolocation-Koordinaten, um die Adresse zu finden
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    var address = data.display_name;
+                    document.getElementById('search_address').value = address;
+
+                    // Automatisch das Formular absenden
+                    document.querySelector('form').submit();
+                })
+                .catch(error => console.error('Error fetching address:', error));
+        }, function(error) {
+            alert('Fehler beim Abrufen des Standorts: ' + error.message);
+        });
+    } else {
+        alert('Geolocation wird von diesem Browser nicht unterstützt.');
+    }
+});
+
  </script>
+
+{% endblock javascripts %}
  

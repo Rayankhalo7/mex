@@ -40,9 +40,18 @@
                </a>
                <div class="dropdown-menu dropdown-cart-top p-0 dropdown-menu-right shadow-sm border-0">
                   <div class="dropdown-cart-top-header p-4">
-                     <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid mb-4" alt="{{ client.clientname }}">-->
+                     {% if client %}
+    <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" alt="{{ client.clientname }}">
+{% else %}
+    <img class="img-fluid mr-3 float-left" alt="logo" src="{{ url_for('static', filename='frontend/themes/img/list/1.png') }}">
+{% endif %}
+
                      <h6 class="mb-0">{{client.clientname}}</h6>
-                     <p class="text-secondary mb-0">{{client.street}} {{ client.house_number}}, {{client.postal_code}} {{client.city}}</p>
+                     {% if client.city %}
+                                    <p class="text-secondary mb-0">{{ client.street }} {{ client.house_number }}, {{ client.postal_code }} {{ client.city.name }}</p>
+                                {% else %}
+                                    <p class="text-secondary mb-0">Adresse nicht verfügbar</p>
+                                {% endif %}
                      {% if client %}
            <small><a class="text-primary font-weight-bold" href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}">Menü anzeigen</a></small>
            {% else %}

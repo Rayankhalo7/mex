@@ -10,7 +10,9 @@ import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
-from app.models import *
+
+
+
 
 
 # Initialisiere den Serializer als globale Variable
@@ -84,25 +86,41 @@ def create_app():
         g.user = current_user
 
 
-    # Context processor to inject cart and client into all templates
     @app.context_processor
     def inject_globals():
-        client = None
-        cart = session.get('cart', {})
-        total_cost = sum(item['price'] * item['quantity'] for item in cart.values()) if cart else 0
-        tax_details = calculate_tax(cart) if cart else {}
-        total_tax = calculate_tax(cart) if cart else {}
+       cart = session.get('cart', {})
+       total_cost, total_tax, tax_details, total_items = calculate_cart_totals(cart)
+
+    # Standardwert für client, falls nicht in der Session
+       client = None
+       if 'cart_client_id' in session:
+            print(f"cart_client_id gefunden: {session['cart_client_id']}")  # Debugging-Ausgabe
+            client = Client.query.get(session['cart_client_id'])  # Hole den Client aus der Datenbank
+       else:
+            print("cart_client_id nicht in der Session gefunden")  # Debugging-Ausgabe
+
+       return dict(
+        cart=cart,
+        total_cost=total_cost,
+        total_tax=total_tax,
+        tax_details=tax_details,
+        total_items=total_items,
+        client=client
+    )
     
-        if 'cart_client_id' in session:
-          client = Client.query.get(session['cart_client_id'])
-        
-        return dict(client=client, cart=cart, total_cost=total_cost, tax_details=tax_details, total_tax=total_tax)
+    
+    
+
+    
 
 
     serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
     # Blueprint-Registrierungen innerhalb von `app.app_context()` vornehmen, um Zirkularimporte zu vermeiden
     with app.app_context():
+        from app.models.client_model import Client
+        from app.routes.add_to_cart import get_total_cost_api
+        from app.routes.add_to_cart import calculate_cart_totals
         # Register blueprints für user
         from app.routes.user_routes import user_bp
         app.register_blueprint(user_bp, url_prefix='/user')

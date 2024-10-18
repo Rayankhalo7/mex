@@ -3,10 +3,13 @@ from flask import Blueprint, session, redirect, url_for, flash, request, jsonify
 from flask_login import current_user
 from app.models.product import Product  # Importiere das Produktmodell
 from app.models.client_model import Client  # Importiere das Client-Modell
+from app.models.cities import City
+
 
 # Blueprint für den Warenkorb erstellen
 cart_bp = Blueprint('cart', __name__)
 
+# Route zum Hinzufügen von Produkten zum Warenkorb
 # Route zum Hinzufügen von Produkten zum Warenkorb
 @cart_bp.route('/add_to_cart/<int:client_id>/<int:product_id>', methods=['GET', 'POST'])
 def add_to_cart(client_id, product_id):
@@ -51,7 +54,10 @@ def add_to_cart(client_id, product_id):
 
     # Erfolgsmeldung
     flash(f"{product.name} erfolgreich zum Warenkorb hinzugefügt!", 'success')
+
+    # Weiterleitung zur Detailseite des Clients (ohne `cities` als separates Argument)
     return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=client_id))
+
 
 
 # Route zum Erhöhen der Produktmenge im Warenkorb
@@ -126,16 +132,53 @@ def show_cart():
     return render_template('cart.html', cart=cart, total_items=total_items, client=client)
 
 
+# API-Route, die JSON zurückgibt
 @cart_bp.route('/get_total_cost', methods=['GET'])
-def get_total_cost():
-    # Debugging: Zeige den Inhalt der Session an
-    print(f"Session-Warenkorb: {session.get('cart')}")
-
+def get_total_cost_api():
     cart = session.get('cart', {})
+    total_cost, total_tax, tax_details, total_items = calculate_cart_totals(cart)
+
+    return jsonify({
+        "total_cost": total_cost,
+        "tax": total_tax,
+        "grand_total": total_cost,
+        "tax_details": tax_details,
+        "cart": cart,
+        "total_items": total_items
+    })
+
+# Hilfsfunktion zur Berechnung der Gesamtkosten für Templates
+def calculate_cart_totals(cart):
     total_cost = 0.0
     total_tax = 0.0
     tax_details = {}
-    total_items = 0  # Variable zur Berechnung der Gesamtartikelanzahl
+    total_items = 0
+
+    # Berechne die Gesamtkosten und Steuern basierend auf dem Preis
+    for product_id, item in cart.items():
+        product = Product.query.get(product_id)
+        if product:
+            item_total = item['price'] * item['quantity']
+            total_cost += item_total
+            tax_rate = product.tax_rate if product.tax_rate is not None else 0.0
+            tax = item_total * (tax_rate / (100 + tax_rate))
+            total_tax += tax
+            if tax_rate in tax_details:
+                tax_details[tax_rate] += tax
+            else:
+                tax_details[tax_rate] = tax
+            total_items += item['quantity']
+        else:
+            print(f"Product with ID {product_id} not found")
+
+    return total_cost, total_tax, tax_details, total_items
+
+
+def calculate_cart_totals(cart):
+    total_cost = 0.0
+    total_tax = 0.0
+    tax_details = {}
+    total_items = 0
 
     # Berechne die Gesamtkosten und Steuern basierend auf dem Preis
     for product_id, item in cart.items():
@@ -151,18 +194,8 @@ def get_total_cost():
             else:
                 tax_details[tax_rate] = tax
 
-            # Berechne die Gesamtanzahl der Artikel
             total_items += item['quantity']
         else:
             print(f"Product with ID {product_id} not found")
 
-    grand_total = total_cost
-
-    return jsonify({
-        "total_cost": total_cost,
-        "tax": total_tax,
-        "grand_total": grand_total,
-        "tax_details": tax_details,
-        "cart": cart,
-        "total_items": total_items  # Rückgabe der Gesamtartikelanzahl
-    })
+    return total_cost, total_tax, tax_details, total_items
