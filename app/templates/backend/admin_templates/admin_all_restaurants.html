@@ -26,6 +26,7 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="border-0 rounded-start">Restaurant Name</th>
+                                            <th class="border-0">Stadt</th>
                                             <th class="border-0">Status</th>
                                             <th class="border-0">Registriert am:</th>
                                             <th class="border-0"></th>
@@ -42,11 +43,12 @@
                                                     <div><span class="h6">{{ client.clientname }}</span>
                                                         <br>
                                                         <p style="font-size: 12px; font-weight: 300; padding-top: 8px;">
-                                                            {{ client.street }} {{ client.house_number }}, {{ client.city }}
+                                                            {{ client.street }} {{ client.house_number }}, {{client.postal_code}} {{client.city.name}}
                                                         </p>
                                                     </div>
                                                 </a>
                                             </td>
+                                            <th class="border-0">{{client.city.name}}</th>
                     
                                             <!-- Status -->
                                             <td class="border-0 fw-bold">
@@ -63,12 +65,19 @@
                                             <!-- Icon-Menü drei Punkte vertikal -->
                                             <td class="border-0">
                                                 <div class="dropdown">
-                                                    <a href="#" class="text-secondary" id="dropdownMenuLink{{ client.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <a href="#" class="text-secondary" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                                         <span class="sidebar-icon">
-                                                            <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-                                                          </span>
+                                                            <i class="fas fa-cog"></i>
+                                                        </span>
                                                     </a>
-                                                   
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                        
+                                                        <a class="dropdown-item" href="{{ url_for('admin_bp.edit_restaurant', client_id=client.id) }}">Bearbeiten</a>
+                                                        <form action="{{ url_for('admin_bp.delete_restaurant', client_id=client.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="dropdown-item text-danger">Löschen</button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>

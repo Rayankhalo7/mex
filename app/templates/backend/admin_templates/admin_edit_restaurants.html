@@ -1,0 +1,123 @@
+{% extends "admin_dashboard/layout/base.html" %}
+
+{% block title %} Admin Profil {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+
+
+
+<div class="row">
+
+
+    <div class="row">
+        <div class="col-12 col-xl-12">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">Alle Restaurants</h2>
+    
+                <!-- Überprüfe, ob es `flash`-Nachrichten gibt -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <!-- Bootstrap-Alert zur Anzeige der `flash`-Nachricht -->
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+    
+                <!-- Formular zum Hinzufügen eines neuen Clients -->
+                <form action="{{ url_for('admin_bp.edit_restaurant', client_id=client.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-3">
+                        <label for="clientname" class="form-label">Client Name</label>
+                        <input type="text" class="form-control" id="clientname" name="clientname" value="{{ client.clientname }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-Mail</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ client.email }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Telefonnummer</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ client.phone_number }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Straße</label>
+                        <input type="text" class="form-control" id="street" name="street" value="{{ client.street }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="house_number" class="form-label">Hausnummer</label>
+                        <input type="text" class="form-control" id="house_number" name="house_number" value="{{ client.house_number }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="postal_code" class="form-label">PLZ</label>
+                        <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ client.postal_code }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="city" class="form-label">Stadt</label>
+                        <select class="form-control" id="city" name="city" required>
+                            <option value="" disabled>Stadt auswählen</option>
+                            {% for city in cities %}
+                                <option value="{{ city.id }}" {% if client.city_id == city.id %}selected{% endif %}>
+                                    {{ city.name }} ({{ city.postal_code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="1" {% if client.status == 1 %}selected{% endif %}>Aktiv</option>
+                            <option value="0" {% if client.status == 0 %}selected{% endif %}>Inaktiv</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    
+
+
+
+</div>   
+
+
+
+{% endblock content %}
+
+
+
+{% block javascripts %}
+<!-- Specific Page JS goes HERE  -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#image').change(function(e){
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $('#showImage').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    });
+</script>
+
+{% endblock javascripts %}

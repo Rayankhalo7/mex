@@ -11,6 +11,7 @@ from app.models.client_model import Client
 from hashlib import md5
 from app import serializer
 from flask import flash
+from app.models.cities import City
 from app.models.order import Order
 
 
@@ -289,9 +290,11 @@ def all_restaurants():
 
     # Hol alle Clients aus der Datenbank
     clients = Client.query.all()
+    # Lade die Liste der Städte
+    cities = City.query.all()
 
     # Übergabe der `admin`-Variable an das Template
-    return render_template('admin_all_restaurants.html', clients=clients, admin=admin, page_name="Alle Restaurants")
+    return render_template('admin_all_restaurants.html', cities=cities, clients=clients, admin=admin, page_name="Alle Restaurants")
 
 
 
@@ -304,6 +307,9 @@ def add_restaurants():
     # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
     admin = Admin.query.get(session['admin_id'])
 
+    # Lade die Liste der Städte
+    cities = City.query.all()
+
     if request.method == 'POST':
         clientname = request.form['clientname']
         email = request.form['email']
@@ -311,14 +317,14 @@ def add_restaurants():
         street = request.form.get('street')
         house_number = request.form.get('house_number')
         postal_code = request.form.get('postal_code')
-        city = request.form.get('city')
+        city_id = request.form.get('city')  # Hol die ausgewählte Stadt
         status = request.form.get('status', type=int)  # 1 für aktiv, 0 für inaktiv
 
         # Überprüfe, ob der `clientname` oder die `email` bereits existieren
         existing_client = Client.query.filter((Client.clientname == clientname) | (Client.email == email)).first()
         if existing_client:
             flash(f"Ein Client mit dem Namen '{clientname}' oder der E-Mail '{email}' existiert bereits. Bitte wählen Sie einen anderen Namen oder eine andere E-Mail-Adresse.", "danger")
-            return render_template('admin_add_restaurants.html', admin=admin, page_name="Restaurant hinzufügen")
+            return render_template('admin_add_restaurants.html', admin=admin, cities=cities, page_name="Restaurant hinzufügen")
 
         # Erstelle einen temporären `md5`-Hash
         temporary_password = "temporary_password"
@@ -332,7 +338,7 @@ def add_restaurants():
             street=street,
             house_number=house_number,
             postal_code=postal_code,
-            city=city,
+            city_id=city_id,  # Verknüpfe den Client mit der ausgewählten Stadt
             status=status,
             password_hash=temporary_md5_hash  # Setze den temporären md5-Hash
         )
@@ -347,7 +353,60 @@ def add_restaurants():
         flash('Neuer Client wurde erfolgreich hinzugefügt. Eine E-Mail zur Passworterstellung wurde gesendet.', 'success')
         return redirect(url_for('admin_bp.all_restaurants'))  # Gehe zurück zur Übersicht
 
-    return render_template('admin_add_restaurants.html', admin=admin, page_name="Restaurant hinzufügen")
+    return render_template('admin_add_restaurants.html', admin=admin, cities=cities, page_name="Restaurant hinzufügen")
+
+@admin_bp.route('/edit_restaurant/<int:client_id>', methods=['GET', 'POST'])
+def edit_restaurant(client_id):
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Lade den zu bearbeitenden Client
+    client = Client.query.get_or_404(client_id)
+
+    # Lade die Liste der Städte
+    cities = City.query.all()
+
+    if request.method == 'POST':
+        client.clientname = request.form['clientname']
+        client.email = request.form['email']
+        client.phone_number = request.form.get('phone_number')
+        client.street = request.form.get('street')
+        client.house_number = request.form.get('house_number')
+        client.postal_code = request.form.get('postal_code')
+        client.city_id = request.form.get('city')  # Aktualisiere die Stadt
+        client.status = request.form.get('status', type=int)
+
+        db.session.commit()
+
+        flash('Das Restaurant wurde erfolgreich aktualisiert.', 'success')
+        return redirect(url_for('admin_bp.all_restaurants'))
+
+    return render_template('backend/admin_templates/admin_edit_restaurants.html', admin=admin, client=client, cities=cities, page_name="Restaurant bearbeiten")
+
+@admin_bp.route('/delete_restaurant/<int:client_id>', methods=['POST'])
+def delete_restaurant(client_id):
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    # Finde den zu löschenden Client
+    client = Client.query.get_or_404(client_id)
+
+    # Lösche den Client
+    db.session.delete(client)
+    db.session.commit()
+
+    flash(f'Das Restaurant {client.clientname} wurde erfolgreich gelöscht.', 'success')
+    return redirect(url_for('admin_bp.all_restaurants'))
+
+
+
+
 
 def send_password_set_email(client):
     """Funktion zum Senden der E-Mail, um ein Passwort festzulegen."""
@@ -550,3 +609,99 @@ def update_order_status(order_id):
 
     return redirect(url_for('admin_bp.view_order', order_id=order_id))  # Zurück zur Bestelldetailseite
 
+
+
+
+
+
+
+
+# Route zum Anzeigen aller Städte
+@admin_bp.route('/cities', methods=['GET'])
+def all_cities():
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    cities = City.query.all()
+    return render_template('admin_all_cities.html', admin=admin, cities=cities, page_name="Alle Städte")
+
+
+# Route, um eine neue Stadt hinzuzufügen
+@admin_bp.route('/add_city', methods=['GET', 'POST'])
+def add_city():
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    if request.method == 'POST':
+        name = request.form['name']
+        postal_code = request.form['postal_code']
+        latitude = request.form['latitude']
+        longitude = request.form['longitude']
+
+        # Überprüfen, ob eine Stadt mit dieser PLZ bereits existiert
+        existing_city = City.query.filter_by(postal_code=postal_code).first()
+        if existing_city:
+            flash('Eine Stadt mit dieser PLZ existiert bereits.', 'warning')
+            return redirect(url_for('admin_bp.add_city'))
+
+        # Neue Stadt erstellen
+        new_city = City(
+            name=name,
+            postal_code=postal_code,
+            latitude=float(latitude),
+            longitude=float(longitude)
+        )
+
+        # Stadt zur Datenbank hinzufügen
+        db.session.add(new_city)
+        db.session.commit()
+
+        flash(f'Stadt {name} wurde erfolgreich hinzugefügt.', 'success')
+        return redirect(url_for('admin_bp.all_cities'))
+
+    return render_template('admin_add_city.html', admin=admin)
+
+
+# Route zum Bearbeiten einer Stadt
+@admin_bp.route('/edit_city/<int:city_id>', methods=['GET', 'POST'])
+def edit_city(city_id):
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    # Lade das Admin-Objekt anhand der Admin-ID in der Sitzung
+    admin = Admin.query.get(session['admin_id'])
+
+    city = City.query.get_or_404(city_id)
+
+    if request.method == 'POST':
+        city.name = request.form['name']
+        city.postal_code = request.form['postal_code']
+        city.latitude = float(request.form['latitude'])
+        city.longitude = float(request.form['longitude'])
+
+        db.session.commit()
+        flash(f'Stadt {city.name} wurde erfolgreich aktualisiert.', 'success')
+        return redirect(url_for('admin_bp.all_cities'))
+
+    return render_template('admin_edit_city.html', admin=admin, city=city)
+
+
+# Route zum Löschen einer Stadt
+@admin_bp.route('/delete_city/<int:city_id>', methods=['POST'])
+def delete_city(city_id):
+    if "admin_id" not in session:
+        return redirect(url_for('admin_bp.login'))
+
+    city = City.query.get_or_404(city_id)
+
+    db.session.delete(city)
+    db.session.commit()
+
+    flash(f'Stadt {city.name} wurde erfolgreich gelöscht.', 'success')
+    return redirect(url_for('admin_bp.all_cities'))

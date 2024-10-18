@@ -10,6 +10,7 @@ import os
 from itsdangerous import URLSafeTimedSerializer
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
+from app.models import *
 
 # Initialisiere den Serializer als globale Variable
 serializer = None

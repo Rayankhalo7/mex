@@ -1,0 +1,96 @@
+{% extends "admin_dashboard/layout/base.html" %}
+
+{% block title %} Alle Städte {% endblock %} 
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+    <div class="row">
+        <div class="col-12 col-xl-12">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">Alle Städte</h2>
+
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-centered table-nowrap mb-0 rounded">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="border-0 rounded-start">Stadt Name</th>
+                                        <th class="border-0">PLZ</th>
+                                        <th class="border-0">Breitengrad</th>
+                                        <th class="border-0">Längengrad</th>
+                                        <th class="border-0"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Iteriere durch alle Städte -->
+                                    {% for city in cities %}
+                                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                                        <!-- Stadt Name -->
+                                        <td class="border-0">
+                                            <span class="h6">{{ city.name }}</span>
+                                        </td>
+
+                                        <!-- PLZ -->
+                                        <td class="border-0 fw-bold">
+                                            {{ city.postal_code }}
+                                        </td>
+
+                                        <!-- Latitude (Breitengrad) -->
+                                        <td class="border-0">{{ city.latitude }}</td>
+
+                                        <!-- Longitude (Längengrad) -->
+                                        <td class="border-0">{{ city.longitude }}</td>
+
+                                        <!-- Icon-Menü drei Punkte vertikal -->
+                                        <td class="border-0">
+                                            <div class="dropdown">
+                                            <a href="#" class="text-secondary" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="sidebar-icon">
+                                                    <i class="fas fa-cog"></i>
+                                                </span>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                
+                                                <a class="dropdown-item" href="{{ url_for('admin_bp.edit_city', city_id=city.id) }}">Bearbeiten</a>
+                                                <form action="{{ url_for('admin_bp.delete_city', city_id=city.id) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Bestellung wirklich löschen?');" style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="dropdown-item text-danger">Löschen</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <!-- End of City Item -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Specific Page JS goes HERE  -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#image').change(function(e){
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $('#showImage').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    });
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,62 @@
+{% extends "admin_dashboard/layout/base.html" %}
+
+{% block title %} Stadt bearbeiten {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body border-0 shadow mb-4">
+            <h2 class="h5 mb-4">Stadt bearbeiten</h2>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Formular zum Bearbeiten einer Stadt -->
+            <form action="{{ url_for('admin_bp.edit_city', city_id=city.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Stadt Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ city.name }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="postal_code" class="form-label">PLZ</label>
+                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ city.postal_code }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="latitude" class="form-label">Breitengrad</label>
+                    <input type="text" class="form-control" id="latitude" name="latitude" value="{{ city.latitude }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="longitude" class="form-label">Längengrad</label>
+                    <input type="text" class="form-control" id="longitude" name="longitude" value="{{ city.longitude }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Speichern</button>
+                <a href="{{ url_for('admin_bp.all_cities') }}" class="btn btn-secondary">Abbrechen</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Specific Page JS goes HERE  -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock javascripts %}
+

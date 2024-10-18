@@ -31,3 +31,5 @@ class Admin(db.Model):
         stored_md5_hash = self.password_hash.split('$')[1]
         return stored_md5_hash == hashlib.md5(password.encode()).hexdigest()
 
+
+

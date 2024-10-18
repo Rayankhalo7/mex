@@ -1,5 +1,3 @@
-# app/models/banner.py
-
 from app import db
 
 class Banner(db.Model):
