@@ -10,7 +10,7 @@ from app.models.rating import Rating
 from app.models.lieferzeiten import Lieferzeiten
 from datetime import datetime
 from app.models.product import Product
-from app.models.client_model import Client
+
 
 # Blueprint für das Frontend erstellen
 frontend_bp = Blueprint('frontend_bp', __name__, template_folder='templates/frontend')
@@ -41,15 +41,41 @@ def calculate_total_cost_and_tax(cart):
 
     return total_cost, total_tax, tax_details
 
-# Route für die Startseite
+
 @frontend_bp.route('/')
 def home():
     # Alle Clients aus der Datenbank abrufen
     clients = Client.query.all()
-    if not clients:
-        return render_template('frontend/home.html')  # Falls keine Clients vorhanden sind, andere Seite anzeigen
 
-    return render_template('frontend/home.html', clients=clients)
+    # Falls keine Clients vorhanden sind, leere Seite anzeigen
+    if not clients:
+        return render_template('frontend/home.html')
+
+    client = None
+    # Überprüfen, ob eine Client-ID im Warenkorb gespeichert ist
+    if 'cart_client_id' in session:
+        # Den Client basierend auf der Client-ID im Warenkorb abrufen
+        client = Client.query.filter_by(id=session['cart_client_id']).first()
+
+    # Warenkorb aus der Session abrufen
+    cart = session.get('cart', {})
+
+    # Berechnung der Gesamtkosten, Steuern und Steuerdetails
+    total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+    # Berechnung der Gesamtartikelanzahl
+    total_items = sum(item['quantity'] for item in cart.values())
+
+    return render_template(
+        'frontend/home.html',
+        clients=clients,
+        client=client,
+        cart=cart,
+        total_cost=total_cost,
+        tax_details=tax_details,
+        total_tax=total_tax,
+        total_items=total_items
+    )
 
 # Route für die Client-Detailseite
 @frontend_bp.route('/client/<int:client_id>')

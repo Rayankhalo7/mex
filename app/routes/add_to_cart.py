@@ -2,6 +2,7 @@
 from flask import Blueprint, session, redirect, url_for, flash, request, jsonify, render_template
 from flask_login import current_user
 from app.models.product import Product  # Importiere das Produktmodell
+from app.models.client_model import Client  # Importiere das Client-Modell
 
 # Blueprint für den Warenkorb erstellen
 cart_bp = Blueprint('cart', __name__)
@@ -10,20 +11,19 @@ cart_bp = Blueprint('cart', __name__)
 @cart_bp.route('/add_to_cart/<int:product_id>', methods=['GET', 'POST'])
 def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
+    client_id = product.client_id
 
-    if 'cart' not in session:
-        session['cart'] = {}
+    # Warenkorb aus der Session holen oder neuen Warenkorb erstellen
+    cart = session.get('cart', {})
 
-    cart = session['cart']
-
-    # Speichere die client_id in der Session
-    if 'cart_client_id' in session and session['cart_client_id'] != product.client_id:
-        session['cart'] = {}
-        session['cart_client_id'] = product.client_id
-        flash('Der Warenkorb wurde geleert, da Sie zu einem anderen Client gewechselt haben.', 'info')
-
+    # Wenn kein Client in der Session gespeichert ist, setze den aktuellen Client
     if 'cart_client_id' not in session:
-        session['cart_client_id'] = product.client_id
+        session['cart_client_id'] = client_id
+    # Wenn der aktuelle Client nicht derselbe wie der gespeicherte ist, leere den Warenkorb
+    elif session['cart_client_id'] != client_id:
+        flash("Du kannst nur Produkte von einem Client gleichzeitig im Warenkorb haben. Der Warenkorb wurde geleert.", "danger")
+        session['cart'] = {}  # Leere den Warenkorb
+        session['cart_client_id'] = client_id
 
     # Hinzufügen des Produkts zum Warenkorb
     if str(product_id) in cart:
@@ -43,7 +43,6 @@ def add_to_cart(product_id):
     session['cart'] = cart
     flash(f"{product.name} erfolgreich zum Warenkorb hinzugefügt!", 'success')
     return redirect(request.referrer or url_for('frontend_bp.client_detail', client_id=product.client_id))
-
 
 
 # Route zum Erhöhen der Produktmenge im Warenkorb
@@ -103,12 +102,19 @@ def remove_from_cart(product_id):
 @cart_bp.route('/cart')
 def show_cart():
     cart = session.get('cart', {})
+    client_id = session.get('cart_client_id')
+
+    if client_id:
+        client = Client.query.get(client_id)
+    else:
+        flash('Kein Client zugeordnet. Bitte wähle einen gültigen Client.', 'warning')
+        client = None
     
     # Berechne die Anzahl der Artikel
     total_items = sum(item['quantity'] for item in cart.values())
     
-    # Rendere das Template und übergebe `cart` und `total_items`
-    return render_template('cart.html', cart=cart, total_items=total_items)
+    # Rendere das Template und übergebe `cart`, `total_items`, und `client`
+    return render_template('cart.html', cart=cart, total_items=total_items, client=client)
 
 
 @cart_bp.route('/get_total_cost', methods=['GET'])

@@ -156,11 +156,48 @@ def password_reset_token(token):
     return render_template('backend/user_templates/user_password_reset_form.html', token=token)
 
 
+from app.routes.frontend import calculate_total_cost_and_tax
+
 # Dashboard
 @user_bp.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("backend/user_templates/dashboard/dashboard.html", user=current_user, page_name="Dashboard")
+    clients = Client.query.all()
+
+    # Falls keine Clients vorhanden sind, leere Seite anzeigen
+    if not clients:
+        return render_template('backend/user_templates/dashboard/dashboard.html')
+
+    client = None
+    # Überprüfen, ob eine Client-ID im Warenkorb gespeichert ist
+    if 'cart_client_id' in session:
+        # Den Client basierend auf der Client-ID im Warenkorb abrufen
+        client = Client.query.filter_by(id=session['cart_client_id']).first()
+
+    # Warenkorb aus der Session abrufen
+    cart = session.get('cart', {})
+
+    # Berechnung der Gesamtkosten, Steuern und Steuerdetails
+    total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+    # Berechnung der Gesamtartikelanzahl
+    total_items = sum(item['quantity'] for item in cart.values())
+
+    return render_template(
+        "backend/user_templates/dashboard/dashboard.html", 
+        user=current_user,
+        clients=clients,
+        client=client,
+        cart=cart,
+        total_cost=total_cost,
+        tax_details=tax_details,
+        total_tax=total_tax,
+        total_items=total_items,
+        page_name="Dashboard"  # Korrektur: Komma hinzugefügt
+    )
+
+
+
 
 
 # Profil bearbeiten
@@ -202,6 +239,20 @@ def profile_edit():
 def passwort_aendern():
     user = current_user  # Verwende den aktuell eingeloggenen Benutzer
     errors = {}  # Fehlerdictionary zum Speichern von Fehlern während der Überprüfung
+
+    client = None
+    # Überprüfen, ob eine Client-ID im Warenkorb gespeichert ist
+    if 'cart_client_id' in session:
+        # Den Client basierend auf der Client-ID im Warenkorb abrufen
+        client = Client.query.filter_by(id=session['cart_client_id']).first()
+
+    cart = session.get('cart', {})
+
+    # Berechnung der Gesamtkosten, Steuern und Steuerdetails
+    total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+    total_items = sum(item['quantity'] for item in cart.values())
+
 
     if request.method == 'POST':
         # Hole die eingegebenen Werte aus dem Formular
@@ -246,28 +297,63 @@ def passwort_aendern():
                 flash('Fehler beim Speichern des neuen Passworts. Bitte versuche es erneut.', 'danger')
 
     # Rendere die Seite mit eventuellen Fehlern, falls das Formular nicht korrekt ausgefüllt wurde
-    return render_template('backend/user_templates/dashboard/passwort_aendern.html', user=user, errors=errors, page_name="Passwort ändern")
+    return render_template('backend/user_templates/dashboard/passwort_aendern.html',total_items=total_items,cart=cart,total_cost=total_cost, total_tax=total_tax, tax_details=tax_details, user=user, errors=errors,client=client, page_name="Passwort ändern")
 
 
 @user_bp.route("/meine_bestellungen", methods=["GET"])
 @login_required
 def meine_bestellungen():
     user = current_user  # Der aktuell eingeloggte Benutzer
+
+    # Überprüfen, ob eine Client-ID im Warenkorb gespeichert ist
+    client = None
+    if 'cart_client_id' in session:
+        # Den Client basierend auf der Client-ID im Warenkorb abrufen
+        client = Client.query.filter_by(id=session['cart_client_id']).first()
+
+    # Warenkorb aus der Session abrufen
+    cart = session.get('cart', {})
+
+    # Berechnung der Gesamtkosten, Steuern und Steuerdetails für den Warenkorb
+    total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+    # Berechnung der Gesamtartikelanzahl im Warenkorb
+    total_items = sum(item['quantity'] for item in cart.values())
+
     try:
         # Bestellungen des aktuellen Benutzers aus der Datenbank abrufen
         orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.order_date.desc()).all()
         
-        # Render the template with the orders
+        # Template mit den Bestellungen und zusätzlichen Informationen (Warenkorb, Kosten, Steuern) rendern
         return render_template(
             'backend/user_templates/dashboard/meine_bestellungen.html',
             user=user,
             orders=orders,
+            client=client,
+            cart=cart,
+            total_cost=total_cost,
+            total_tax=total_tax,
+            tax_details=tax_details,
+            total_items=total_items,
             page_name="Meine Bestellungen"
         )
     except Exception as e:
-        flash('Fehler beim Abrufen der Bestellungen. Bitte versuche es erneut.', 'danger')
+        # Fehler abfangen und anzeigen, falls etwas schiefgeht
+        flash(f'Fehler beim Abrufen der Bestellungen: {str(e)}', 'danger')
         print(f"Fehler beim Abrufen der Bestellungen: {e}")
-        return render_template('backend/user_templates/dashboard/meine_bestellungen.html', user=user, orders=[], page_name="Meine Bestellungen", enumerate=enumerate)
+        return render_template(
+            'backend/user_templates/dashboard/meine_bestellungen.html',
+            user=user,
+            orders=[],  # Leere Bestellungen im Fehlerfall
+            client=client,
+            cart=cart,
+            total_cost=total_cost,
+            total_tax=total_tax,
+            tax_details=tax_details,
+            total_items=total_items,
+            page_name="Meine Bestellungen"
+        )
+
 
 
 
@@ -291,25 +377,34 @@ def meine_bestellung(order_id):
         if not order_items:
             print("Keine Bestellpositionen gefunden")
 
-        # Berechnungen im Backend
+        # Berechnung der Gesamtkosten, Steuern und Steuerdetails für den Warenkorb
+        cart = session.get('cart', {})  # Warenkorb aus der Session holen
+        total_cost, total_tax, tax_details = calculate_total_cost_and_tax(cart)
+
+        # Berechnungen im Backend für die Bestellung
         total_netto = 0
         total_brutto = 0
-        total_tax = 0
+        total_tax_order = 0
 
         for item in order_items:
             netto_price = item.price / (1 + (item.product.tax_rate / 100))  # Netto-Preis pro Produkt
             tax_amount = item.price - netto_price  # Steuerbetrag pro Produkt
             total_netto += netto_price * item.quantity  # Netto-Summe
             total_brutto += item.price * item.quantity  # Brutto-Summe
-            total_tax += tax_amount * item.quantity  # Steuer-Summe
+            total_tax_order += tax_amount * item.quantity  # Steuer-Summe
 
         # Summen auf 2 Dezimalstellen runden
         total_netto = round(total_netto, 2)
         total_brutto = round(total_brutto, 2)
-        total_tax = round(total_tax, 2)
+        total_tax_order = round(total_tax_order, 2)
 
         # Debugging: Überprüfe die berechneten Werte
-        print(f"Total Netto: {total_netto}, Total Brutto: {total_brutto}, Total Steuer: {total_tax}")
+        print(f"Total Netto: {total_netto}, Total Brutto: {total_brutto}, Total Steuer: {total_tax_order}")
+
+        # Den Client aus der Session laden, falls er vorhanden ist
+        client = None
+        if 'cart_client_id' in session:
+            client = Client.query.filter_by(id=session['cart_client_id']).first()
 
         return render_template(
             'backend/user_templates/dashboard/view_meine_bestellung.html',
@@ -318,8 +413,13 @@ def meine_bestellung(order_id):
             order_items=order_items,
             total_price=total_brutto,
             page_name="Bestelldetails",
-            total_tax=total_tax,
-            total_netto=total_netto
+            total_tax=total_tax_order,
+            total_netto=total_netto,
+            cart=cart,  # Den Warenkorb dem Template übergeben
+            total_cost=total_cost,
+            tax_details=tax_details,
+            total_items=sum(item['quantity'] for item in cart.values()),  # Anzahl der Artikel im Warenkorb berechnen
+            client=client  # Den Client dem Template übergeben
         )
 
     except NotFound:
@@ -330,6 +430,7 @@ def meine_bestellung(order_id):
         print(f"Fehler beim Abrufen der Bestelldetails: {e}")
         flash('Fehler beim Abrufen der Bestelldetails. Bitte versuche es erneut.', 'danger')
         return redirect(url_for('user_bp.meine_bestellungen'))
+
 
 
 
