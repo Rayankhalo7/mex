@@ -1,47 +1,62 @@
-{% extends "frontend/base_resault.html" %}
+{% extends "backend/client_templates/search/base_search.html" %}
 
 {% block title %}Suchergebnisse{% endblock %}
 
 {% block content %}
-<section class="section pt-5 pb-5 products-section">
-    <div class="container">
-        <div class="section-header text-center">
-            <h2>Lieblings Restaurants</h2>
-            <p>Listen der besten Restaurants, Cafés und Bars in Deutschland</p>
-            <span class="line"></span>
+    
+
+    <main class="main">
+        <h1 class="page-title">Restaurants in Ihrer Nähe</h1>
+
+        <div class="filter-container">
+            <input type="text" id="searchName" placeholder="Restaurantname suchen...">
+            <select id="filterCategory">
+                <option value="">Alle Kategorien</option>
+                <option value="Lebensmittel, Alkohol">Lebensmittel, Alkohol</option>
+                <option value="Italienische Pizza, Pasta">Italienische Pizza, Pasta</option>
+                <option value="Italienische Pizza, Döner">Italienische Pizza, Döner</option>
+                <option value="Burger, Amerikanische Pizza">Burger, Amerikanische Pizza</option>
+            </select>
+            <select id="filterRating">
+                <option value="">Alle Bewertungen</option>
+                <option value="4">4 Sterne & mehr</option>
+                <option value="3">3 Sterne & mehr</option>
+                <option value="2">2 Sterne & mehr</option>
+            </select>
+            <button id="applyFilters">Filter anwenden</button>
         </div>
-        <div class="row">
-            {% if clients %}
-                {% for client in clients %}
-                <div class="col-md-3">
-                    <div class="item pb-3">
-                        <div class="list-card bg-white h-100 rounded overflow-hidden position-relative shadow-sm">
-                            <div class="list-card-image">
-                                <a href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}">
-                                    <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" class="img-fluid item-img">
-                                </a>
+        
+        <section class="restaurant-list">
+            <div class="container">
+                {% if clients %}
+                    {% for client in clients %}
+                    <div class="restaurant-item">
+                        <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" alt="{{ client.clientname }}" class="restaurant-img">
+                        <div class="restaurant-details">
+                            <h2>{{ client.clientname }}</h2>
+                            <p class="category">{{ client.street }} {{ client.house_number }}, {{ client.city.name }}</p>
+                            <div class="rating">
+                                <span class="star">&#9733;</span>
+                                <span>{{ client.rating or '4.5' }}</span>
+                                <span>({{ client.reviews or '100+' }})</span>
                             </div>
-                            <div class="p-3 position-relative">
-                                <div class="list-card-body">
-                                    <h6 class="mb-1"><a href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}" class="text-black">{{ client.clientname }}</a></h6>
-                                    <p class="text-gray mb-3">{{ client.street }} {{ client.house_number }}, {{ client.city.name }}</p>
-                                    
-                                    {% if client.opening_hours|length > 0 %}
-                                        <p class="text-gray mb-3 time"><i class="icofont-wall-clock"></i> Öffnungszeiten: 
-                                        {{ client.opening_hours[0].open_time.strftime('%H:%M') }} - {{ client.opening_hours[0].close_time.strftime('%H:%M') }}</p>
-                                    {% else %}
-                                        <p class="text-gray mb-3 time"><i class="icofont-wall-clock"></i> Öffnungszeiten: Keine Angaben</p>
-                                    {% endif %}
-                                </div>
+                            <div class="extra">
+                                <span class="icon">&#128337;</span>
+                                <span>Öffnungszeiten: {% if client.opening_hours|length > 0 %} {{ client.opening_hours[0].open_time.strftime('%H:%M') }} - {{ client.opening_hours[0].close_time.strftime('%H:%M') }} {% else %} Keine Angaben {% endif %}</span>
                             </div>
                         </div>
+                        <div class="restaurant-action">
+                            <a href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}" class="btn-primary">Jetzt bestellen</a>
+                        </div>
                     </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>Keine Restaurants in der Nähe gefunden.</p>
-            {% endif %}
-        </div>
-    </div>
-</section>
-{% endblock content %}
+                    {% endfor %}
+                {% else %}
+                    <p>Keine Restaurants in der Nähe gefunden.</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    
+
+    {% endblock content %}

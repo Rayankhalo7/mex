@@ -13,6 +13,7 @@ from flask import request
 from werkzeug.exceptions import NotFound
 from app.models.order_item import OrderItem
 from app.models.client_model import Client
+from app.models.cities import City
 
 # Definiere die erlaubten Dateiendungen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -163,10 +164,11 @@ from app.routes.frontend import calculate_total_cost_and_tax
 @login_required
 def dashboard():
     clients = Client.query.all()
+    cities = City.query.all()
 
     # Falls keine Clients vorhanden sind, leere Seite anzeigen
     if not clients:
-        return render_template('backend/user_templates/dashboard/dashboard.html')
+        return render_template('backend/user_templates/dashboard/dashboard.html', cities=cities)
 
     client = None
     # Überprüfen, ob eine Client-ID im Warenkorb gespeichert ist

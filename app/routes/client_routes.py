@@ -527,6 +527,8 @@ def update_order_status(order_id):
 
 
 
+
+
 # Route für die Suchseite (search_page)
 @client_bp.route('/search_page', methods=['GET'])
 def search_page():
