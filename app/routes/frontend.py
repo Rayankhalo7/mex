@@ -300,3 +300,95 @@ def get_nearby_restaurants():
         flash('Standort konnte nicht ermittelt werden.', 'warning')
         return redirect(url_for('frontend_bp.home'))
 
+
+
+@client_bp.route('/all_restaurants', methods=['GET'])
+def all_restaurants():
+    # Abrufen aller Restaurants aus der Datenbank
+    all_clients = db.session.query(
+        Client.id.label('client_id'),
+        Client.clientname,
+        Client.street,
+        Client.house_number,
+        Client.photo,
+        City.name.label('city_name'),
+        func.coalesce(func.avg(Rating.rating), 0).label('average_rating'),
+        func.count(Rating.id).label('total_ratings'),
+        func.count(Rating.comment).label('total_reviews')
+    ).outerjoin(Rating, Rating.client_id == Client.id).join(City, City.id == Client.city_id).group_by(Client.id, City.name).all()
+
+    # Öffnungszeiten für jeden Client laden
+    client_opening_hours = {
+        client.client_id: OpeningHours.query.filter_by(client_id=client.client_id).all()
+        for client in all_clients
+    }
+
+    # Setze den aktuellen Zeitpunkt
+    current_time = datetime.now()
+
+    return render_template(
+        'backend/client_templates/frontend_all_restaurants.html', 
+        clients=all_clients,
+        client_opening_hours=client_opening_hours,
+        current_time=current_time
+    )
+
+
+
+from flask import request, jsonify
+
+@client_bp.route('/filter_restaurants', methods=['POST'])
+def filter_restaurants():
+    data = request.get_json()
+    name = data.get('name', '')
+    category = data.get('category', '')
+    rating = int(data.get('rating', 0))
+
+    # Basisauswahl aller Clients
+    query = db.session.query(
+        Client.id.label('client_id'),
+        Client.clientname,
+        Client.street,
+        Client.house_number,
+        Client.photo,
+        City.name.label('city_name'),
+        func.coalesce(func.avg(Rating.rating), 0).label('average_rating'),
+        func.count(Rating.id).label('total_ratings'),
+        func.count(Rating.comment).label('total_reviews')
+    ).outerjoin(Rating, Rating.client_id == Client.id).join(City, City.id == Client.city_id)
+
+    # Name filtern
+    if name:
+        query = query.filter(Client.clientname.ilike(f"%{name}%"))
+
+    # Kategorie filtern
+    if category:
+        query = query.filter(Client.category == category)
+
+    # Bewertung filtern
+    if rating:
+        query = query.having(func.coalesce(func.avg(Rating.rating), 0) >= rating)
+
+    # Gefilterte Ergebnisse abrufen
+    clients = query.group_by(Client.id, City.name).all()
+
+    # Öffnungszeiten für jedes Restaurant abrufen
+    client_data = []
+    for client in clients:
+        opening_hours = OpeningHours.query.filter_by(client_id=client.client_id).all()
+        opening_hours_text = ", ".join([f"{oh.day_of_week}: {oh.open_time.strftime('%H:%M')} - {oh.close_time.strftime('%H:%M')}" for oh in opening_hours])
+
+        client_data.append({
+            "client_id": client.client_id,
+            "clientname": client.clientname,
+            "street": client.street,
+            "house_number": client.house_number,
+            "city_name": client.city_name,
+            "photo": url_for('static', filename=client.photo) if client.photo else url_for('static', filename='frontend/themes/img/list/1.png'),
+            "average_rating": round(client.average_rating, 1),
+            "total_ratings": client.total_ratings,
+            "total_reviews": client.total_reviews,
+            "opening_hours": opening_hours_text
+        })
+
+    return jsonify({"clients": client_data})

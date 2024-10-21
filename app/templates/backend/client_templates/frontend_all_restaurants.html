@@ -1,0 +1,162 @@
+{% extends "backend/client_templates/search/base_search.html" %}
+
+{% block title %}Alle Restaurants{% endblock %}
+
+{% block content %}
+<main class="main">
+    <h1 class="page-title">Alle Restaurants</h1>
+
+    <div class="filter-container">
+        <div class="filter-row">
+            <input type="text" id="searchName" placeholder="Restaurantname suchen...">
+        </div>
+        <div class="filter-row">
+            <select id="filterCategory">
+                <option value="">Alle Kategorien</option>
+                <option value="Lebensmittel, Alkohol">Lebensmittel, Alkohol</option>
+                <option value="Italienische Pizza, Pasta">Italienische Pizza, Pasta</option>
+                <option value="Italienische Pizza, Döner">Italienische Pizza, Döner</option>
+                <option value="Burger, Amerikanische Pizza">Burger, Amerikanische Pizza</option>
+            </select>
+            <select id="filterRating">
+                <option value="">Alle Bewertungen</option>
+                <option value="4">4 Sterne & mehr</option>
+                <option value="3">3 Sterne & mehr</option>
+                <option value="2">2 Sterne & mehr</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <button id="applyFilters">Filter anwenden</button>
+        </div>
+    </div>
+
+    <section class="restaurant-list">
+        <div class="container">
+            {% if clients %}
+                {% for client in clients %}
+                <div class="restaurant-item">
+                    <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" alt="{{ client.clientname }}" class="restaurant-img">
+                    <div class="restaurant-details">
+                        <h2>{{ client.clientname }}</h2>
+                        <p class="category">{{ client.street }} {{ client.house_number }}, {{ client.city_name }}</p>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span>{{ client.average_rating | round(1) }}</span>
+                            <h6 class="restaurant-detailed-ratings">
+                                <span class="badge bg-primary text-white rounded">
+                                    <i class="icofont-star"></i> {{ client.average_rating | round(1) }}
+                                </span>
+                                {{ client.total_ratings or "0" }} Bewertungen  
+                                <i class="icofont-speech-comments"></i> 
+                                {{ client.total_reviews or "0" }} Kommentare
+                            </h6>
+                        </div>
+                        <div class="extra">
+                            <span class="icon">&#128337;</span>
+                            <span>Öffnungszeiten: 
+                                {% set weekday_map = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+                                {% set current_day = weekday_map[current_time.strftime('%A')] %}
+                                
+                                {% set opening_hours = client_opening_hours[client.client_id] if client.client_id in client_opening_hours else [] %}
+                                {% if opening_hours %}
+                                    {% set today_opening_hours = opening_hours | selectattr('day_of_week', 'equalto', current_day) | first %}
+                                    
+                                    {% if today_opening_hours %}
+                                        <i class="icofont-clock-time"></i>
+                                        <strong>{{ current_day }}:</strong> 
+                                        {{ today_opening_hours.open_time.strftime('%H:%M') }} - {{ today_opening_hours.close_time.strftime('%H:%M') }}
+                                        
+                                        {% set now_time = current_time.time() %}
+                                        {% if today_opening_hours.open_time <= now_time <= today_opening_hours.close_time %}
+                                            <span class="badge badge-success"> geöffnet</span>
+                                        {% else %}
+                                            <span class="badge badge-danger"> geschlossen </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="icofont-clock-time text-primary mr-2"></i> <strong> Öffnungszeiten:</strong> Heute geschlossen
+                                    {% endif %}
+                                {% else %}
+                                    <i class="icofont-clock-time"></i><strong> Öffnungszeiten:</strong> Keine Angaben
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                    </div>
+                    <div class="restaurant-action">
+                        <a href="{{ url_for('frontend_bp.client_detail', client_id=client.client_id) }}" class="btn-primary">Jetzt bestellen</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Keine Restaurants gefunden.</p>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+
+
+
+{% endblock content %}
+<script>
+    document.getElementById('applyFilters').addEventListener('click', function() {
+        const name = document.getElementById('searchName').value;
+        const category = document.getElementById('filterCategory').value;
+        const rating = document.getElementById('filterRating').value;
+
+        fetch('/filter_restaurants', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'  // Falls du CSRF-Schutz verwendest
+            },
+            body: JSON.stringify({
+                name: name,
+                category: category,
+                rating: rating
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.querySelector('.restaurant-list .container');
+            container.innerHTML = '';  // Vorherigen Inhalt löschen
+
+            if (data.clients.length === 0) {
+                container.innerHTML = '<p>Keine Restaurants gefunden.</p>';
+                return;
+            }
+
+            data.clients.forEach(client => {
+                const clientHtml = `
+                <div class="restaurant-item">
+                    <img src="${client.photo}" alt="${client.clientname}" class="restaurant-img">
+                    <div class="restaurant-details">
+                        <h2>${client.clientname}</h2>
+                        <p class="category">${client.street} ${client.house_number}, ${client.city_name}</p>
+                        <div class="rating">
+                            <span class="star">&#9733;</span>
+                            <span>${client.average_rating.toFixed(1)}</span>
+                            <h6 class="restaurant-detailed-ratings">
+                                <span class="badge bg-primary text-white rounded">
+                                    <i class="icofont-star"></i> ${client.average_rating.toFixed(1)}
+                                </span>
+                                ${client.total_ratings || "0"} Bewertungen  
+                                <i class="icofont-speech-comments"></i> 
+                                ${client.total_reviews || "0"} Kommentare
+                            </h6>
+                        </div>
+                        <div class="extra">
+                            <span class="icon">&#128337;</span>
+                            <span>Öffnungszeiten: ${client.opening_hours}</span>
+                        </div>
+                    </div>
+                    <div class="restaurant-action">
+                        <a href="/client_detail/${client.client_id}" class="btn-primary">Jetzt bestellen</a>
+                    </div>
+                </div>`;
+                container.innerHTML += clientHtml;
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
