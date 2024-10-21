@@ -819,8 +819,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff6347', end
 .offer-dedicated-nav .nav-link.active,
 .offer-dedicated-nav .nav-link:hover,
 .offer-dedicated-nav .nav-link:focus {
-    border-color: #3868fb;
-    color: #3868fb;
+    border-color: #ff6347 ;
+    color: #ff6347 ;
 }
 .offer-dedicated-nav .nav-link {
     border-bottom: 2px solid #fff;

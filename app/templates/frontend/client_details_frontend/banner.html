@@ -68,7 +68,7 @@
                 <div class="restaurant-detailed-header-right text-right">
                   {% if lieferzeiten %}
     {% for lieferzeit in lieferzeiten %}
-        <button class="btn btn-success" type="button">
+        <button class="btn btn-primary" type="button">
             <i class="icofont-clock-time"></i> {{ lieferzeit.zeit_von.strftime('%M') }} – {{ lieferzeit.zeit_bis.strftime('%M') }} min
         </button>
     {% endfor %}
