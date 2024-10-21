@@ -302,7 +302,7 @@ def get_nearby_restaurants():
 
 
 
-@client_bp.route('/all_restaurants', methods=['GET'])
+@frontend_bp.route('/all_restaurants', methods=['GET'])
 def all_restaurants():
     # Abrufen aller Restaurants aus der Datenbank
     all_clients = db.session.query(
@@ -337,7 +337,7 @@ def all_restaurants():
 
 from flask import request, jsonify
 
-@client_bp.route('/filter_restaurants', methods=['POST'])
+@frontend_bp.route('/filter_restaurants', methods=['POST'])
 def filter_restaurants():
     data = request.get_json()
     name = data.get('name', '')
