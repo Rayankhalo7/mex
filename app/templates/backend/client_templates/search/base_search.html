@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant-Liste</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='frontend/search_theme/style.css')}}">
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+    <!-- Font Awesome-->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/fontawesome/css/all.min.css')}}" rel="stylesheet">
+    <!-- Font Awesome-->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/icofont/icofont.min.css') }}" rel="stylesheet">
+    <!-- Select2 CSS-->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/select2/css/select2.min.css')}}" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="{{ url_for('static', filename='frontend/themes/css/osahan.css') }}" rel="stylesheet">
+
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.theme.css')}}">
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
     
 </head>
 <body>
@@ -19,6 +34,211 @@
     {% block javascripts %}
     
     <script src="{{ url_for('static', filename='frontend/search_theme/script.js')}}"></script>
+
+    <!-- jQuery -->
+  <script src="{{ url_for('static', filename='frontend/themes/vendor/jquery/jquery-3.3.1.slim.min.js')}}"></script>
+  <!-- Bootstrap core JavaScript-->
+  <script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  <!-- Select2 JavaScript-->
+  <script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
+  
+  <!-- Owl Carousel -->
+  <script src="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.js')}}"></script>
+  
+  <!-- Custom scripts for all pages-->
+  <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
+  
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  
+  <script type="text/javascript">
+    // Toastr options configuration
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
+        "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
+        "extendedTimeOut": "1000"
+    }
+  
+    // Überprüfe, ob es geflashte Nachrichten gibt
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    var type = "{{ category }}";  // Kategorie: success, info, warning, error
+    switch(type){
+        case 'info':
+            toastr.info("{{ message }}");
+            break;
+        case 'success':
+            toastr.success("{{ message }}");
+            break;
+        case 'warning':
+            toastr.warning("{{ message }}");
+            break;
+        case 'error':
+            toastr.error("{{ message }}");
+            break;
+    }
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </script>
+ 
+
+ <script>
+    $(document).ready(function() {
+        // CSRF-Token aus dem Meta-Tag holen
+    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+// jQuery AJAX-Anfragen konfigurieren, um den CSRF-Token automatisch hinzuzufügen
+$.ajaxSetup({
+    headers: {
+        'X-CSRFToken': csrfToken
+    }
+});
+        // Funktion zum Erhöhen der Menge
+        $(document).on('click', '.inc', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/increase_quantity/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreicher Erhöhung
+                        toastr.success('Die Menge des Produkts wurde erhöht.');
+
+                        // Aktualisiere die Anzahl vor dem Produktnamen
+                        let quantityInput = $(`[data-product-id="${productId}"] .count-number-input`);
+                        quantityInput.val(response.quantity);
+                        let productName = $(`[data-product-id="${productId}"] .product-name`);
+                        productName.text(`${response.quantity}x ${productName.data('name')}`);
+
+                        // Aktualisiere den Preis
+                        let pricePerUnit = $(`[data-product-id="${productId}"]`).data('price-per-unit');
+                        let newPrice = (pricePerUnit * response.quantity).toFixed(2);
+                        $(`[data-product-id="${productId}"] .text.font-weight-bold`).text(`${newPrice} €`);
+
+                        // Aktualisiere Gesamtsumme, Steuer und Anzahl im Warenkorb
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Erhöhen der Menge.');
+                    console.log('Fehler beim Erhöhen der Menge:', error);
+                }
+            });
+        });
+
+        // Funktion zum Verringern der Menge
+        $(document).on('click', '.dec', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/decrease_quantity/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreicher Verringerung
+                        toastr.success('Die Menge des Produkts wurde verringert.');
+
+                        if (response.quantity > 0) {
+                            // Aktualisiere die Menge und den Preis in der UI
+                            let quantityInput = $(`[data-product-id="${productId}"] .count-number-input`);
+                            quantityInput.val(response.quantity);
+                            let productName = $(`[data-product-id="${productId}"] .product-name`);
+                            productName.text(`${response.quantity}x ${productName.data('name')}`);
+                            
+                            // Berechne den neuen Preis
+                            let pricePerUnit = $(`[data-product-id="${productId}"]`).data('price-per-unit');
+                            let newPrice = (pricePerUnit * response.quantity).toFixed(2);
+                            $(`[data-product-id="${productId}"] .text.font-weight-bold`).text(`${newPrice} €`);
+                        } else {
+                            // Wenn die Menge auf 0 sinkt, entferne das Produkt
+                            toastr.info('Das Produkt wurde aus dem Warenkorb entfernt.');
+                            $(`[data-product-id="${productId}"]`).remove();
+                        }
+
+                        // Aktualisiere die Gesamtsumme und Steuer
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Verringern der Menge.');
+                    console.log('Fehler beim Verringern der Menge:', error);
+                }
+            });
+        });
+        
+        // Entfernen eines Produkts
+        $(document).on('click', '.remove', function() {
+            let productId = $(this).closest('[data-product-id]').data('product-id');
+            $.ajax({
+                url: `/cart/remove_from_cart/${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Toastr-Benachrichtigung bei erfolgreichem Entfernen
+                        toastr.info('Das Produkt wurde aus dem Warenkorb entfernt.');
+
+                        // Entferne das Produkt aus der UI
+                        $(`[data-product-id="${productId}"]`).remove();
+
+                        // Aktualisiere Gesamtkosten und Steuer
+                        updateCartSummary();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Entfernen des Produkts.');
+                    console.log('Fehler beim Entfernen des Produkts:', error);
+                }
+            });
+        });
+    
+        // Funktion zur Aktualisierung der Gesamtkosten und Steuer
+        function updateCartSummary() {
+            $.ajax({
+                url: '/cart/get_total_cost',
+                type: 'GET',
+                success: function(response) {
+                    // Gesamtkosten und Steuer aktualisieren
+                    $('#total-cost').text(`${response.total_cost.toFixed(2)} €`);
+                    $('#total-cost-header').text(`${response.total_cost.toFixed(2)} €`);
+                    $('#tax').text(`${response.tax.toFixed(2)} €`);
+                    $('#tax-header').text(`${response.tax.toFixed(2)} €`);
+                    $('#grand-total-header').text(`${response.grand_total.toFixed(2)} €`);
+                    $('#grand-total').text(`${response.grand_total.toFixed(2)} €`);
+                    $('#cart-count-header').text(`${response.total_items}`);
+                    $('#cart-count').text(`${response.total_items} Artikel im Warenkorb`);
+
+                    // Steuerdetails pro Steuersatz aktualisieren
+                    let taxDetailsHtml = '';
+                    for (let rate in response.tax_details) {
+                        let taxAmount = response.tax_details[rate].toFixed(2);
+                        taxDetailsHtml += `<p class="text-muted mb-1 d-flex justify-content-between">
+                            <span>MwSt./USt. ${rate} %:</span> <span class="text-muted mb-1 text-right">${taxAmount} €</span>  
+                        </p>`;
+                    }
+                    $('#tax-details-header').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
+                    $('#tax-details').html(taxDetailsHtml);  // Steuerdetails in den Container einfügen
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Fehler beim Abrufen der Gesamtkosten.');
+                    console.log('Fehler beim Abrufen der Gesamtkosten:', error);
+                }
+            });
+        }
+
+        // Initialisiere beim Laden der Seite
+        updateCartSummary();
+    });
+</script>
+
+
+
+        
+    
   
 
     {% endblock javascripts %}

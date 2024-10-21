@@ -14,6 +14,7 @@ from app.models.order import Order
 from app.models.lieferzeiten import Lieferzeiten
 from app.models.opening_hours import OpeningHours
 from geopy.geocoders import Nominatim
+from app.models.cities import City
 
 
 
@@ -23,6 +24,32 @@ from geopy.geocoders import Nominatim
 
 # Definiere den Blueprint
 client_bp = Blueprint('client_bp', __name__, template_folder='../templates/backend/client_templates')
+
+def calculate_total_cost_and_tax(cart):
+    """
+    Berechnet die Gesamtkosten, Steuern und Details für den Warenkorb.
+    """
+    total_cost = 0.0
+    total_tax = 0.0
+    tax_details = {}
+
+    for item in cart.values():
+        item_cost = item['price'] * item['quantity']
+        total_cost += item_cost
+
+        if item.get('tax_rate'):
+            tax_rate = item['tax_rate']
+            # Berechne die Steuer für dieses Produkt
+            item_tax = item_cost * (tax_rate / (100 + tax_rate))
+            total_tax += item_tax
+
+            # Steuersatz in die Steuerdetails aufnehmen
+            if tax_rate in tax_details:
+                tax_details[tax_rate] += item_tax
+            else:
+                tax_details[tax_rate] = item_tax
+
+    return total_cost, total_tax, tax_details
 
 # Definiere die erlaubten Dateitypen
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -528,65 +555,5 @@ def update_order_status(order_id):
 
 
 
-
-# Route für die Suchseite (search_page)
-@client_bp.route('/search_page', methods=['GET'])
-def search_page():
-    return render_template('backend/client_templates/search_page.html')
-
-# Route zum Suchen von Restaurants
-@client_bp.route('/search_restaurants', methods=['GET'])
-def search_restaurants():
-    search_address = request.args.get('search_address')
-
-    if not search_address:
-        flash('Bitte geben Sie eine Adresse ein.', 'warning')
-        return redirect(url_for('client_bp.search_page'))
-
-    # Geocoding der Adresse in Breitengrad und Längengrad
-    geolocator = Nominatim(user_agent="restaurant_search_app")
-    
-    try:
-        location = geolocator.geocode(search_address)
-    except Exception:
-        flash('Fehler bei der Geocodierung. Bitte versuchen Sie es erneut.', 'danger')
-        return redirect(url_for('client_bp.search_page'))
-
-    if location:
-        latitude = location.latitude
-        longitude = location.longitude
-
-        # Suche Restaurants in der Nähe basierend auf der Entfernung
-        nearby_clients = Client.query.filter(
-            db.func.sqrt(
-                db.func.pow(Client.latitude - latitude, 2) +
-                db.func.pow(Client.longitude - longitude, 2)
-            ) < 0.1  # Radius in km
-        ).all()
-
-        return render_template('backend/client_templates/search_results.html', clients=nearby_clients, search_address=search_address)
-    else:
-        flash('Adresse nicht gefunden. Bitte versuchen Sie es erneut.', 'warning')
-        return redirect(url_for('client_bp.search_page'))
-
-# Route zur Suche nach Restaurants anhand von Koordinaten
-@client_bp.route('/find_nearby_restaurants', methods=['GET'])
-def find_nearby_restaurants():
-    latitude = request.args.get('lat', type=float)
-    longitude = request.args.get('lon', type=float)
-
-    if latitude and longitude:
-        # Finde nahegelegene Restaurants basierend auf Koordinaten
-        nearby_clients = Client.query.filter(
-            db.func.sqrt(
-                db.func.pow(Client.latitude - latitude, 2) +
-                db.func.pow(Client.longitude - longitude, 2)
-            ) < 0.1  # Radius in km
-        ).all()
-
-        return render_template('backend/client_templates/search_results.html', clients=nearby_clients)
-    else:
-        flash('Standort konnte nicht ermittelt werden.', 'warning')
-        return redirect(url_for('client_bp.search_page'))
 
 

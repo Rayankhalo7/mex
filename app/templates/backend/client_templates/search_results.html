@@ -9,22 +9,31 @@
         <h1 class="page-title">Restaurants in Ihrer Nähe</h1>
 
         <div class="filter-container">
-            <input type="text" id="searchName" placeholder="Restaurantname suchen...">
-            <select id="filterCategory">
-                <option value="">Alle Kategorien</option>
-                <option value="Lebensmittel, Alkohol">Lebensmittel, Alkohol</option>
-                <option value="Italienische Pizza, Pasta">Italienische Pizza, Pasta</option>
-                <option value="Italienische Pizza, Döner">Italienische Pizza, Döner</option>
-                <option value="Burger, Amerikanische Pizza">Burger, Amerikanische Pizza</option>
-            </select>
-            <select id="filterRating">
-                <option value="">Alle Bewertungen</option>
-                <option value="4">4 Sterne & mehr</option>
-                <option value="3">3 Sterne & mehr</option>
-                <option value="2">2 Sterne & mehr</option>
-            </select>
-            <button id="applyFilters">Filter anwenden</button>
+            <div class="filter-row">
+                <input type="text" id="searchName" placeholder="Restaurantname suchen...">
+            </div>
+            <div class="filter-row">
+                <select id="filterCategory">
+                    <option value="">Alle Kategorien</option>
+                    <option value="Lebensmittel, Alkohol">Lebensmittel, Alkohol</option>
+                    <option value="Italienische Pizza, Pasta">Italienische Pizza, Pasta</option>
+                    <option value="Italienische Pizza, Döner">Italienische Pizza, Döner</option>
+                    <option value="Burger, Amerikanische Pizza">Burger, Amerikanische Pizza</option>
+                </select>
+                <select id="filterRating">
+                    <option value="">Alle Bewertungen</option>
+                    <option value="4">4 Sterne & mehr</option>
+                    <option value="3">3 Sterne & mehr</option>
+                    <option value="2">2 Sterne & mehr</option>
+                </select>
+            </div>
+            <div class="filter-row">
+                <button id="applyFilters">Filter anwenden</button>
+            </div>
         </div>
+        
+        
+        
         
         <section class="restaurant-list">
             <div class="container">
@@ -34,19 +43,58 @@
                         <img src="{% if client.photo %}{{ url_for('static', filename=client.photo) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" alt="{{ client.clientname }}" class="restaurant-img">
                         <div class="restaurant-details">
                             <h2>{{ client.clientname }}</h2>
-                            <p class="category">{{ client.street }} {{ client.house_number }}, {{ client.city.name }}</p>
+                            <p class="category">{{ client.street }} {{ client.house_number }}, {{ client.city_name }}</p>
                             <div class="rating">
                                 <span class="star">&#9733;</span>
-                                <span>{{ client.rating or '4.5' }}</span>
-                                <span>({{ client.reviews or '100+' }})</span>
+                                <span>{{ client.average_rating | round(1) }}</span>
+                                <h6 class="restaurant-detailed-ratings">
+                                    <!-- Durchschnittliche Bewertung anzeigen -->
+                                    <span class="badge bg-primary text-white rounded">
+                                        <i class="icofont-star"></i> {{ client.average_rating | round(1) }}
+                                    </span>
+                                    <!-- Anzahl der Bewertungen anzeigen -->
+                                    {{ client.total_ratings or "0" }} Bewertungen  
+                                    <i class="icofont-speech-comments"></i> 
+                                    <!-- Anzahl der Kommentare anzeigen -->
+                                    {{ client.total_reviews or "0" }} Kommentare
+                                </h6>
                             </div>
                             <div class="extra">
                                 <span class="icon">&#128337;</span>
-                                <span>Öffnungszeiten: {% if client.opening_hours|length > 0 %} {{ client.opening_hours[0].open_time.strftime('%H:%M') }} - {{ client.opening_hours[0].close_time.strftime('%H:%M') }} {% else %} Keine Angaben {% endif %}</span>
+                                <span>Öffnungszeiten: 
+                                    {% set weekday_map = {'Monday': 'Montag', 'Tuesday': 'Dienstag', 'Wednesday': 'Mittwoch', 'Thursday': 'Donnerstag', 'Friday': 'Freitag', 'Saturday': 'Samstag', 'Sunday': 'Sonntag'} %}
+                                    {% set current_day = weekday_map[current_time.strftime('%A')] %}
+                                    
+                                    {% set opening_hours = client_opening_hours[client.client_id] if client.client_id in client_opening_hours else [] %}
+                                    {% if opening_hours %}
+                                        <!-- Finde die Öffnungszeiten für den heutigen Tag -->
+                                        {% set today_opening_hours = opening_hours | selectattr('day_of_week', 'equalto', current_day) | first %}
+                                        
+                                        {% if today_opening_hours %}
+                                            <!-- Anzeige des Wochentags und der Öffnungszeiten -->
+                                            <i class="icofont-clock-time"></i>
+                                            <strong>{{ current_day }}:</strong> 
+                                            {{ today_opening_hours.open_time.strftime('%H:%M') }} - {{ today_opening_hours.close_time.strftime('%H:%M') }}
+                                            
+                                            <!-- Überprüfe, ob der Client geöffnet ist -->
+                                            {% set now_time = current_time.time() %}
+                                            {% if today_opening_hours.open_time <= now_time <= today_opening_hours.close_time %}
+                                                <span class="badge badge-success"> geöffnet</span>
+                                            {% else %}
+                                                <span class="badge badge-danger"> geschlossen </span>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="icofont-clock-time text-primary mr-2"></i> <strong> Öffnungszeiten:</strong> Heute geschlossen
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="icofont-clock-time"></i><strong> Öffnungszeiten:</strong> Keine Angaben
+                                    {% endif %}
+                                </span>
                             </div>
+                            
                         </div>
                         <div class="restaurant-action">
-                            <a href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}" class="btn-primary">Jetzt bestellen</a>
+                            <a href="{{ url_for('frontend_bp.client_detail', client_id=client.client_id) }}" class="btn-primary">Jetzt bestellen</a>
                         </div>
                     </div>
                     {% endfor %}

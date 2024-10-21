@@ -1,11 +1,129 @@
-<header class="header">
-    <nav>
-        <a href="#" class="logo">EssenBestellen</a>
-        <ul class="nav-links">
-            <li><a href="#">Startseite</a></li>
-            <li><a href="#">Restaurants</a></li>
-            <li><a href="#">Über uns</a></li>
-            <li><a href="#">Kontakt</a></li>
-        </ul>
-    </nav>
-</header>
+<nav class="navbar navbar-expand-lg navbar-dark osahan-nav" style="width: 100%; min-width: 100%;">
+    <div class="container" style="min-width: 1260px !important;">
+       <a class="navbar-brand" href="{{url_for('home')}}"><img alt="Mahlzeit Express" src="#"></a>
+       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+       <span class="navbar-toggler-icon"></span>
+       </button>
+       <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ml-auto" style="color: black !important;">
+             <li class="nav-item active">
+                <a class="nav-link" href="{{url_for('home')}}">Startseite <span class="sr-only">(current)</span></a>
+             </li>
+             <li class="nav-item">
+                <a class="nav-link" href="offers.html"><i class="icofont-sale-discount"></i> Angebote <span class="badge badge-warning">New</span></a>
+             </li>
+             <li class="nav-item dropdown">
+                <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Restaurants
+                </a>
+                
+             </li>
+             
+             <li class="nav-item dropdown">
+               {% if current_user.is_authenticated %}
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     <img class="nav-osahan-pic rounded-pill" alt="Generic placeholder image" src="{% if current_user.photo %}{{ url_for('static', filename=current_user.photo) }}{% else %}{{ url_for('static', filename='upload/no_image.jpg') }}{% endif %}"> Mein Account
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right shadow-sm border-0">
+                     <a class="dropdown-item" href="{{ url_for('user_bp.dashboard') }}"><i class="icofont-food-cart"></i> Dashboard</a>
+                     <a class="dropdown-item" href="{{ url_for('user_bp.logout') }}"><i class="icofont-sale-discount"></i> Logout</a>
+                  </div>
+               {% else %}
+                  <a class="nav-link" href="{{ url_for('user_bp.login') }}">Login</a>
+               {% endif %}
+            </li>
+            
+            <li class="nav-item dropdown dropdown-cart">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               <i class="fas fa-shopping-basket"></i> Warenkorb
+               <span class="badge badge-success"><span id="cart-count-header">{{ total_items }}</span></span>
+               </a>
+               <div class="dropdown-menu dropdown-cart-top p-0 dropdown-menu-right shadow-sm border-0">
+                  <div class="dropdown-cart-top-header p-4">
+                     {% if client %}
+    <img class="img-fluid mr-3 float-left" alt="logo" src="{% if client.photo %}{{ url_for('static', filename=client.photo.replace('\\', '/')) }}{% else %}{{ url_for('static', filename='frontend/themes/img/list/1.png') }}{% endif %}" alt="{{ client.clientname }}">
+{% else %}
+    <img class="img-fluid mr-3 float-left" alt="logo" src="{{ url_for('static', filename='frontend/themes/img/list/1.png') }}">
+{% endif %}
+
+                     <h6 class="mb-0">{{client.clientname}}</h6>
+                     {% if client.city %}
+                                    <p class="text-secondary mb-0">{{ client.street }} {{ client.house_number }}, {{ client.postal_code }} {{ client.city.name }}</p>
+                                {% else %}
+                                    <p class="text-secondary mb-0">Adresse nicht verfügbar</p>
+                                {% endif %}
+                     {% if client %}
+           <small><a class="text-primary font-weight-bold" href="{{ url_for('frontend_bp.client_detail', client_id=client.id) }}">Menü anzeigen</a></small>
+           {% else %}
+           <small>Kein Client zugeordnet</small>
+           {% endif %}
+                  </div>
+                  <div class="dropdown-cart-top-body border-top p-4">
+                     <div class="bg-white">
+                        {% for product_id, item in cart.items() %}
+                        <div class="gold-members d-flex align-items-center justify-content-between" data-product-id="{{ product_id }}" data-price-per-unit="{{ item['price'] }}">
+                            <div class="media align-items-top">
+                                <div class="mr-2">
+                                    <!-- Produktbild anzeigen -->
+                                    <img src="{{ url_for('static', filename='upload/client_produktbilder/' ~ item['client_id'] ~ '/' ~ item['image']) }}" alt="{{ item['name'] }}" style="width: 30px; height: 30px;" class="rounded-pill">
+                                </div>
+                                <div class="media-body">
+                                    <!-- Produktname anzeigen -->
+                                    <p class="mt-1 mb-0 text-black"><p class="mt-1 mb-0 text-black product-name" data-name="{{ item['name'] }}">{{ item['quantity'] }}x {{ item['name'] }}</p>
+                                </p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <!--<span class="count-number">
+                                    <button class="btn btn-outline-secondary btn-sm left dec mr-1"> <i class="icofont-minus"></i> </button>
+                                    <input class="count-number-input text-center" type="text" value="{{ item['quantity'] }}" readonly="" style="width: 40px;">
+                                    <button class="btn btn-outline-secondary btn-sm right inc ml-1"> <i class="icofont-plus"></i> </button>
+                  
+                                    <button class="btn btn-outline-danger btn-sm right remove ml-1"> <i class="icofont-trash"></i> </button>
+                                </span>-->
+                                <span class="ml-3 text font-weight-bold" style="color: black !important;">{{ '{:.2f}'.format(item['price'] * item['quantity']) }} €</span> <!-- Produktpreis x Menge mit zwei Dezimalstellen -->
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                     
+                  </div>
+                  <div class="dropdown-cart-top-footer border-top p-4">
+                     <div class="mb-2 bg-white clearfix">
+                        <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                            <span>Zwischensumme:</span> <span class="text" id="total-cost-header">{{ '{:.2f}'.format(total_cost) }} €</span>  <!-- Subtotal Element mit zwei Dezimalstellen -->
+                        </h6>
+                  
+                        <div id="tax-details-header">
+                            {% for rate, tax_amount in tax_details.items() %}
+                            <p class="text-muted mb-1 d-flex justify-content-between">
+                                <span>MwSt./USt. {{ rate }} %:</span> <span class="text-muted mb-1 text-right">{{ '{:.2f}'.format(tax_amount) }} €</span>  
+                            </p>
+                            {% endfor %}
+                        </div>
+                        
+                        
+                        
+                        <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                            <span>MwSt./USt. Insgesamt:</span> <span class="text" id="tax-header">{{ '{:.2f}'.format(total_tax) }} €</span>  
+                        </h6>
+                  
+                         
+                  <hr>
+                        <h6 class="font-weight-bold text-right mb-2 d-flex justify-content-between">
+                            <span>Gesamtsumme:</span> <span class="text" id="grand-total-header">{{ '{:.2f}'.format(total_cost) }} €</span>  
+                        </h6>
+                        <p class="text-muted mb-1 text-right">Inkl. MwSt./USt.</p>
+                    </div>  
+                  </div>
+                  <div class="dropdown-cart-top-footer border-top p-2">
+                     
+                     <a href="{{ url_for('checkout_bp.checkout') }}" class="btn btn-success btn-block btn-lg">Zur Kasse gehen <i class="icofont-long-arrow-right"></i></a>
+                  </div>
+               </div>
+               
+            </li>
+          </ul>
+       </div>
+    </div>
+ </nav>

@@ -1,44 +1,41 @@
 <!doctype html>
 <html lang="en">
    <head>
-      <!-- Required meta tags -->
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <meta name="description" content="Askbootstrap">
-      <meta name="author" content="Askbootstrap">
-      <meta name="csrf-token" content="{{ csrf_token() }}">
-      <title>Meine Profil</title>
-      <!-- Favicon Icon -->
-      <link rel="icon" type="image/png" href="img/favicon.png">
-      <!-- Bootstrap core CSS-->
-      
-      <link href="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-      <!-- Font Awesome-->
-      <link href="{{ url_for('static', filename='frontend/themes/vendor/fontawesome/css/all.min.css')}}" rel="stylesheet">
-      <!-- Font Awesome-->
-      <link href="{{ url_for('static', filename='frontend/themes/vendor/icofont/icofont.min.css') }}" rel="stylesheet">
-      <!-- Select2 CSS-->
-      <link href="{{ url_for('static', filename='frontend/themes/vendor/select2/css/select2.min.css')}}" rel="stylesheet">
-      <!-- Custom styles for this template-->
-      <link href="{{ url_for('static', filename='frontend/themes/css/osahan.css') }}" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Askbootstrap">
+    <meta name="author" content="Askbootstrap">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Meine Profil</title>
+    <!-- Favicon Icon -->
+    <link rel="icon" type="image/png" href="img/favicon.png">
 
-      <!-- Owl Carousel -->
-      <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.css')}}">
-      <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.theme.css')}}">
+    <!-- Toastr CSS -->
+    
 
-      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+    <!-- Bootstrap core CSS-->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/fontawesome/css/all.min.css')}}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/icofont/icofont.min.css') }}" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="{{ url_for('static', filename='frontend/themes/vendor/select2/css/select2.min.css')}}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='frontend/themes/css/osahan.css') }}" rel="stylesheet">
 
-      
+    <!-- Owl Carousel -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.theme.css')}}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
 
-      
-
-<style>
-    .custom-toast {
-    top: 120px !important;  /* Bewegt die Benachrichtigung 250px von oben nach unten */
-}
-
-</style>
+    <style>
+        .custom-toast {
+            top: 120px !important; /* Bewegt die Benachrichtigung nach unten */
+        }
+    </style>
    </head>
    <body>
       <div class="homepage-header">
@@ -80,58 +77,55 @@
 
 
 
-      {% block javascripts %}
-  <!-- jQuery -->
-  <script src="{{ url_for('static', filename='frontend/themes/vendor/jquery/jquery-3.3.1.slim.min.js')}}"></script>
-  <!-- Bootstrap core JavaScript-->
-  <script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-  <!-- Select2 JavaScript-->
-  <script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
-  
-  <!-- Owl Carousel -->
-  <script src="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.js')}}"></script>
-  
-  <!-- Custom scripts for all pages-->
-  <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
-  
-  
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  
-  <script type="text/javascript">
-    // Toastr options configuration
-    toastr.options = {
-        "closeButton": true,
-        "progressBar": true,
-        "positionClass": "toast-top-right custom-toast",  // Benachrichtigungen oben rechts mit benutzerdefinierter Klasse
-        "timeOut": "2500",  // Benachrichtigung bleibt 3 Sekunden sichtbar
-        "extendedTimeOut": "1000"
-    }
-  
-    // Überprüfe, ob es geflashte Nachrichten gibt
-    {% with messages = get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    var type = "{{ category }}";  // Kategorie: success, info, warning, error
-    switch(type){
-        case 'info':
-            toastr.info("{{ message }}");
-            break;
-        case 'success':
-            toastr.success("{{ message }}");
-            break;
-        case 'warning':
-            toastr.warning("{{ message }}");
-            break;
-        case 'error':
-            toastr.error("{{ message }}");
-            break;
-    }
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-  </script>
+      
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+      <!-- Toastr JavaScript -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+      
+
+      <!-- Bootstrap core JavaScript -->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/select2/js/select2.min.js')}}"></script>
+      <!-- Owl Carousel -->
+      <script src="{{ url_for('static', filename='frontend/themes/vendor/owl-carousel/owl.carousel.js')}}"></script>
+      <!-- Custom scripts for all pages -->
+      <script src="{{ url_for('static', filename='frontend/themes/js/custom.js')}}"></script>
+
+      <script type="text/javascript">
+          // Toastr options configuration
+          toastr.options = {
+              "closeButton": true,
+              "progressBar": true,
+              "positionClass": "toast-top-right custom-toast",
+              "timeOut": "2500",
+              "extendedTimeOut": "1000"
+          }
+
+          // Überprüfe, ob es geflashte Nachrichten gibt
+          {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+          {% for category, message in messages %}
+          var type = "{{ category }}";
+          switch(type){
+              case 'info':
+                  toastr.info("{{ message }}");
+                  break;
+              case 'success':
+                  toastr.success("{{ message }}");
+                  break;
+              case 'warning':
+                  toastr.warning("{{ message }}");
+                  break;
+              case 'error':
+                  toastr.error("{{ message }}");
+                  break;
+          }
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+      </script>
  
 
  <script>
@@ -281,13 +275,26 @@ $.ajaxSetup({
     });
 </script>
 
-
+<script>
     
+</script>
+
+
+<script>
+    document.querySelector('.form-noborder').addEventListener('submit', function(event) {
+        var searchAddress = document.getElementById('search_address').value.trim();
+        if (!searchAddress) {
+            event.preventDefault(); // Verhindert das Absenden des Formulars
+            toastr.warning('Bitte geben Sie eine Adresse ein.'); // Toastr-Warnung anzeigen
+        }
+    });
+</script>
+
         
     
   
   <!-- JavaScript für das dynamische Hinzufügen und Entfernen von Produkten -->
   
-{% endblock javascripts %}
+
    </body>
 </html>
